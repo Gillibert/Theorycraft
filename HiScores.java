@@ -68,7 +68,7 @@ public boolean addScore(Score news,boolean disp)
 	if(res)
 		{
 		list.add(news);
-		if(disp) Game.MW.addLog(Local.CONGRATULATIONS_HISCORES);
+		if(disp) Game.MW.addLog(String.format(Local.CONGRATULATIONS_HISCORES,news.name));
 		save();
 		}
 	return res;

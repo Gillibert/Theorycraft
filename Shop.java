@@ -20,7 +20,7 @@ public Shop(Player p)
 	inventory = new ArrayList<Item>();
 	for(int i=0; i<nbitem; i++)
 		{
-			it = new Item(level);
+			it = new Item(level,p,Item.ITEM_SHOP);
 		    inventory.add(it);
 		}
 	}

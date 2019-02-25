@@ -63,7 +63,7 @@ public class MenuWindow extends javax.swing.JDialog  {
     public void refresh()
     {
 	// Directory path here
-	String path = "."; 
+	String path = "./heroes/"; 
 	String files;
 	File folder = new File(path);
 	File[] listOfFiles = folder.listFiles(); 
@@ -84,16 +84,18 @@ public class MenuWindow extends javax.swing.JDialog  {
 		sauvegardes.setSelectedIndex(0);
 	refresh_buttons();
     }
-
-	public void hiscores()
-	{
-		
-	}
 	
     public void effacer()
     {
-	File f = new File((String)save_list.get(sauvegardes.getSelectedIndex()));
+	String fn = (String)save_list.get(sauvegardes.getSelectedIndex());
+	File f = new File("heroes/" + fn);
 	f.delete();
+	
+	int dotPos = fn.lastIndexOf(".");
+	String strFilename = fn.substring(0, dotPos);
+	String strNewFileName = strFilename + ".log";
+	File f2 = new File("heroes/" + strNewFileName);
+	f2.delete();
     }
 
     public void creer()
@@ -111,7 +113,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 		
 		StaticItem.init(universe);
 		Monster.SetOptimalDistribution(universe);
-		if(Game.DEBUG) universe.joueur.giveStuff();
+		if(Game.DEBUG_MODE_GIFT) universe.joueur.giveStuff();
 		
 		if (Game.MW == null)
 		{
@@ -131,7 +133,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 	InputStream file = null;
 	try{
 		Universe universe;
-	    file = new FileInputStream((String)save_list.get(sauvegardes.getSelectedIndex()));
+	    file = new FileInputStream("heroes/" + (String)save_list.get(sauvegardes.getSelectedIndex()));
 	    InputStream buffer = new BufferedInputStream( file );
 		ObjectInput input = new ObjectInputStream ( buffer );
 	    universe = (Universe)input.readObject();
@@ -151,7 +153,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 	InputStream file = null;
 	try{
 		Universe universe;
-	    file = new FileInputStream((String)save_list.get(sauvegardes.getSelectedIndex()));
+	    file = new FileInputStream("heroes/" + (String)save_list.get(sauvegardes.getSelectedIndex()));
 	    InputStream buffer = new BufferedInputStream( file );
 	    ObjectInput input = new ObjectInputStream ( buffer );
 	    universe = (Universe)input.readObject();

@@ -13,8 +13,8 @@ static void init()
 	list.add(new Challenge(Local.DUNGEONS_AND_DRAGONS, 0,20));
 	list.add(new Challenge(Local.INFERNO, 0,60));
 	list.add(new Challenge(Local.THIS_IS_SPARTA, 0,300));
-	list.add(new Challenge(Local.SKY_IS_THE_LIMIT, 0,2000));
 	list.add(new Challenge(Local.OVER_9000, 0,9000));
+	list.add(new Challenge(Local.SKY_IS_THE_LIMIT, 0,2000000000));
 	list.add(new Challenge(Local.BEGGAR, 1,			10000));
 	list.add(new Challenge(Local.GROCER, 1,			100000));
 	list.add(new Challenge(Local.TRADER, 1,			1000000));

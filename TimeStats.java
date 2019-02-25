@@ -19,7 +19,7 @@ public static int ACTIVITY_PIEGE = 8;
 public static int ACTIVITY_FUITE = 9;
 public static int ACTIVITY_PENALTY = 10;
 
-public static int NB_GAIN = 7;
+public static int NB_MONEY = 12;
 public static int GAIN_DROP = 0;
 public static int GAIN_RENTE = 1;
 public static int GAIN_SELL_BASE = 2;
@@ -27,6 +27,11 @@ public static int GAIN_SELL_MAGIC = 3;
 public static int GAIN_SELL_RARE = 4;
 public static int GAIN_SELL_MAT = 5;
 public static int GAIN_SELL_OTHER = 6;
+public static int LOSS_DEATH = 7;
+public static int LOSS_BUY_BASE = 8;
+public static int LOSS_BUY_MAT = 9;
+public static int LOSS_BUY_ORB = 10;
+public static int LOSS_BUY_OTHER = 11;
 
 public static int NB_SOURCE_XP = 3;
 public static int XP_MONSTER = 0;
@@ -68,7 +73,7 @@ private double true_total_time;
 public TimeStats()
 {
 	events_base = new double[NB_EVENT];
-	events_money = new double[NB_GAIN];
+	events_money = new double[NB_MONEY];
 	
 	true_total_time = 0;
 	total_time = 0;
@@ -76,7 +81,7 @@ public TimeStats()
 	data.add(new double[NB_ACTIVITY]);
 	
 	data_money = new  ArrayList<double[]>();
-	data_money.add(new double[NB_GAIN]);
+	data_money.add(new double[NB_MONEY]);
 	
 	data_xp = new  ArrayList<double[]>();
 	data_xp.add(new double[NB_SOURCE_XP]);
@@ -86,7 +91,11 @@ public String eventStats()
 {
 	double gain_total = events_money[GAIN_DROP]+events_money[GAIN_RENTE]+events_money[GAIN_SELL_BASE]+events_money[GAIN_SELL_MAGIC]+
 		events_money[GAIN_SELL_RARE]+events_money[GAIN_SELL_MAT]+events_money[GAIN_SELL_OTHER];
+		
+	double perte_total = events_money[LOSS_DEATH]+events_money[LOSS_BUY_BASE]+events_money[LOSS_BUY_MAT]+events_money[LOSS_BUY_ORB]+
+		events_money[LOSS_BUY_OTHER];
 	String res = Local.FIGHT_STATS;
+
 	res +=String.format(Local.FIGHT_STATS_LIST,
 	events_base[EVENT_FIGHT_ATTEMPT],events_base[EVENT_FIND_MONSTER],
 	100.0*events_base[EVENT_FIGHT_ATTEMPT]/events_base[EVENT_FIND_MONSTER],
@@ -118,13 +127,19 @@ public String eventStats()
 	events_base[EVENT_DROP_MAT],events_base[EVENT_DROP_ORB],
 	
 	gain_total,
+	perte_total,
 	events_money[GAIN_DROP], 100.0*events_money[GAIN_DROP]/gain_total,
 	events_money[GAIN_RENTE], 100.0*events_money[GAIN_RENTE]/gain_total,
 	events_money[GAIN_SELL_BASE], 100.0*events_money[GAIN_SELL_BASE]/gain_total,
 	events_money[GAIN_SELL_MAGIC], 100.0*events_money[GAIN_SELL_MAGIC]/gain_total,
 	events_money[GAIN_SELL_RARE], 100.0*events_money[GAIN_SELL_RARE]/gain_total,
 	events_money[GAIN_SELL_MAT], 100.0*events_money[GAIN_SELL_MAT]/gain_total,
-	events_money[GAIN_SELL_OTHER], 100.0*events_money[GAIN_SELL_OTHER]/gain_total
+	events_money[GAIN_SELL_OTHER], 100.0*events_money[GAIN_SELL_OTHER]/gain_total,
+	events_money[LOSS_DEATH], 100.0*events_money[LOSS_DEATH]/perte_total,
+	events_money[LOSS_BUY_BASE], 100.0*events_money[LOSS_BUY_BASE]/perte_total,
+	events_money[LOSS_BUY_MAT], 100.0*events_money[LOSS_BUY_MAT]/perte_total,
+	events_money[LOSS_BUY_ORB], 100.0*events_money[LOSS_BUY_ORB]/perte_total,
+	events_money[LOSS_BUY_OTHER], 100.0*events_money[LOSS_BUY_OTHER]/perte_total
 	);
 	res += Local.UL_END;
 	return res;
@@ -150,7 +165,7 @@ public void addActivity(double time, int num)
 		{
 			double[] act = data.get(data.size()-1);
 			data.add(new double[NB_ACTIVITY]);
-			data_money.add(new double[NB_GAIN]);
+			data_money.add(new double[NB_MONEY]);
 			data_xp.add(new double[NB_SOURCE_XP]);
 			total_time = 0;
 		}

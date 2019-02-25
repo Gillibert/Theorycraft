@@ -4,7 +4,7 @@ class Monster extends Player {
 //************* Table des monstres ***************
 // Statistiques principales des monstres
     // IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
-    // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14) RESF()
+    // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12)
     // RESF(15) MF(16) RF(17) QALF(18) QTYF(19) POWF(20) GF(21)
     // ED_MV(22) ED_ANI(23) ED_HUM(24) ED_PV(25) ED_DEM(26) ED_CHAMP(27)
     // ESTI(28) FLEE(29) FLEE_SPD(30) INIT(31)
@@ -71,7 +71,7 @@ public static String[] fa_f = {"faiblarde","chétive","rabougrie","rachitique","
 public static String[] fo_m = {"sanguinaire","féroce","meurtrier","tueur","cruel","géant"};
 public static String[] fo_f = {"sanguinaire","féroce","meurtrière","tueuse","cruelle","géante"};
 
-public static String[] adj_m = {"le déloyal", "le fourbe", "l'hypocrite", "l'insidieux", "le perfide", "le sourd", "le tortueux", "le traître", "le sadique", "le sournois", "le barbare", "le cruel", "le pervers", "le tortionnaire", "le vicieux", "le pestiféré", "le maudit", "le damné"};
+public static String[] adj_m = {"l'abominable", "le déloyal", "le fourbe", "l'hypocrite", "l'insidieux", "le perfide", "le tortueux", "le traître", "le sadique", "le sournois", "le barbare", "le cruel", "le pervers", "le dépravé", "l'exécuteur", "le tortionnaire", "le vicieux", "le pestiféré", "le maudit", "le damné", "l'odieux", "le tourmenteur", "le tyrannique", "le sanguinaire"};
 
 public static MonsterSet[] ZooByLevel;
 public static String[] MonsterNames;
@@ -270,8 +270,6 @@ new Monster("Nazgûl",      31+2*34, 0, new int[]{1,0,10},true)
 };
 
 
-//(12+3 x+0.15 x^1.9)
-
 public ArrayList<Item> drop(Player p)
 {
   ArrayList<Item> res = new ArrayList<Item>();
@@ -281,7 +279,7 @@ public ArrayList<Item> drop(Player p)
   if (tags[5]) count = 2*count; // Champion
   for(int i=0; i<count; i++)
 	{
-	    res.add(new Item(drplev,p));
+	    res.add(new Item(drplev,p,Item.ITEM_DROP));
 	}
 return res;
 }
@@ -326,14 +324,14 @@ public static void initZoo()
     }
 
 // Crée un monstre de niveau lev au hazard
-public Monster(int lev, Universe u)
+public Monster(int lev, Universe u, int zone)
 	{
 	super(u,true);
 	stats_with_bonus = new double[nb_stats];
 	stats = new double[nb_stats];
 
 	// Sélectionne les monstres de bon niveau
-	double max_thorical_level = u.get_zone_max_level(18);
+	double max_thorical_level = u.get_zone_max_level(u.map.zonesR.size()-1);
 	int normalized_lev = (int)(100*(lev/max_thorical_level));
 	if(normalized_lev>=99) normalized_lev = 99;
 	ArrayList<Monster> t_list = ZooByLevel[normalized_lev].list;
@@ -355,7 +353,7 @@ public Monster(int lev, Universe u)
 
 	double pts;
 
-	if(Math.random() > u.proba_champion()) // Normal
+	if(Math.random() > u.proba_champion() * u.map.boss_coeff.get(zone))
 		{
 		tags[5]=false;
 		pts = u.monster_points_for_level(level);
@@ -365,7 +363,7 @@ public Monster(int lev, Universe u)
 		tags[5]=true;
 		name = StaticItem.nameGenerator.getName() + " " + adj_m[(int)(Math.random()*adj_m.length)];
 
-		level = (int)u.boss_level(level);
+		level = (int)u.niveau_champion(level);
 		pts = u.monster_points_for_level(level)*1.5;
 		}
 	
@@ -415,13 +413,11 @@ public static double EstimateMonsterVictory(Player p, double nbsample)
 	return mob_victory/nbsample;
 }
 
-// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7) VDV(8) VITA(9) CON(10)
-// ED_HUM(24) INIT(31) IMUN_FINAL(32) EPIN(34) REP(35)
 public static double ImproveMonster2(Player p,double best_mob_victory,double finesse)
 {
 	double best_mob_victory_backup = best_mob_victory;
-	int source[] = new int[]{0,1,2,3,4,5,6,7,8,9,10,24,31,32,34,35};
-	int target[] = new int[]{8,31,34,35};
+	int source[] = new int[]{Universe.IAS,Universe.DMG,Universe.REDUC,Universe.ABS,Universe.ESQ,Universe.PRC,Universe.LCK,Universe.CRT,Universe.VDV,Universe.VITA,Universe.CON,Universe.ED_HUM,Universe.INIT,Universe.IMUN_FINAL,Universe.EPIN,Universe.FIRST_STRIKE};
+	int target[] = new int[]{Universe.VDV,Universe.INIT,Universe.EPIN,Universe.REP};
 
 	double pts;
 	double backup[] = new double[nb_stats];
@@ -445,12 +441,12 @@ public static double ImproveMonster2(Player p,double best_mob_victory,double fin
 			
 			if (idx==target.length)
 			{
-				// IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24)
+				//IAS DMG PRC LCK CRT ED_HUM INIT FIRST_STRIKE
 				for(int i=0; i<50; i++) DistToDPS(p, pts/50.0);
 			}
 			else if (idx==target.length+1)
 			{
-				//REDUC(2) ABS(3) ESQ(4) VITA(9) CON(10) IMUN_FINAL(32)
+				//VITA, REDUC, CON, ABS, ESQ, IMUN_FINAL
 				for(int i=0; i<50; i++) DistToHP(p, pts/50.0, true);
 			}
 			else if (idx < target.length)
@@ -562,20 +558,28 @@ public static double AverageDPH(Player p1, Player p2)
 		Math.min(dm_crit*defender_reduc-defender_absorption,p2_vie)*(crit_proba);
 	return dm_per_att;
 }
-// Approximation pour les combats courts
-// Todo estimer le nombre de coups dans un combat
-public static double AttPerSec(Player p1)
-{
-	return 1.0/(1.0/p1.att_per_sec()+ p1.initiative());
-}
 
-// Prends en compte (p1) : IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24)
-// Prends en compte (p2) : REDUC(2) ABS(3) ESQ(4)
-public static double AverageDPS(Player p1, Player p2)
+public static double NbCoupsMoyens(Player p1, Player p2)
 {
 	double dph = AverageDPH(p1, p2);
 	double defender_esquive = p2.universe.esquive_proba(p2.ESQ(),p1.PRC());
-	return dph*(1.0-defender_esquive)*AttPerSec(p1);
+	return Math.max(p2.vie_max() / (dph*(1.0-defender_esquive)),1.0);
+}
+
+// Approximation pour les combats courts
+public static double AttPerSec(Player p1, Player p2)
+{
+	return 1.0/(1.0/p1.att_per_sec()+ p1.initiative()/NbCoupsMoyens(p1,p2));
+}
+
+// Prends en compte (p1) : IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24) INIT(31) FIRST_STRIKE(53)
+// Prends en compte (p2) : REDUC(2) ABS(3) ESQ(4)
+public static double AverageDPS(Player p1, Player p2)
+{
+	double nbcm = NbCoupsMoyens(p1,p2);
+	double dph = AverageDPH(p1, p2) * (1.0 + (p1.multi_premier_coup()-1.0) / nbcm);
+	double defender_esquive = p2.universe.esquive_proba(p2.ESQ(),p1.PRC());
+	return dph*(1.0-defender_esquive)*AttPerSec(p1,p2);
 }
 
 // Prends en compte (p1) : REDUC(2) ABS(3) ESQ(4) VITA(9) CON(10) IMUN_FINAL(32)
@@ -584,6 +588,7 @@ public static double AverageDPS(Player p1, Player p2)
 public static double AverageTimeAlive(Player p1, Player p2)
 {
 	double vie = p1.vie_max();
+	//System.out.println(String.format("vie_max = %f (VITA=%f CON=%f)",vie,p1.VITA(),p1.CON()));
 	
 	// Coups ennemis
 	double esquive = p1.universe.esquive_proba(p1.ESQ(),p2.PRC());
@@ -601,13 +606,13 @@ public static double AverageTimeAlive(Player p1, Player p2)
 	System.out.println("average_dmg_per_given_attack = " + average_dmg_per_given_attack);
 	System.out.println("average_dmg_per_attack = " + average_dmg_per_attack);*/
 	
-	return vie / (average_dmg_per_attack*AttPerSec(p2) + average_dmg_per_given_attack*AttPerSec(p1));
+	return vie / (average_dmg_per_attack*AttPerSec(p2,p1) + average_dmg_per_given_attack*AttPerSec(p1,p2));
 }
 
 public static void DistToDPS(Player p, double pts)
 {
-	//IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24) INIT(31)
-	int target[] = new int[]{0,1,5,6,7,24,31};
+	//IAS DMG PRC LCK CRT ED_HUM INIT FIRST_STRIKE
+	int target[] = new int[]{0,1,5,6,7,24,31,53};
 	
 	int index;
 	double a_score;
@@ -647,19 +652,19 @@ public static void dispTot(String str, Player p)
 	
 	System.out.println(str + " DPS:" + dps + " HP:" + hp + " total:" + tot);
 }
+
 public static void DistToHP(Player p, double pts, boolean full)
 {
+	//VITA, REDUC, CON, ABS, ESQ, IMUN_FINAL
 	int target[];
 	int best_index;
 	if(full)
 	{
-		//REDUC(2) ABS(3) ESQ(4) VITA(9) CON(10) IMUN_FINAL(32)
-		target = new int[]{2,3,4,9,10,32};
+		target = new int[]{Universe.VITA, Universe.REDUC, Universe.CON, Universe.ABS, Universe.ESQ, Universe.IMUN_FINAL};
 	}
 	else
 	{
-		//REDUC(2) ABS(3) VITA(9) CON(10)
-		target = new int[]{9,2,3,10};
+		target = new int[]{Universe.VITA, Universe.REDUC, Universe.CON};
 	}
 	
 	int index;

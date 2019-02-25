@@ -11,6 +11,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 
     private JEditorPane infos;
     private JScrollPane scroll;
+	private int displayType;
 	
     public InfoWindow(Player J) {
 	super();
@@ -23,23 +24,47 @@ public class InfoWindow extends javax.swing.JDialog  {
 		Joueur = J;
 		refresh();
 	}
-
 	public String infoHTML()
 	{
+		if(displayType==0) return infoCraftHTML();
+		if(displayType==1) return infoPlayerStatsHTML();
+		return infoUniverseHTML();
+	}
+	
+	public String infoCraftHTML()
+	{
 		String res = Local.HTML_BODY;
-		res += Local.H2_PLAYER_STATISTICS_H2;
+		res += Local.H2_CRAFTING_H2;
+		res += Item.CraftDesc(Joueur);
+		res += Local.BODY_HTML_END;
+		return res;
+	}
+	
+	public String infoPlayerStatsHTML()
+	{
+		String res = Local.HTML_BODY;
+		res += Local.H2S + Local.PLAYER_STATISTICS + Local.H2E;
 		res +=  String.format(Local.PLAYER_STATISTICS_LIST,Joueur.name, Joueur.level, Joueur.defi.name,
-		Joueur.temps_total,Joueur.money,Joueur.charge,Joueur.charge_max(),Joueur.total_skill_points());
+		Joueur.temps_total,Joueur.money,Joueur.charge,Joueur.charge_max(),Joueur.total_skill_points(),Joueur.points_divins_totaux(),Joueur.orbes_investits_en_points_divins);
 		res += Joueur.t_stats.eventStats();
+		res += Local.BODY_HTML_END;
+		return res;
+	}
+	public String infoUniverseHTML()
+	{
+		String res = Local.HTML_BODY;
 		res += String.format(Local.UNIVERSE_INFORMATION_LIST,
 			Joueur.universe.seed,
 			Joueur.universe.number_of_travel,
+			Joueur.MAX_LEVEL,
 			Joueur.universe.vie_depart(),
 			Joueur.universe.points_initiaux(),
+			Joueur.universe.efficacite_base(),
 			Joueur.universe.puissance_ench_sup(),
-			100 * Joueur.universe.penalty_for_bad_material()*(1.0 - 0.5 * Joueur.universe.static_plage_random()),
-			100 * Joueur.universe.penalty_for_bad_material()*(1.0 + 0.5 * Joueur.universe.static_plage_random()),
-			100 * Joueur.universe.penalty_for_bad_material(),
+			100 * Joueur.universe.qualite_max(),
+			-100 * Joueur.universe.penalty_for_bad_material()*(1.0 - 0.5 * Joueur.universe.static_plage_random()),
+			-100 * Joueur.universe.penalty_for_bad_material()*(1.0 + 0.5 * Joueur.universe.static_plage_random()),
+			-100 * Joueur.universe.penalty_for_bad_material(),
 			1.0 - 0.5 * Joueur.universe.static_plage_random(), 
 			1.0 + 0.5 * Joueur.universe.static_plage_random(),
 			100*Joueur.universe.base_gold_penalty_for_death(),
@@ -48,7 +73,9 @@ public class InfoWindow extends javax.swing.JDialog  {
 			100*Joueur.universe.proba_champion(),
 			Joueur.universe.base_penalty_for_new_challenge(),
 			Joueur.universe.travel_cost(),
-			Joueur.universe.base_penalty_for_travel()
+			Joueur.universe.base_penalty_for_travel(),
+			Joueur.universe.base_penalty_for_dimensional_travel(),
+			100*Joueur.universe.proba_ressource()
 			);
 			
 			res += Local.H3_AVAILABLE_OBJECTS_H3;
@@ -86,7 +113,10 @@ public class InfoWindow extends javax.swing.JDialog  {
 			res += Local.DL;
 			for(int i=0; i< Joueur.universe.map.zonesR.size(); i++)
 			{
-			res += String.format(Local.DT_ZONE,Joueur.universe.map.zonesName.get(i),Joueur.universe.get_zone_level(i),Joueur.universe.get_zone_max_level(i));
+			String no_loot = "";
+			if (i<2) no_loot = Local.NO_LOOT_Z;
+			res += String.format(Local.DT_ZONE,Joueur.universe.map.zonesName.get(i),Joueur.universe.get_zone_level(i),Joueur.universe.get_zone_max_level(i),no_loot);
+			res += String.format(Local.TRAPS_AND_CHAMPION_PROBABILITY,100*Joueur.universe.proba_rencontrer_piege()*Joueur.universe.map.trap_coeff.get(i),100*Joueur.universe.proba_champion()*Joueur.universe.map.boss_coeff.get(i));
 			res += String.format(Local.MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM,Joueur.universe.get_zone_level(i),
 			Joueur.universe.monster_points_for_level(Joueur.universe.get_zone_level(i)),
 			(Joueur.universe.get_zone_level(i)+Joueur.universe.get_zone_max_level(i))/2.0,
@@ -94,24 +124,36 @@ public class InfoWindow extends javax.swing.JDialog  {
 			Joueur.universe.get_zone_max_level(i),
 			Joueur.universe.monster_points_for_level(Joueur.universe.get_zone_max_level(i)));
 			res += String.format(Local.CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM,
-			(int)Joueur.universe.boss_level(Joueur.universe.get_zone_level(i)),
-			Joueur.universe.monster_points_for_level((int)Joueur.universe.boss_level(Joueur.universe.get_zone_level(i)))*1.5,
-			(Joueur.universe.boss_level(Joueur.universe.get_zone_level(i))+Joueur.universe.boss_level(Joueur.universe.get_zone_max_level(i)))/2.0,
-			Joueur.universe.monster_points_for_level((Joueur.universe.boss_level(Joueur.universe.get_zone_level(i))+Joueur.universe.boss_level(Joueur.universe.get_zone_max_level(i)))/2.0)*1.5,
-			(int)Joueur.universe.boss_level(Joueur.universe.get_zone_max_level(i)),
-			Joueur.universe.monster_points_for_level((int)Joueur.universe.boss_level(Joueur.universe.get_zone_max_level(i)))*1.5);
+			(int)Joueur.universe.niveau_champion(Joueur.universe.get_zone_level(i)),
+			Joueur.universe.monster_points_for_level((int)Joueur.universe.niveau_champion(Joueur.universe.get_zone_level(i)))*1.5,
+			(Joueur.universe.niveau_champion(Joueur.universe.get_zone_level(i))+Joueur.universe.niveau_champion(Joueur.universe.get_zone_max_level(i)))/2.0,
+			Joueur.universe.monster_points_for_level((Joueur.universe.niveau_champion(Joueur.universe.get_zone_level(i))+Joueur.universe.niveau_champion(Joueur.universe.get_zone_max_level(i)))/2.0)*1.5,
+			(int)Joueur.universe.niveau_champion(Joueur.universe.get_zone_max_level(i)),
+			Joueur.universe.monster_points_for_level((int)Joueur.universe.niveau_champion(Joueur.universe.get_zone_max_level(i)))*1.5);
 			}
 			res += Local.DL_END;
-		
-		res += Local.H2_CRAFTING_H2;
-		res += Item.CraftDesc(Joueur);
 		
 		res += Local.BODY_HTML_END;
 		return res;
 	}
 	
-	public void montre()
+	public void montreInfoCraft()
 	{
+	displayType = 0;
+	refresh();
+	this.setVisible(true);
+	}
+	
+	public void montrePlayerStats()
+	{
+	displayType = 1;
+	refresh();
+	this.setVisible(true);
+	}
+	
+	public void montreInfoUniverse()
+	{
+	displayType = 2;
 	refresh();
 	this.setVisible(true);
 	}

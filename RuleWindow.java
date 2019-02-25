@@ -309,7 +309,6 @@ public class RuleWindow extends javax.swing.JDialog  {
 		is_shopping_rule.setSelected(current_rule.shopping_rule);
 		}
 	
-	// TODO faire des test
 	private void update_current_rule() 
 	{
 		current_rule.name = rule_name.getText();

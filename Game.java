@@ -1,56 +1,19 @@
-import java.util.ArrayList;
+import java.util.*;
+import java.io.*;
 
 public class Game {
 
     public static MainWindow MW;
 	public static MenuWindow MENU;
 	public static ChallengeWindow CW;
-	
-    public static boolean DEBUG = false;
-    public static boolean FAST = true;
+	public static boolean DEBUG_MODE_MAX_LOAD = false;
+    public static boolean DEBUG_MODE_GIFT = false;
+    public static boolean REAL_TIME = true;
 	public static boolean FILL_SCORE = false;
+	public static boolean LOG_IN_FILE = true;
 	public static int LANG = 0;
 	public static HiScore HI;
 
-	public static void findCoolUniverse()
-	{
-		for(int i=0; i<10000; i++)
-		{
-		Universe U = new Universe(i);
-		if(U.points_initiaux() < 20) continue;
-		if(U.get_zone_max_level(0) < 20) continue;
-		
-		Player play = new Player(U, true);
-		play.stats_with_bonus = new double[Player.nb_stats];
-		play.stats_with_bonus[Universe.REDUC] = 10*U.classic_points_par_niveau(0);
-		play.stats_with_bonus[Universe.ABS] = 40*U.classic_points_par_niveau(0);
-		play.stats_with_bonus[Universe.EPIN] = 20*U.classic_points_par_niveau(0);
-		play.stats_with_bonus[Universe.TRAP_DET] =10*U.classic_points_par_niveau(0);
-		
-		play.tags = new boolean[Player.nb_tags];
-	    for(int t=0; t<Player.nb_tags; t++) play.tags[t]=false;
-	    play.tags[2]=true; // Humain
-		//double pp = (1.0-play.proba_trouver_piege(50))*U.proba_rencontrer_piege();
-		
-		double epinedmg = play.epines();
-		//double dph = Monster.AverageDPH(mob,play);
-		//if(pp > 0.3) continue;
-		//if(dph > 0) continue;
-		if(epinedmg < 10) continue;
-		
-		double totalMonsterVictory = 0;
-		for(int j=0; j<50; j++)
-		{
-			Monster mob = new Monster(200, U);
-			play.mob = mob;
-			totalMonsterVictory += Monster.EstimateMonsterVictory(play,100);
-		}
-		totalMonsterVictory = totalMonsterVictory/50.0;
-		double survivalRate = (1.0-U.proba_rencontrer_piege())*(1.0-totalMonsterVictory) + U.proba_rencontrer_piege()*(play.proba_trouver_piege(50));
-		if(survivalRate < 0.6) continue;
-		System.out.println(String.format("(%d) points=%.2f zone=%d epines=%f totalMonsterVictory=%.2f survivalRate=%.2f" ,i,U.points_initiaux(), U.get_zone_max_level(0),epinedmg,totalMonsterVictory,survivalRate));
-		}
-	}
 	
 	public static void fillScores()
 	{
@@ -61,16 +24,16 @@ public class Game {
 		System.out.println("nlop=" + nlop);
 		double best_time[] = new double[ChallengeList.list.size()];
 		for(int i=0; i< ChallengeList.list.size(); i++) best_time[i]=100000;
-		best_time[0]=2000;
-		best_time[5]=500000;
+		best_time[0]=20000;
+		best_time[5]=900000;
 		
-		for(int i=0; i<5000; i++)
+		for(int i=0; i<100000; i++)
 		{
+		if(i%100==0) System.out.println(i);
 		Universe U = new Universe(i);
 		StaticItem.init(U);
 		Monster.SetOptimalDistribution(U);
-		if(U.points_initiaux() < 20) continue;
-		//if(U.get_zone_max_level(0) < 20) continue;
+
 		boolean must_end = false;
 		for (int cli = 0; cli < ChallengeList.list.size() && !must_end; cli++)
 		{
@@ -82,13 +45,14 @@ public class Game {
 		int victory_count = 0;
 		int trap_death_count = 0;
 		int trap_count = 0;
-		joueur.zone = 0;
+		joueur.zone = 2;
 		
 		while(joueur.temps_total < best_time[cli] && 
 			((!joueur.defi.isCond() && joueur.defi.boss_level/2 > joueur.level) || 
 			(joueur.defi.isCond() && !joueur.defi.isTrue(joueur,false))))
 			{
-			for(int zi=joueur.zone+1; zi < joueur.universe.map.zonesR.size(); zi++)
+			// TODO MEILLEUR CHOIX DE LA ZONE EN TENANT COMPTE DES ARENES		
+			for(int zi=joueur.zone+1; zi < joueur.universe.nombre_zones(); zi++)
 				{
 				if (joueur.max_zone_level() >= joueur.universe.get_zone_level(zi))
 				{
@@ -104,7 +68,7 @@ public class Game {
 				if(!the_object.equiped) tmplst.add(the_object);
 				joueur.sell(tmplst);
 			}
-			if(joueur.points_a_distribuer() > 4)
+			if(joueur.points_a_distribuer() >= 2)
 			{
 				while (joueur.points_a_distribuer() > 1.0)
 				{
@@ -177,6 +141,22 @@ public class Game {
 	
     public static void main(String args[])
     {
+	try{
+	    InputStream fileProp = new FileInputStream("theorycraft.config");
+		Properties prop = new Properties();
+		prop.load(fileProp);
+	    fileProp.close();
+		REAL_TIME = Boolean.parseBoolean(prop.getProperty("REAL_TIME"));
+		DEBUG_MODE_MAX_LOAD = Boolean.parseBoolean(prop.getProperty("DEBUG_MODE_MAX_LOAD"));
+		DEBUG_MODE_GIFT = Boolean.parseBoolean(prop.getProperty("DEBUG_MODE_GIFT"));
+		LOG_IN_FILE = Boolean.parseBoolean(prop.getProperty("LOG_IN_FILE"));
+		LANG = Integer.parseInt(prop.getProperty("LANG"));
+	}
+	catch(Exception ex)
+	    {
+			System.out.println("can't load theorycraft.config");
+	    }
+		
 	Local.init(LANG);
 	HI = HiScore.loadScore();
 	Monster.initZoo();

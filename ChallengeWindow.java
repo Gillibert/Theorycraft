@@ -67,8 +67,11 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	
 	public void montre_choix_defi()
     {
-	if (challenges.getSelectedIndex() == -1)
-		challenges.setSelectedIndex(0);
+	int idx;
+	for(idx =0; idx < defi_list.size(); idx++)
+		if (defi_list.get(idx)== universe.joueur.defi.name) break;
+	if (idx == defi_list.size()) idx = 0;
+	challenges.setSelectedIndex(idx);
 	choisir.setText(Local.CHOOSE);
 	set_seed.setVisible(false);
 	choisir.setVisible(true);
@@ -160,7 +163,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	ivjJFrameContentPane.add(desc);
 	
     this.addWindowListener(new java.awt.event.WindowAdapter() {
-	    public void windowClosing(java.awt.event.WindowEvent e) {choisir();} });
+	    public void windowClosing(java.awt.event.WindowEvent e) {} });
 	
 	return ivjJFrameContentPane;
     }

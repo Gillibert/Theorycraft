@@ -1,5 +1,69 @@
 CHANGE LOG
 
+Version 1.1 04/10/2018 "God game"
+FEATURE : Ajout de la possibilité d'éditer l'univers avec des points divins.
+FEATURE : Toutes les équations de l'univers peuvent être modifiées avec des points divins.
+FEATURE : Toutes les constantes de base de l'univers peuvent être modifiées avec des points divins.
+FEATURE : Ajout d'une formule permettant de sacrifier des orbes d'évolution pour obtenir des points divins.
+FEATURE : Ajout d'un fichier theorycraft.config permettant de configurer le jeu.
+FEATURE : Voyager prend maintenant du temps (via le système de pénalités).
+FEATURE : Ajout d'un log gardant une trace complète de la partie (fichier .log portant le nom du héros).
+FEATURE : Ajout de courbes sur les dépenses et les pertes, le butin de base en or, le niveau relatif des champions, les points divins en fonction du nombre d'orbes sacrifiés et du niveau, l'expérience rapportée par les monstres et les pièges, et les nouvelles compétences.
+FEATURE : Ajout de statistiques sur les dépenses et les pertes (achat chez les marchands, pénalités liées à la mort).
+FEATURE : Les zones ont maintenant une propriété propre déterminant localement la probabilité de rencontrer un champion ou un piège.
+FEATURE : Ajout d'un système d'arènes. Dans les arènes il n'y a presque pas de pièges et de champions et les monstres ne donnent pas de butin.
+FEATURE : Ajout des compétences "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes".
+FEATURE : Ajout des compétences "Allégement des ressources" et "Allégement de l'équipement".
+FEATURE : Il est désormais possible de séparer des objets chez les marchands.
+
+CHANGE :  Si on a plus de 100 points à distribuer on peut les distribuer 50 par 50, si on a plus de 1000 points à distribuer on peut les distribuer 500 par 500, et ainsi de suite sans limite (avec "MAJ").
+CHANGE : L'équation régissant l'expérience rapportée par les monstres et les pièges dépend désormais de l'univers.
+CHANGE : L'efficacité de base des objets dépend désormais de l'univers. Elle reste à 0.6 dans l'univers 0.
+CHANGE : La probabilité qu'un objet soit une ressource dépend désormais de l'univers. Elle est à 0.3 dans l'univers 0.
+CHANGE : La qualité maximale d'un objet dépend désormais de l'univers. Elle reste à 0.5 dans l'univers 0.
+CHANGE : Interface refondue pour bien séparer ce qui est action et ce qui est information.
+CHANGE : Les monstres distribuent désormais plus intelligemment leurs points de compétence.
+CHANGE : Ajustement des compétences dans les univers aléatoires.
+CHANGE : Ajustement des compétences dans l'univers par défaut (univers 0).
+CHANGE : L'affichage du résultat de la compétence nécrophagie à la fin des combats a été modifié.
+
+FIX : Plus de clignotement sur la carte du monde.
+FIX : Correction d'un bug permettant de changer de défi gratuitement en utilisant les highscores.
+FIX : Les effets de la compétence "Recherche de puissance" sont désormais affichés dans la fenêtre de compétences.
+FIX : La courbe sur le temps passé en shopping et en crafting est désormais correctement affichée.
+
+Version 1.0 21/06/2018 "Fluidity"
+FEATURE : Création automatique des highscores à partir de vraie parties jouées par un algorithme. Les joueurs peuvent maintenant essayer de battre les meilleurs temps "officiels".
+FEATURE : Ajout d'un menu permettant de charger une partie ou de créer une nouvelle partie sans quitter le jeu.
+FEATURE : Ajout d'un menu pour changer de défi en cours de jeu (moyennant une pénalité de temps).
+FEATURE : Possibilité d'accéder directement aux meilleurs temps depuis le jeu. 
+FEATURE : Les caractéristiques des pièges dépendent désormais de l'univers.
+FEATURE : La plage aléatoire dépend désormais de l'univers.
+FEATURE : La liste des régions dépend désormais de l'univers.
+FEATURE : Si on a plus de 200 points à distribuer on peut les distribuer 50 par 50, si on a plus de 2000 points à distribuer on peut les distribuer 500 par 500, et si on a plus de 20000 points à distribuer on peut les distribuer 5000 par 5000 (avec "MAJ").
+FEATURE : Ajout d'informations sur le craft.
+FEATURE : Ajout de statistiques sur les rencontres (combats gagnés, perdus, fuis, coups portés, pièges rencontrés, évités, survécus).
+FEATURE : Ajout de statistiques sur le commerce (marchands rencontrés, crafting).
+FEATURE : Ajout de statistiques sur les drops (objets normaux, magiques, rares, ressources, orbes).
+FEATURE : Ajout de statistiques sur les sources de revenu.
+FEATURE : Ajout des compétences "Réduction des pénalités" et "Accès étendu".
+
+CHANGE : Rafraîchissement périodique de l'écran, plus de clignotement.
+CHANGE : Carte du monde plus peuplée.
+CHANGE : Révision du système d'alliage, pour des alliages plus puissants et dépendants de l'univers.
+CHANGE : Le temps de fuite est désormais pris en compte dans les courbes de statistiques sur les combats.
+CHANGE : Ajustement des compétences.
+CHANGE : Le temps de crafting dépend désormais du nombre d'objets placés dans la forge.
+CHANGE : Les informations sur l'univers sont désormais affichées en HTML.
+CHANGE : Ajustement du nombre de points de compétences des monstres (augmentation).
+CHANGE : On peut désormais jeter un objet directement depuis la forge.
+
+FIX : Correction d'un bug concernant la disponibilité des casques dans les univers aléatoires.
+FIX : Correction d'un bug empêchant d'effacer des sauvegardes corrompues ou écrites avec une ancienne version du jeu.
+FIX : Correction d'un bug limitant l'affichage des régions dans la description de l'univers.
+FIX : Correction d'un bug avec les personnages dont l'expérience dépasse la capacité d'un entier 32 bits.
+FIX : Correction d'un bug permettant de profiter des points de compétences distribués après une annulation dans la fenêtre de distribution.
+
 Version 0.9 15/02/2017 "Random universe"
 FEATURE : Il y a maintenant la possibilité de jouer dans un univers dont les règles sont aléatoires.
 FEATURE : Ajout d'une fenêtre d'information sur l'univers.

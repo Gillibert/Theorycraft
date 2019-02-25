@@ -36,7 +36,8 @@ public class InventoryWindow extends javax.swing.JDialog  {
     private int idx_tmp2;
     private int idx_tmp3;
     private ArrayList<Item> vlist;
-
+	private boolean refreshing = false;
+	
     public InventoryWindow(Player J) {
 	super();
 	Joueur = J;
@@ -71,14 +72,14 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	idx_tmp = -2;
 	refresh_filter_list();
-	refresh(1);
+	refresh(0);
 	setVisible(true);
     }
 
     public void montre_shop()
     {
 	craft_mode = false;
-	this.setTitle(String.format(Local.WINDOW_SHOP, Joueur.shop.name));
+	this.setTitle(String.format(Local.WINDOW_SHOP, Joueur.shop.name, Joueur.shop.level));
 	this.setSize(new Dimension(785+20, 420));
 	sell.setVisible(true);
 	buy.setVisible(true);
@@ -96,7 +97,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	idx_tmp = -2;
 	refresh_filter_list();
-	refresh(1);
+	refresh(0);
 	setVisible(true);
     }
 
@@ -121,12 +122,19 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	idx_tmp = -2;
 	refresh_filter_list();
-	refresh(1);
+	refresh(0);
 	setVisible(true);
     }
 
     public void refresh(int sli)
     {
+	if(refreshing==true) return;
+	refreshing=true;
+	if((liste_it.getSelectedIndex() != -1) && sli==0)
+	{sli=1;}
+	if((liste_shop.getSelectedIndex() != -1) && sli==0)
+	{sli=2;}
+
 	prompt.setText(String.format(Local.WINDOW_INVENTORY_PROMPT,Joueur.money,Joueur.charge,Joueur.charge_max()));
 	toggle.setEnabled(false);
 	sell.setEnabled(false);
@@ -180,7 +188,8 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		int x = vlist.size()-1;
 		if(x > -1)
 		    liste_it.setSelectedIndex(Math.min(idx_tmp2,x));
-	    }
+	    
+		}
 	if(liste_it.getSelectedIndex() != -1)
 	    split.setEnabled(vlist.get(liste_it.getSelectedIndex()).stackable);
 	if((liste_it.getSelectedIndex() != -1) && sli == 1)
@@ -228,6 +237,12 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		toggle.setEnabled(false);
 		destroy.setEnabled(true);
 	    }
+		
+	if(Joueur.shop != null && !craft_mode && liste_shop.getSelectedIndex() != -1)
+	{
+	    split.setEnabled(Joueur.shop.inventory.get(liste_shop.getSelectedIndex()).stackable);
+	}
+	refreshing=false;
     }
 	
     private void display_item(Item it)
@@ -477,9 +492,17 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
     private void separer()
     {
-	Joueur.split(vlist.get(liste_it.getSelectedIndex()));
 	idx_tmp = -2; // force le refresh complet
-	refresh(1);
+	if(liste_it.getSelectedIndex() != -1)
+	{
+		Joueur.split(vlist.get(liste_it.getSelectedIndex()),Joueur.inventory);
+		refresh(1);
+	}
+	if(Joueur.shop != null && !craft_mode && liste_shop.getSelectedIndex() != -1)
+	{
+		Joueur.split(Joueur.shop.inventory.get(liste_shop.getSelectedIndex()),Joueur.shop.inventory);
+		refresh(2);
+	}
     }
 
 	private void jeter()
@@ -500,9 +523,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     {
 	if(tout)
 	{
-		int size = vlist.size();
-		for(int i=0; i< size; i++)
-			Joueur.put_craft(vlist.get(i));
+		Joueur.put_craft(vlist);
 	}
 	else
 	{

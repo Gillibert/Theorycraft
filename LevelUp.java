@@ -89,7 +89,7 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    scroll2 = new JScrollPane(infos);
 	    scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	    scroll2.setBounds(new Rectangle(385, 32, 275, 320));
+	    scroll2.setBounds(new Rectangle(385, 32, 300, 320));
 
 	    plus = new JButton();
 	    plus.setBounds(new Rectangle(245, 365, 44, 21));
@@ -98,10 +98,8 @@ public class LevelUp extends javax.swing.JDialog  {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) 
 				{
-					if(Joueur.points_a_distribuer() >= 20000) plus(5000);
-					else if(Joueur.points_a_distribuer() >= 2000) plus(500);
-					else if(Joueur.points_a_distribuer() >= 200) plus(50);
-					else plus(5);
+					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_a_distribuer())))*0.5,5.0);
+					plus(step);
 				}
 				else plus(1);
 		    }
@@ -115,10 +113,8 @@ public class LevelUp extends javax.swing.JDialog  {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0)
 				{
-					if(Joueur.points_a_distribuer() >= 20000) moins(5000);
-					else if(Joueur.points_a_distribuer() >= 2000) moins(500);
-					else if(Joueur.points_a_distribuer() >= 200) moins(50);
-					else moins(5);
+					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_a_distribuer())))*0.5,5.0);
+					moins(step);
 				}
 				else moins(1);
 		    }
@@ -165,7 +161,7 @@ public class LevelUp extends javax.swing.JDialog  {
     private void initialize() {
 
 	this.setLocation(new Point(15, 15));
-	this.setSize(new Dimension(670, 420));
+	this.setSize(new Dimension(670, 420+25));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -207,17 +203,17 @@ public class LevelUp extends javax.swing.JDialog  {
 	this.setVisible(false);
     }
 	
-    private void plus(int x)
+    private void plus(double x)
     {
-	int toAdd = Math.min((int)(Joueur.points_a_distribuer()),x);
+	double toAdd = Math.min(Math.floor(Joueur.points_a_distribuer()),x);
 	Joueur.stats[table.getSelectedRow()] += toAdd; 
 	refresh();
     }
 
-    private void moins(int x)
+    private void moins(double x)
     {
 	int idx = table.getSelectedRow();
-	int toRem = Math.min((int)(Joueur.stats[idx] - stats_tmp[idx]),x);
+	double toRem = Math.min(Math.floor(Joueur.stats[idx] - stats_tmp[idx]),x);
 	Joueur.stats[idx] -= toRem; 
 	refresh();
     }

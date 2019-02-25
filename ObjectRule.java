@@ -255,14 +255,14 @@ public class ObjectRule implements Serializable {
 		case 4: return Check(i.poids);
 		case 5: return Check(i.prix());
 		case 6: return Check(i.effectiveIlvl());
-		case 7: return Check(i.ilvl*i.material.coeffEfficacite);
-		case 8: return Check(i.elvl*i.material.coeffLevel);
+		case 7: return Check(i.ilvl*i.material.coeffEfficacite*i.base_power);
+		case 8: return Check(i.elvl*i.material.coeffPuissance);
 		case 9: return Check(i.ilvl);
 		case 10: return Check(i.elvl);
 		case 11: return Check(i.material.coeffPoids);
 		case 12: return Check(i.material.coeffPrix);
 		case 13: return Check(i.material.coeffEfficacite);
-		case 14: return Check(i.material.coeffLevel);
+		case 14: return Check(i.material.coeffPuissance);
 		case 15: return !(i.baseItem==null) && Check(StaticItem.BaseItemNamesList.indexOf(i.baseItem.name));
 		case 16: return Check(StaticItem.MaterialNamesList.indexOf(i.material.name));
 		case 17: return Check((i.equiped) ? 1 : 0); // convert to int

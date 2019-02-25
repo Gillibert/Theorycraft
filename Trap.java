@@ -42,7 +42,7 @@ public boolean trapEncounter(Player p)
 	String lower_case_name = NameGenerator.firstCharLowercase(name);
 	p.t_stats.addEvent(1.0,TimeStats.EVENT_TRAP_ATTEMPT);
 	boolean res = true;
-	if(p.disp) Game.MW.addLog(String.format(Local.YOU_COME_ACROSS,lower_case_name,level));
+	if(p.disp) Game.MW.addLog(String.format(Local.YOU_COME_ACROSS,p.name,lower_case_name,level));
 	double trap_find_proba = p.proba_trouver_piege(hidden);
 	if (Math.random() < trap_find_proba)
 		{
@@ -78,7 +78,7 @@ public boolean trapEncounter(Player p)
 		p.meurt();
 	}
 	else {
-		p.gain_xp(Math.pow(50*level,0.85), 1, level);
+		p.gain_xp(p.universe.xp_for_level(level)*0.75, TimeStats.XP_TRAP, level);
 		res = false;
 		}
 	return res;

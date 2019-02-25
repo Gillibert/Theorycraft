@@ -8,17 +8,22 @@ public class Map implements Serializable {
 	public String map_img;
 	public ArrayList<Rectangle> zonesR;
 	public ArrayList<String> zonesName;
-	public Map(Random gen, int zl_14)
+	public ArrayList<Double> boss_coeff;
+	public ArrayList<Double> trap_coeff;
+	
+	public Map(TheoryGenerator gen, int zl_14)
 		{
 		map_img="images/main_map2.png";
 
 		zonesR = new ArrayList<Rectangle>();
 		zonesName = new ArrayList<String>();
+		boss_coeff = new ArrayList<Double>();
+		trap_coeff = new ArrayList<Double>();
 		
 		ArrayList<Rectangle> tempZR = new ArrayList<Rectangle>();
 		ArrayList<String> tempZN = new ArrayList<String>();
 		
-		NameGenerator nameGen = new NameGenerator(gen.nextInt());
+		NameGenerator nameGen = new NameGenerator(Integer.MAX_VALUE);
 		
 		tempZR.add(new Rectangle(135, 132, 50, 56));
 		tempZN.add(nameGen.getNameOf(Local.BAY));
@@ -58,6 +63,9 @@ public class Map implements Serializable {
 
 		tempZR.add(new Rectangle(189, 73, 60, 54));
 		tempZN.add(nameGen.getNameOf(Local.MOUNTAINS));
+
+		tempZR.add(new Rectangle(255, 60, 57, 37));
+		tempZN.add(nameGen.getNameOf(Local.MOUNTAINS));
 		
 		tempZR.add(new Rectangle(418, 336, 55, 50));
 		tempZN.add(nameGen.getNameOf(Local.ROADSTEAD));
@@ -77,6 +85,9 @@ public class Map implements Serializable {
 		tempZR.add(new Rectangle(219, 165, 49, 46));
 		tempZN.add(nameGen.getNameOf(Local.JUNCTION));
 
+		tempZR.add(new Rectangle(356, 213, 54, 43));
+		tempZN.add(nameGen.getNameOf(Local.JUNCTION));
+		
 		tempZR.add(new Rectangle(260, 98, 53, 30));
 		tempZN.add(nameGen.getNameOf(Local.RIFT));
 		
@@ -118,18 +129,32 @@ public class Map implements Serializable {
 		{
 			numbers.add(i);
 		}
-		Collections.shuffle(numbers,gen) ;
+		Collections.shuffle(numbers,gen.gen) ;
 		
 		int MIN_NBZ;
 		if(zl_14 > 400) {MIN_NBZ = 12;}
 		else {MIN_NBZ = 20;}
 		
 		int nbz = MIN_NBZ+gen.nextInt(tempZR.size()-MIN_NBZ+1);
+		//int nbz = tempZR.size(); 
+		
+		zonesR.add(new Rectangle(345, 69, 55, 37));
+		zonesName.add(nameGen.getNameOf(Local.ARENA));
+		boss_coeff.add(0.01);
+		trap_coeff.add(0.01);
+		
+		zonesR.add(new Rectangle(403, 26, 66, 37));
+		zonesName.add(nameGen.getNameOf(Local.ARENA));
+		boss_coeff.add(0.002);
+		trap_coeff.add(0.01);
+		
 		for(int i=0; i < nbz; i++)
 		{
 			int index = numbers.get(i);
 			zonesR.add(tempZR.get(index));
 			zonesName.add(tempZN.get(index));
+			boss_coeff.add(0.75+0.50*gen.nextDouble());
+			trap_coeff.add(0.75+0.50*gen.nextDouble());
 		}
 		}
 

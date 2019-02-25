@@ -9,7 +9,7 @@ class Material implements Serializable {
     public double coeffPrix; // Plus cher
     public double coeffSolidite; // Plus solide
     public double coeffEfficacite; // Plus efficace (sur l'enchantement de base)
-    public double coeffLevel; // Plus haut ilvl (affecte les enchantements secondaires)
+    public double coeffPuissance; // Plus haut ilvl (affecte les enchantements secondaires)
 
     public Material(String n, String no, int ty, double cpo, double cpr, double sol, double eff, double ilvl)
     {
@@ -20,7 +20,7 @@ class Material implements Serializable {
 	coeffPrix=cpr;
 	coeffSolidite=sol;
 	coeffEfficacite=eff;
-	coeffLevel=ilvl;
+	coeffPuissance=ilvl;
     }
 
 }

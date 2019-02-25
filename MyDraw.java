@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
 
-public class MyDraw extends java.awt.Canvas  {
+public class MyDraw extends JPanel {
 
 		private ArrayList<CurveObject> the_curves;
 
@@ -41,7 +41,10 @@ public class MyDraw extends java.awt.Canvas  {
 		
 		public void paint(Graphics g) 
 		{
+		setDoubleBuffered(true);
 		if (the_curves == null) return;
+		g.clearRect(0, 0, getWidth(), getHeight());
+		
 		double bx = 32;
 		double by = 20;
 		double mx = getWidth();
@@ -124,7 +127,8 @@ public class MyDraw extends java.awt.Canvas  {
 			else if(tx<100.0) ster = String.format("%.1f",tx);
 			else ster = String.format("%.0f",tx);
 			
-			graph.drawString(ster, (int)lx-26, (int)(my-6));
+			if(tx<10000.0) graph.drawString(ster, (int)lx-26, (int)(my-6));
+			else graph.drawString(ster, (int)lx-32, (int)(my-6));
 		}
 		
 		for(double ty=stepy; ty < ymax; ty+=stepy)

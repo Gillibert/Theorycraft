@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 
 class StaticItem {
-    public static double PROBA_RES_BASE = 0.4;
-
     public static int RESSOURCE_ELEM = 0;
     public static int RESSOURCE_PRIM = 1;
     public static int RESSOURCE_ORB = 2;
@@ -55,7 +53,7 @@ class StaticItem {
     }
     
     public static Material[] MA = new Material[]{
-    // type; coeffPoids; coeffPrix;     coeffSolidite; coeffEfficacite; coeffLevel;
+    // type; coeffPoids; coeffPrix;     coeffSolidite; coeffEfficacite; coeffPuissance;
     new Material("ordure","d'ordures",0,          2.0,0.4,     0.2,0.15,0.05),
     new Material("détritus","de détritus",0,      2.0,0.4,     0.2,0.20,0.10),
     new Material("papier","de papier",0,          2.0,0.5,     0.2,0.25,0.15),
@@ -135,41 +133,41 @@ class StaticItem {
     new Material("perle","de perles",3,            0.8,3.4,     0.6,3.0,3.20),
     new Material("diamant","de diamants",3,        1.0,5.0,     5.0,3.5,1.30),
 
-    new Material("jour","de jour",4,               0.01,4.2,    0.2,0.2,3.50),
-    new Material("nuit","de nuit",4,               0.01,4.2,    0.2,0.2,3.60),
-    new Material("éther","d'éther",4,              0.01,4.2,    0.2,0.2,3.70),
-    new Material("lumière","de lumière",4,         0.01,4.2,    0.2,0.2,3.80),
-    new Material("obscurité","d'obscurité",4,      0.01,4.2,    0.2,0.2,3.90),
-    new Material("ombre","d'ombre",4,              0.01,4.3,    0.2,0.2,4.00),
-    new Material("cahos","de cahos",4,             0.01,4.3,    0.2,0.2,4.05),
-    new Material("ordre","d'ordre",4,              0.01,4.3,    0.2,0.2,4.10),
-    new Material("néant","de néant",4,             0.01,4.4,    0.2,0.2,4.15),
-    new Material("loyauté","de loyauté",4,         0.01,4.5,    0.2,0.2,4.20),
-    new Material("générosité","de générosité",4,   0.01,4.6,    0.2,0.2,4.25),
-    new Material("violence","de violence",4,       0.01,4.7,    0.2,0.2,4.30),
-    new Material("éternité","d'éternité",4,        0.01,4.8,    0.2,0.2,4.35),
-    new Material("temps","de temps",4,             0.01,4.9,    0.2,0.2,4.40),
-    new Material("zéro","de zéro",4,               0.01,5.1,    0.2,0.2,4.45),
-    new Material("utopie","d'utopie",4,            0.01,5.1,    0.2,0.2,4.50),
-    new Material("dystopie","de dystopie",4,       0.01,5.2,    0.2,0.2,4.55),
-    new Material("entropie","d'entropie",4,        0.01,5.3,    0.2,0.2,4.60),
-    new Material("amour","d'amour",4,              0.01,5.4,    0.2,0.2,4.65),
-    new Material("haine","de haine",4,             0.01,5.5,    0.2,0.2,4.70),
-    new Material("vengeance","de vengeance",4,     0.01,5.6,    0.2,0.2,4.75),
-    new Material("désordre","de désordre",4,       0.01,5.7,    0.2,0.2,4.80),
-    new Material("excellence","d'excellence",4,    0.01,5.8,    0.2,0.2,4.85),
-    new Material("savoir","de savoir",4,           0.01,5.9,    0.2,0.2,4.90),
-    new Material("vérité","de vérité",4,           0.01,6.0,    0.2,0.2,4.95),
-    new Material("perfection","de perfection",4,   0.01,6.5,    0.2,0.2,5.00),
-    new Material("illogisme","d'illogisme",4,      0.01,6.5,    0.2,5.00,0.2)
+    new Material("jour","de jour",4,               0.02,4.2,    0.2,0.2,3.50),
+    new Material("nuit","de nuit",4,               0.02,4.2,    0.2,0.2,3.60),
+    new Material("éther","d'éther",4,              0.02,4.2,    0.2,0.2,3.70),
+    new Material("lumière","de lumière",4,         0.02,4.2,    0.2,0.2,3.80),
+    new Material("obscurité","d'obscurité",4,      0.02,4.2,    0.2,0.2,3.90),
+    new Material("ombre","d'ombre",4,              0.02,4.3,    0.2,0.2,4.00),
+    new Material("cahos","de cahos",4,             0.02,4.3,    0.2,0.2,4.05),
+    new Material("ordre","d'ordre",4,              0.02,4.3,    0.2,0.2,4.10),
+    new Material("néant","de néant",4,             0.02,4.4,    0.2,0.2,4.15),
+    new Material("loyauté","de loyauté",4,         0.02,4.5,    0.2,0.2,4.20),
+    new Material("générosité","de générosité",4,   0.02,4.6,    0.2,0.2,4.25),
+    new Material("violence","de violence",4,       0.02,4.7,    0.2,0.2,4.30),
+    new Material("éternité","d'éternité",4,        0.02,4.8,    0.2,0.2,4.35),
+    new Material("temps","de temps",4,             0.02,4.9,    0.2,0.2,4.40),
+    new Material("zéro","de zéro",4,               0.02,5.1,    0.2,0.2,4.45),
+    new Material("utopie","d'utopie",4,            0.02,5.1,    0.2,0.2,4.50),
+    new Material("dystopie","de dystopie",4,       0.02,5.2,    0.2,0.2,4.55),
+    new Material("entropie","d'entropie",4,        0.02,5.3,    0.2,0.2,4.60),
+    new Material("amour","d'amour",4,              0.02,5.4,    0.2,0.2,4.65),
+    new Material("haine","de haine",4,             0.02,5.5,    0.2,0.2,4.70),
+    new Material("vengeance","de vengeance",4,     0.02,5.6,    0.2,0.2,4.75),
+    new Material("désordre","de désordre",4,       0.02,5.7,    0.2,0.2,4.80),
+    new Material("excellence","d'excellence",4,    0.02,5.8,    0.2,0.2,4.85),
+    new Material("savoir","de savoir",4,           0.02,5.9,    0.2,0.2,4.90),
+    new Material("vérité","de vérité",4,           0.02,6.0,    0.2,0.2,4.95),
+    new Material("perfection","de perfection",4,   0.02,6.5,    0.2,0.2,5.00),
+    new Material("illogisme","d'illogisme",4,      0.02,6.5,    0.2,5.00,0.2)
     };
 
     public static Material[] ORB = new  Material[]{
-    new Material("orbe d'augmentation","",5,         0.001,60.0,     1.0,1.0,1.30),
-    new Material("orbe de transmutation","",5,       0.001,60.0,     1.0,1.0,1.31),
-    new Material("orbe de transfert","",5,           0.001,60.0,     1.0,1.0,1.32),
-    new Material("orbe de fusion","",5,              0.001,60.0,     1.0,1.0,1.33),
-    new Material("orbe d'évolution","",5,            0.001,60.0,     1.0,1.0,1.34)
+	new Material("orbe d'évolution","",5,            0.0002,60.0,     1.0,1.0,0.4),
+    new Material("orbe d'augmentation","",5,         0.0002,55.0,     1.0,1.0,0.5),
+    new Material("orbe de transmutation","",5,       0.0002,50.0,     1.0,1.0,0.6),
+    new Material("orbe de transfert","",5,           0.0002,45.0,     1.0,1.0,0.7),
+	new Material("orbe de fusion","",5,              0.0002,40.0,     1.0,1.0,0.8),
     };
 
     public static BaseItem[] BA = new  BaseItem[]{
@@ -243,21 +241,21 @@ class StaticItem {
     new BaseItem("heko obi","MS",          1,4,10,58,    0.12),
     new BaseItem("tsuke obi","MS",         1,4,10,60,    0.12),
 
-    new BaseItem("guêtres","FP",           1,5,14,10,    0.20),
-    new BaseItem("jambières","FP",         1,5,14,20,    0.20),
-    new BaseItem("kyahan","MP",            1,5,14,60,    0.20),
+    new BaseItem("guêtres","FP",           1,5,Universe.RUN,10,    0.20),
+    new BaseItem("grèves","FP",            1,5,Universe.RUN,20,    0.20),
+    new BaseItem("kyahan","MP",            1,5,Universe.RUN,60,    0.20),
     new BaseItem("ocreas","FP",            2,5,2,20,     0.90),
     new BaseItem("cnémides","FP",          2,5,2,40,     1.00),
     new BaseItem("jambières","FP",         2,5,2,50,     1.10),
     new BaseItem("suneate","MP",           2,5,2,60,     1.10),
 
-	new BaseItem("escarpins","MP",         1,6,14,8,     0.20),
-    new BaseItem("chaussons","MP",         1,6,14,13,    0.20),
-    new BaseItem("charentaises","FP",      1,6,14,23,    0.20),
-    new BaseItem("pantoufles","FP",        1,6,14,33,    0.20),
-    new BaseItem("babouches","FP",         1,6,14,43,    0.20),
-    new BaseItem("sandales","FP",          2,6,14,53,    0.40),
-    new BaseItem("basquettes","FP",        1,6,14,60,    1.00),
+	new BaseItem("escarpins","MP",         1,6,Universe.RUN,8,     0.20),
+    new BaseItem("chaussons","MP",         1,6,Universe.RUN,13,    0.20),
+    new BaseItem("charentaises","FP",      1,6,Universe.RUN,23,    0.20),
+    new BaseItem("pantoufles","FP",        1,6,Universe.RUN,33,    0.20),
+    new BaseItem("babouches","FP",         1,6,Universe.RUN,43,    0.20),
+    new BaseItem("sandales","FP",          2,6,Universe.RUN,53,    0.40),
+    new BaseItem("basquettes","FP",        1,6,Universe.RUN,60,    1.00),
     new BaseItem("souliers","FP",          2,6,2,12,     0.50),
     new BaseItem("galoches","FP",          2,6,2,22,     0.50),
     new BaseItem("sabots","MP",            2,6,2,32,     1.20),
@@ -271,7 +269,7 @@ class StaticItem {
     new BaseItem("bas","MP",               1,7,32,60,    0.06),
     new BaseItem("chaussettes","FP",       1,7,33,60,    0.06),
     new BaseItem("mi-bas","MP",            1,7,43,60,    0.06),
-    new BaseItem("tabis","FP",             1,7,14,60,    0.06),
+    new BaseItem("tabis","FP",             1,7,Universe.RUN,60,    0.06),
 
     new BaseItem("pendentif","MS",         3,8,15,30,    0.09),
     new BaseItem("médaillon","MS",         3,8,16,30,    0.09),
@@ -355,7 +353,8 @@ class StaticItem {
     new BaseItem("holster","MS",           1,13,7,60,    0.20),
     new BaseItem("fourreau","MS",          1,13,6,60,    0.30),
     
-    new BaseItem("monocle","MS",           3,14,5,35,    0.05),
+    new BaseItem("monocle","MS",           3,14,5,30,    0.05),
+	new BaseItem("binocle","MS",           3,14,5,35,    0.05),
     new BaseItem("bésicles","FP",          3,14,5,40,    0.05),
     new BaseItem("lentilles","FP",         3,14,5,45,    0.05),
     new BaseItem("lunettes","FP",          3,14,5,50,    0.05),
@@ -414,7 +413,7 @@ class StaticItem {
 		if ((MA[j].type == 0 && BA[i].pref_level < 10 && BA[i].mat <= 2) 
 			|| (BA[i].mat == MA[j].type))
             {
-            Item it = new Item(BA[i],MA[j]);
+            Item it = new Item(BA[i],MA[j],universe);
 			WhiteItemByPosition[it.pos].list.add(it);
             WhiteItemByLevel[it.effectiveIlvl()].list.add(it);
             }

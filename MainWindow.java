@@ -4,8 +4,9 @@ import java.awt.Rectangle;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
-
 import java.awt.event.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 import javax.swing.text.DefaultCaret;
 import javax.swing.JTable;
@@ -35,6 +36,7 @@ public class MainWindow extends javax.swing.JDialog {
 	private ScheduledExecutorService refreshService;
     public Player Joueur;
     public LevelUp DistWindow;
+	public EditUniverse EditUniverseWindow;
     public Courbes CurvWindow;
     public InventoryWindow InvWindow;
     public WorldMap WorldMapWindow;
@@ -56,7 +58,6 @@ public class MainWindow extends javax.swing.JDialog {
     private JButton combat_cmd;
     private JTextArea stats;
     private JTextArea stats3;
-    private JButton courbes;
     private JButton shop_cmd;
     private JButton craft_cmd;
     private JButton inventaire_cmd;
@@ -64,7 +65,7 @@ public class MainWindow extends javax.swing.JDialog {
 	private JButton univers_cmd;
     private JScrollPane scroll;
     public JTextArea log;
-
+    private BufferedWriter outputLog;
     private JButton plus;
     private JButton moins;
     private JButton toggle;
@@ -76,6 +77,7 @@ public class MainWindow extends javax.swing.JDialog {
 	{
 		Joueur = J;
 		DistWindow.SetPlayer(J);
+		EditUniverseWindow.SetPlayer(J);;
 		CurvWindow.SetPlayer(J);
 		InvWindow.SetPlayer(J);
 		WorldMapWindow.SetPlayer(J);
@@ -87,9 +89,18 @@ public class MainWindow extends javax.swing.JDialog {
     public MainWindow(Player J) {
 	super();
 	Joueur = J;
+	outputLog = null;
+	
+	if(Game.LOG_IN_FILE)
+	{
+		try {outputLog = new BufferedWriter(new FileWriter("heroes/" + J.name+ ".log",true));}
+		catch(Exception ex) {System.out.println(Local.CANT_WRITE_IN_LOG);}
+	}
+		
 	lines = new String[max_lines];
 	index_line=0;
 
+	EditUniverseWindow = new EditUniverse(Joueur);
 	DistWindow = new LevelUp(Joueur);
 	CurvWindow = new Courbes(Joueur);
 	InvWindow = new InventoryWindow(Joueur);
@@ -118,7 +129,7 @@ public class MainWindow extends javax.swing.JDialog {
       }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
-    public void refreshInFight() // Refresh hp bars only
+    public void refreshHpBars() // Refresh hp bars only
     {
 	if(Joueur.mob != null) 
 	    {
@@ -167,12 +178,19 @@ public class MainWindow extends javax.swing.JDialog {
     {
 	SwingUtilities.invokeLater(new Runnable() {
      public void run() {
-	double progress;
-	xp_bar.setString(String.format(Local.NEXT_LEVEL,
-	Joueur.xp_pt-Joueur.xp_level(Joueur.level),
-	Joueur.next_level()-Joueur.xp_level(Joueur.level)));
-	progress=1.0*(Joueur.xp_pt-Joueur.xp_level(Joueur.level))/(Joueur.next_level()-Joueur.xp_level(Joueur.level));
-	xp_bar.setValue((int)((100.0*progress)));
+	if(Joueur.level < Joueur.MAX_LEVEL)
+	{
+		double current = Joueur.xp_pt-Joueur.xp_level(Joueur.level);
+		double next = Joueur.next_level()-Joueur.xp_level(Joueur.level);
+		xp_bar.setString(String.format(Local.NEXT_LEVEL,current,next));
+		double progress=current/next;
+		xp_bar.setValue((int)((100.0*progress)));
+	}
+	else
+	{
+		xp_bar.setString(Local.MAX_LEVEL);
+		xp_bar.setValue(100);
+	}
 
 	//mySetText(stats,Joueur.short_infos());
 	stats.setText(Joueur.short_infos());
@@ -192,15 +210,17 @@ public class MainWindow extends javax.swing.JDialog {
 		}
 	    }
 	refreshLog();
-	refreshInFight();
+	refreshHpBars();
       }
     });
 	}
 	
 	private void refreshSlow()
 	{
+		if (EditUniverseWindow.isVisible()) EditUniverseWindow.refresh();
 		if (InWindow.isVisible()) InWindow.refresh();
 		if (WorldMapWindow.isVisible()) WorldMapWindow.refresh();
+		if(Game.LOG_IN_FILE) {try{outputLog.flush();} catch(Exception ex){}}
 		refresh();
 	}
 
@@ -209,6 +229,10 @@ public class MainWindow extends javax.swing.JDialog {
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    Joueur.universe.save();
+			if(Game.LOG_IN_FILE) {
+				try{outputLog.flush(); outputLog.close();}
+				catch(Exception ex){}
+			}
 			System.exit(0);
 		}});
 	 
@@ -286,7 +310,42 @@ public class MainWindow extends javax.swing.JDialog {
 		}
 	    });
 	menu.add(menuItem);
-			
+	
+	menu = new JMenu(Local.INFORMATIONS);
+	menuBar.add(menu);
+	
+	menuItem = new JMenuItem(Local.CHARTS);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			CurvWindow.montre();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.CRAFTING);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			InWindow.montreInfoCraft();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.PLAYER_STATISTICS);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			InWindow.montrePlayerStats();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.UNIVERSE_INFO);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			InWindow.montreInfoUniverse();
+		}
+	    });
+	menu.add(menuItem);
+	
 	xp_bar = new JProgressBar();
 	xp_bar.setStringPainted(true);
 	xp_bar.setBounds(new Rectangle(5, 265, 415, 15));
@@ -411,23 +470,13 @@ public class MainWindow extends javax.swing.JDialog {
 		}
 	    });
 	distrib.setMnemonic('t');
-
-	courbes = new JButton();
-	courbes.setBounds(new Rectangle(285, 285+20, 135, 15));
-	courbes.setText(Local.CHARTS);
-	courbes.addActionListener(new java.awt.event.ActionListener() {
-		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    CurvWindow.montre();
-		}
-	    });
-	courbes.setMnemonic('b');
 	
 	univers_cmd = new JButton();
 	univers_cmd.setBounds(new Rectangle(285, 285+40, 135, 15));
-	univers_cmd.setText(Local.INFORMATIONS);
+	univers_cmd.setText(Local.UNIVERSE_EDITION);
 	univers_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		   InWindow.montre();
+		   EditUniverseWindow.dist(); 
 		}
 	});
 	univers_cmd.setMnemonic('u');
@@ -437,8 +486,8 @@ public class MainWindow extends javax.swing.JDialog {
 	log.setEditable(false);
 	log.setLineWrap(true);
 	log.setWrapStyleWord(true);
-	log.setBackground(Color.gray);
-	log.setSelectionColor(Color.gray);
+	log.setBackground(Color.lightGray);
+	log.setSelectionColor(Color.lightGray);
 	((DefaultCaret)log.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 	
 	scroll = new JScrollPane(log);
@@ -487,7 +536,6 @@ public class MainWindow extends javax.swing.JDialog {
 	ivjJFrameContentPane.add(stats3);
 	ivjJFrameContentPane.add(voyager);
 	ivjJFrameContentPane.add(combat_cmd);
-	ivjJFrameContentPane.add(courbes);
 	ivjJFrameContentPane.add(shop_cmd);
 	ivjJFrameContentPane.add(craft_cmd);
 	ivjJFrameContentPane.add(inventaire_cmd);
@@ -591,6 +639,12 @@ public class MainWindow extends javax.swing.JDialog {
     {
 	lines[index_line]=S;
 	index_line = (index_line +1) % max_lines;
+
+	if(Game.LOG_IN_FILE)
+		{
+		try {outputLog.write(S+"\n");}
+		catch(Exception ex) {System.out.println(Local.CANT_WRITE_IN_LOG);}
+		}
 	}
 	
 	public void refreshLog()

@@ -4,6 +4,8 @@ public class Local {
 	public static int LANG;
 	public static String FONT_TIMES = "Times New Roman";
 	public static String FONT_DIALOG = "Dialog";
+	public static String H2S = "<h2>";
+	public static String H2E = "</h2>";
 	
 	public static String[] TAGS_NAME;
 	public static String[] SKILLS_NAME;
@@ -21,6 +23,9 @@ public class Local {
 	public static String[] SHOP_SURNAMES;
 	public static String[] TRAP_NAMES;
 	public static String[] STOP_RULES_COLUMN_NAMES;
+	public static String[] UNIVERSE_STATS_NAME;
+	public static String[] UNIVERSE_EQUATIONS_NAME;
+	public static String[] EDIT_UNIVERSE_COLUMN_NAMES;
 	
 	public static String COLON;
 	public static String SECONDS;
@@ -90,6 +95,8 @@ public class Local {
 	public static String LOOKING_FOR_TRADER;
 	public static String LOOKING_FOR_MYSTIC_FORGE;
 	public static String CRAFTING;
+	
+	public static String LOSSES_AND_EXPENSES;
 	public static String GOLD_FROM_MONSTERS;
 	public static String GOLD_FROM_LIFE_ANNUITY;
 	public static String GOLD_FROM_SALES;
@@ -98,13 +105,25 @@ public class Local {
 	public static String GOLD_FROM_SELLING_RARE_OBJECTS;
 	public static String GOLD_FROM_SELLING_RESOURCES;
 	public static String GOLD_FROM_SELLING_OTHER;
+	public static String LOSS_FROM_DEATH;
+	public static String LOSS_FROM_SHOPPING;
 	public static String EXPERIENCE_FROM_MONSTERS;
 	public static String EXPERIENCE_FROM_TRAPS;
 	public static String EXPERIENCE_FROM_ORBS;
 	public static String MONSTERS_SKILLS_POINTS;
+	public static String DIVINE_POINTS;
+	public static String DIVINE_POINTS_ORBS;
+	public static String DIVINE_POINTS_LEVEL;
+	public static String MONSTER_LEVEL;
+	public static String CHAMPIONS_LEVEL;
+	public static String BASE_MONSTER_LEVEL;
+		
 	public static String CHAMPIONS_SKILLS_POINTS;
 	public static String TRAPS_DAMAGE;
-	
+	public static String MONSTER_GOLD_LOOT;
+	public static String GOLD_DROP_MIN;
+	public static String GOLD_DROP_AVERAGE;
+	public static String GOLD_DROP_MAX;
 	public static String ATTACKS_PER_SECOND;
 	public static String AVERAGE_DAMAGE_OF_A_BASIC_ATTACK;
 	public static String CRITICAL_STRIKE_PROBABILITY;
@@ -183,8 +202,7 @@ public class Local {
 	public static String EXPERIENCE;
 		
 	public static String HEALTH_POINTS_FOR_A_CONSTITUTION_OF;
-	public static String REGENERATION_PER_SECOND_FOR_A_CONSTITUTION_OF;
-	public static String RESURRECTION_TIME_FOR_LEVEL;
+	public static String RESURRECTION_TIME_CURV;
 	public static String PROBABILITY_THAT_A_BASIC_OBJECT_BECOMES_MAGIC;
 	public static String PROBABILITY_THAT_A_MAGIC_OBJECT_BECOMES_RARE;
 	public static String AVERAGE_NUMBER_OF_ITEMS_ON_A_MONSTER;
@@ -261,11 +279,11 @@ public class Local {
 	public static String BILL_BOSS;
 	public static String GOAL;
 	public static String REACH_LEVEL;
-	public static String WIN_DOLLARS;
+	public static String WIN_GOLD_COINS;
 	public static String DEFEAT_BOSS;
 	public static String LEVEL_REACHED_VICTORY;
 	public static String YOU_MUST_BE_AT_LEAST_LEVEL;
-	public static String YOU_POSSESS_DOLLARS_VICTORY;
+	public static String YOU_POSSESS_GOLD_COINS_VICTORY;
 	public static String YOU_MUST_POSSESS_AT_LEAST;
 	
 	public static String CHOOSE_A_SEED;
@@ -281,6 +299,7 @@ public class Local {
 	public static String CREATE;
 	public static String CANT_WRITE_IN_HISCORES;
 	public static String ERROR_LOADING_HISCORES;
+	public static String CANT_WRITE_IN_LOG;
 	public static String CONGRATULATIONS_HISCORES;
 	public static String HISCORES_LINE;
 	public static String RULE_NEGATION;
@@ -299,6 +318,7 @@ public class Local {
 	public static String MOUNTAINS;
 	public static String ROADSTEAD;
 	public static String WOOD;
+	public static String ARENA;
 	public static String MOUTH;
 	public static String JUNCTION;
 	public static String RIFT;
@@ -306,14 +326,19 @@ public class Local {
 	public static String SWAMP;
 	public static String LAGOON;
 	public static String BRIDGE;
-
+	public static String BASE_EXPERIENCE;
+	public static String BASE_EXPERIENCE_TRAP_LEVEL;
+	public static String BASE_EXPERIENCE_MONSTER_LEVEL;
+	
+	public static String DISTRIBUTION_OF_GOD_POINTS;
 	public static String DISTRIBUTION_OF_SKILL_POINTS;
 	public static String PLUS;
 	public static String MINUS;
 	public static String VALIDATE;
 	public static String CANCEL;
 	public static String SKILL_POINTS_DISTRIBUTION;
-
+	public static String UNIVERSE_EDITION;
+	
 	public static String ERROR_INVALID_NUMBER;
 	public static String ERROR_EMPTY_NAME;
 	public static String ERROR_SELF_REFERENCE;
@@ -374,11 +399,13 @@ public class Local {
 	public static String CHANGE_THE_CHALLENGE;
 	public static String COMPLETE_THE_CHALLENGE;
 	public static String TRAVEL;
+	public static String TRAVEL_TO;
 	public static String INVENTORY;
 	public static String SHOPPING;
 	public static String SKILLS;
 	public static String CHARTS;
 	public static String INFORMATIONS;
+	public static String UNIVERSE_INFO;
 	public static String NEW_GAME;
 	public static String STOP_TO_FIGHT;
 	public static String DEFEATS;
@@ -392,7 +419,7 @@ public class Local {
 	public static String AVOIDS_MONSTER;
 	
 	public static String HTML_BODY;
-	public static String H2_PLAYER_STATISTICS_H2;
+	public static String PLAYER_STATISTICS;
 	public static String PLAYER_STATISTICS_LIST;
 	public static String UNIVERSE_INFORMATION_LIST;
 	public static String H3_AVAILABLE_OBJECTS_H3;
@@ -404,7 +431,8 @@ public class Local {
 	public static String NUMBER_OF_ZONES;
 	public static String DL;
 	public static String DT_ZONE;
-	public static String NO_LOOT_NO_TRAP;
+	public static String NO_LOOT_Z;
+	public static String TRAPS_AND_CHAMPION_PROBABILITY;
 	public static String MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM;
 	public static String CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM;
 	public static String DL_END;
@@ -417,9 +445,17 @@ public class Local {
 	public static String ALCHEMICAL;
 	public static String MAX_ZONE_LEVEL;
 	public static String ZONE_LEVEL_MULTIPLIER;
+	public static String DIVINE_POINTS_MULTIPLIER;
+	public static String FIRST_STRIKE_MULTIPLIER;
+	public static String EQUATION_CAP_MULTIPLIER;
+	public static String CONST_CAP_MULTIPLIER;
+	public static String FIRST_STRIKE;
 	public static String ALLOY;
 	public static String OF_ALLOY;
-	
+	public static String ZONE_LEVEL;
+	public static String RESOURCES_WEIGHT_MULTIPLIER;
+	public static String EQUIPMENT_WEIGHT_MULTIPLIER;
+	public static String MAX_LEVEL;
 	public static void init(int lang)
 	{
 	if(lang == 0)
@@ -436,7 +472,7 @@ public class Local {
 		"Vitesse du temps","Épines","Représailles","Nécrophagie",
 		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
 		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu"};
+		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
@@ -469,14 +505,14 @@ public class Local {
 		"Poids", //objet.poids
 		"Prix réel", //objet.prix 
 		"Niveau effectif", // objet.effectiveIlvl()
-		"Efficacité",  // ilvl*material.coeffEfficacite
-		"Enchantement", // elvl*material.coeffLevel
+		"Efficacité",  // ilvl*material.coeffEfficacite*base_power
+		"Enchantement", // elvl*material.coeffPuissance
 		"Efficacité de base", // objet.ilvl
 		"Enchantement de base",  // objet.elvl
 		"Coefficient de poids",  // material.coeffPoids
 		"Coefficient de prix",  // material.coeffPrix
 		"Coefficient d'efficacité",  // material.coeffEfficacite
-		"Coefficient magique",  // material.coeffLevel
+		"Coefficient magique",  // material.coeffPuissance
 		"Nom de l'objet de base", // objet.baseItem.name
 		"Nom du matériau", // objet.material.name
 		"Equipé" // objet.equiped
@@ -539,7 +575,28 @@ public class Local {
 		
 		String[] tmp16 = {"Action","Condition","Valeur","Activé"};
 		STOP_RULES_COLUMN_NAMES = tmp16;
-			
+		
+		String[] tmp18 = {"Constante de l'univers","Valeur de base","Valeur","Modificateur","Limite"};
+		EDIT_UNIVERSE_COLUMN_NAMES = tmp18;
+		
+		String[] tmp19 = {"Vie de départ",
+		"Probabilité de tomber sur un piège",
+		"Puissance maximale des enchantements",
+		"Points de compétences initiaux",
+		"Pénalité d'or à chaque mort",
+		"Probabilité de tomber sur un champion",
+		"Coût d'un voyage dimensionnel",
+		"Plage aléatoire",
+		"Pénalité pour les matériaux inappropriés",
+		"Pénalité de temps pour changer de défi",
+		"Pénalité de temps d'un voyage",
+		"Pénalité de temps d'un voyage dimensionnel",
+		"Pénalité de temps à chaque mort",
+		"Coefficient d'efficacité de base",
+		"Probabilité qu'un objet soit une ressource",
+		"Qualité maximale des objets"};
+		UNIVERSE_STATS_NAME = tmp19;
+		
 		COLON = " :";
 		SECONDS = "secondes";
 		ALL = "Tout";
@@ -547,19 +604,19 @@ public class Local {
 		NOT_EQUIPPED = "Non équipés";
 		MONSTER_TOO_STRONG = "Monstre trop fort";
 		MONSTER_TOO_WEAK = "Monstre trop faible";
-		LIFE_ANNUITY = "Vous recevez %.2f écus de rente (%.2f secondes x %.2f écus/secondes)";
+		LIFE_ANNUITY = "%s recoit %.2f écus de rente (%.2f secondes x %.2f écus/secondes)";
 		BUYING_OBJECTS = "Achat de %s à %s pour %.2f écus";
 		SELLING_OBJECTS = "Vente de %s à %s pour %.2f écus";
-		DROPPING_OBJECTS = "Vous placez %s dans la forge mystique";
-		THROW_AWAY_OBJECTS = "Vous jetez %s";
-		PICKING_OBJECTS = "Vous récupérez %s depuis la forge mystique";
+		DROPPING_OBJECTS = "%s place %s dans la forge mystique";
+		THROW_AWAY_OBJECTS = "%s jette %s";
+		PICKING_OBJECTS = "%s récupère %s depuis la forge mystique";
 		N_OBJECTS = "%d objets";
 		SHORT_INFOS = "Niveau %d\nTemps total de jeu : %.2f secondes\nOr : %.2f écus\nCharge : %.2f / %.2f\n";
 		LEVEL_N = "Niveau %d\n";
 		
 		LOOKING_FOR_AN_ENNEMY = "Recherche d'un ennemi : %.3f secondes";
 		LOOKING_FOR_A_TRADER = "Recherche d'un marchand : %.3f secondes";
-		ENCOUNTER = "Vous rencontrez %s (niveau %d)";
+		ENCOUNTER = "%s rencontre %s (niveau %d)";
 		LOOKING_FOR_A_MYSTIC_FORGE = "Recherche d'une forge : %.3f secondes";
 		A_HITS_B = "%s frappe %s en %.3f secondes (temps total pour %s : %.3f)\n";
 		A_VERSUS_B = "%s versus %s (niveau %d)";
@@ -582,9 +639,9 @@ public class Local {
 		END_FIGHT_DEATH = "%s est tombé face à %s de niveau %d (temps du combat %.3f secondes)";
 		
 		NO_LOOT = "Pas de butin sur %s";
-		GOLD_LOOT = "Vous ramassez %.2f écus sur le cadavre de %s";
-		ITEMS_LOOT = "Vous ramassez %s sur le cadavre de %s";
-		OBJECTS_LEFT_BEHIND = "Vous abandonnez %s";
+		GOLD_LOOT = "%s ramasse %.2f écus sur le cadavre de %s";
+		ITEMS_LOOT = "%s ramasse %s sur le cadavre de %s";
+		OBJECTS_LEFT_BEHIND = "Objets abandonnés : %s";
 		
 		RESET_BUILD = "Redistribution des points de compétence";
 		FULL_HEAL = "Récupération de %.3f points de vie en %.3f secondes";
@@ -595,7 +652,7 @@ public class Local {
 		DEATH_GOLD_LOSS = "%s perd %.2f × %.1f%% de son or (%.3f écus)";
 		DEATH_TIME_PENALTY = "Pénalité de temps liée à la mort : %.3f secondes (%.3f × %.2f)";
 		RESURRECTION_TIME = "Résurrection : %.3f secondes";
-		NECROPHAGY = "Vous dévorez le cadavre de %s et récupérez %f points de vie";
+		NECROPHAGY = "%s dévore le cadavre de %s et récupère %f points de vie";
 		
 		FIGHT = "Combat";
 		TRAPS = "Pièges";
@@ -611,6 +668,7 @@ public class Local {
 		LOOKING_FOR_TRADER = "Recherche de marchand";
 		LOOKING_FOR_MYSTIC_FORGE = "Recherche de forge";
 		CRAFTING = "Crafting";
+		LOSSES_AND_EXPENSES = "Pertes et dépenses";
 		GOLD_FROM_MONSTERS = "Or sur les monstres";
 		GOLD_FROM_LIFE_ANNUITY = "Rente viagère";
 		GOLD_FROM_SALES = "Vente d'objets";
@@ -619,13 +677,28 @@ public class Local {
 		GOLD_FROM_SELLING_RARE_OBJECTS = "Vente d'objets rares";
 		GOLD_FROM_SELLING_RESOURCES = "Vente de ressources";
 		GOLD_FROM_SELLING_OTHER = "Autres ventes";
+		LOSS_FROM_DEATH = "Or perdu à cause de la mort";
+		LOSS_FROM_SHOPPING = "Or dépensé en achats";
 		
 		EXPERIENCE_FROM_MONSTERS = "Expérience des monstres";
 		EXPERIENCE_FROM_TRAPS = "Expérience des pièges";
 		EXPERIENCE_FROM_ORBS = "Expérience des orbes";
+		BASE_EXPERIENCE = "Expérience de base";
+		BASE_EXPERIENCE_TRAP_LEVEL = "Expérience de base d'un piège (en fonction du niveau)";
+		BASE_EXPERIENCE_MONSTER_LEVEL = "Expérience de base d'un monstre (en fonction du niveau)";
 		MONSTERS_SKILLS_POINTS = "Points à distibuer des monstres";
+		DIVINE_POINTS = "Points divins";
+		DIVINE_POINTS_ORBS = "Points divins (en fonction des orbes sacrifiés)";
+		DIVINE_POINTS_LEVEL = "Points divins (en fonction du niveau)";
+		MONSTER_LEVEL = "Niveau des monstres";
+		CHAMPIONS_LEVEL = "Niveau des champions (relatif)";
+		BASE_MONSTER_LEVEL = "Niveau des monstres de base (relatif)";
 		CHAMPIONS_SKILLS_POINTS = "Points à distibuer des champions";
 		TRAPS_DAMAGE = "Dégâts des pièges";
+		MONSTER_GOLD_LOOT = "Butin d'or (base)";
+		GOLD_DROP_MIN = "Or de base sur les monstres (minimum)";
+		GOLD_DROP_AVERAGE = "Or de base sur les monstres (moyenne)";
+		GOLD_DROP_MAX = "Or de base sur les monstres (maximum)";
 		
 		ATTACKS_PER_SECOND = "Attaques par seconde"; 
 		AVERAGE_DAMAGE_OF_A_BASIC_ATTACK = "Dégâts moyens d'une attaque basique";
@@ -635,7 +708,7 @@ public class Local {
 		AVERAGE_DAMAGE_PER_SECOND = "Dégâts moyens par seconde";
 		DAMAGE_MULTIPLIER = "Multiplicateur de dégâts";
 		OF_LEVEL = "De niveau";
-		LOW_OF_LEVEL = " De niveau ";
+		LOW_OF_LEVEL = " de niveau ";
 		
 		PROBABILITY_TO_HIT_A_MONSTER = "Probabilité de toucher un monstre";
 		PROBABILITY_TO_DODGE_AGAINST_A_MONSTER = "Probabilité d'esquiver contre un monstre";
@@ -661,7 +734,7 @@ public class Local {
 		FINDING_A_FORGE = "Recherche d'une forge";
 		
 		
-		MAXIMUM_LOAD = "Charge maximale en kilogrammes";
+		MAXIMUM_LOAD = "Charge maximale";
 		SALE_PRICE_MULTIPLIER = "Coefficient de vente";
 		BUY_PRICE_MULTIPLIER = "Coefficient d'achat";
 		PROBABILITY_TO_FLEE = "Probabilité de fuite";
@@ -704,11 +777,10 @@ public class Local {
 		TIME_SHOPPING_CRAFTING = "Temps (shopping/crafting)";
 		INCOME_GLOBAL = "Revenu (global)";
 		INCOME_SALES = "Revenu (vente)";
-		EXPERIENCE = "Expérience";
+		EXPERIENCE = "Expérience (sources)";
 		
 		HEALTH_POINTS_FOR_A_CONSTITUTION_OF = "Points de vie pour une constitution de ";
-		REGENERATION_PER_SECOND_FOR_A_CONSTITUTION_OF = "Régénération par seconde pour une constitution de ";
-		RESURRECTION_TIME_FOR_LEVEL = "Temps de résurrection pour le niveau ";
+		RESURRECTION_TIME_CURV = "Temps de résurrection";
 		PROBABILITY_THAT_A_BASIC_OBJECT_BECOMES_MAGIC = "Probabilité qu'un objet normal devienne magique";
 		PROBABILITY_THAT_A_MAGIC_OBJECT_BECOMES_RARE = "Probabilité qu'un objet magique devienne rare";
 		AVERAGE_NUMBER_OF_ITEMS_ON_A_MONSTER = "Nombre moyen d'objets sur un monstre";
@@ -726,7 +798,7 @@ public class Local {
 	
 		WINDOW_CURVES = "Courbes sur les mécanismes du jeu";
 		WINDOW_INVENTORY = "Inventaire";
-		WINDOW_SHOP = "Boutique de %s";
+		WINDOW_SHOP = "Boutique de %s (niveau %d)";
 		WINDOW_FORGE = "Forge mystique";
 		WINDOW_INVENTORY_PROMPT = "Or : %.2f écus, charge : %.2f kg / %.2f kg";
 		EQUIP = "Équiper";
@@ -744,12 +816,12 @@ public class Local {
 		EFFECTIVE_LEVEL_VAL = "Niveau effectif : %d\n";
 		SLOT_VAL = "Emplacement : %s\n";
 		QUALITY_VAL = "Qualité : %.2f%%\n";
-		EFFICIENCY_VAL = "Efficacité : %.1f (%d×%.2f)\n";
+		EFFICIENCY_VAL = "Efficacité : %.1f (%d×%.2f×%.2f)\n";
 		ENCHANTMENT_VAL = "Enchantement : %.1f (%d×%.2f)\n";
 		NUMBER_OF_ENCHANTMENTS_VAL = "Nombre d'enchantements : %d\n";
 		SKILL_BONUS_VAL = "Bonus compétence : %.1f points\n";
 		QUANTITY_VAL = "Quantité : %.4f\n";
-		WEIGHT_VAL = "Poids : %.3f kg\n";
+		WEIGHT_VAL = "Poids : %.3f kg (%.3f allégé)\n";
 		REAL_PRICE_VAL = "Prix réel : %.2f écus\n";
 		SELLING_PRICE_VAL = "Prix de vente : %.2f écus\n";
 		PURCHASE_PRICE_VAL = "Prix d'achat : %.2f écus\n\n";
@@ -781,12 +853,12 @@ public class Local {
 		BILL_BOSS = "Bill";
 		GOAL = "\nObjectif : ";
 		REACH_LEVEL = "atteindre le niveau %d";
-		WIN_DOLLARS = "gagner %d pièces d'or";
+		WIN_GOLD_COINS = "gagner %d pièces d'or";
 		DEFEAT_BOSS = "vaincre %s";
 		LEVEL_REACHED_VICTORY = "Niveau %d atteint, victoire !";
-		YOU_MUST_BE_AT_LEAST_LEVEL = "Vous devez être au moins niveau %d pour gagner.";
-		YOU_POSSESS_DOLLARS_VICTORY = "Vous possédez %d pièces d'or, victoire !";
-		YOU_MUST_POSSESS_AT_LEAST = "Vous devez posséder au moins %d pièces d'or pour gagner.";
+		YOU_MUST_BE_AT_LEAST_LEVEL = "%s doit être au moins niveau %d pour gagner.";
+		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possède %d pièces d'or, victoire !";
+		YOU_MUST_POSSESS_AT_LEAST = "%s doit posséder au moins %d pièces d'or pour gagner.";
 
 		CHOOSE_A_SEED = "Choisissez une graine (un entier naturel)\n 0 pour les règles classiques";
 		CREATE_A_UNIVERSE = "Création d'un univers";
@@ -801,7 +873,8 @@ public class Local {
 		CREATE = "Créer";
 		CANT_WRITE_IN_HISCORES = "Erreur d'écriture du hiscore (fichier hiscores.data).";
 		ERROR_LOADING_HISCORES = "Erreur lors du chargement des hiscores (fichier hiscores.data).";
-		CONGRATULATIONS_HISCORES = "Félicitations, vous entrez dans les hiscores !";
+		CANT_WRITE_IN_LOG = "Erreur d'écriture du log (fichier %s).";
+		CONGRATULATIONS_HISCORES = "Félicitations, %s entre dans les hiscores !";
 		HISCORES_LINE = "%s (%d secondes, graine %d)\n";
 		RULE_NEGATION = "non (%s)";
 		INVALID_RULE = "règle invalide";
@@ -819,6 +892,7 @@ public class Local {
 		MOUNTAINS = "Montagnes";
 		ROADSTEAD = "Rade";
 		WOOD = "Bois";
+		ARENA = "Arène";
 		MOUTH = "Bouche";
 		JUNCTION = "Confluent";
 		RIFT = "Faille";
@@ -827,13 +901,15 @@ public class Local {
 		LAGOON = "Lagune";
 		BRIDGE = "Pont";
 		
+		DISTRIBUTION_OF_GOD_POINTS = "Distribution de %.2f points divins";
 		DISTRIBUTION_OF_SKILL_POINTS = "Distribution de %.2f points de compétences";
 		PLUS = "+";
 		MINUS = "-";
 		VALIDATE = "Valider";
 		CANCEL = "Annuler";
 		SKILL_POINTS_DISTRIBUTION = "Répartition des points de compétences";
-		
+		UNIVERSE_EDITION = "Modifier l'univers";
+				
 		ERROR_INVALID_NUMBER = "Erreur : nombre invalide";
 		ERROR_EMPTY_NAME = "Erreur : nom vide";
 		ERROR_SELF_REFERENCE = "Erreur : autoréférence";
@@ -873,7 +949,7 @@ public class Local {
 		DELETE_A_HERO = "Supprimer un héros";
 		SEED_TIME = "%s (%d)\nSeed : %d\tTemps : %f";
 		
-		YOU_COME_ACROSS = "Vous tombez sur : %s (niveau %d).";
+		YOU_COME_ACROSS = "%s tombe sur : %s (niveau %d).";
 		SUCCESSFUL_TRAP_DETECTION = "Réussite de la détection (score du piège : %.3f, probabilité de détection : %.2f%%).";
 		COMPLETELY_AVOIDS = "%s évite entièrement %s.";
 		FAILED_DETECTION = "Échec de la détection (score du piège : %.3f, probabilité de détection : %.2f%%).";
@@ -893,10 +969,12 @@ public class Local {
 		CHANGE_THE_CHALLENGE = "Changer de défi";
 		COMPLETE_THE_CHALLENGE = "Finir le défi";
 		TRAVEL = "Voyager";
+		TRAVEL_TO = "%s voyage vers %s en %.3f secondes (%.3f × %.2f)";
 		INVENTORY = "Inventaire";
 		SHOPPING = "Shopping";
 		SKILLS = "Compétences";
 		CHARTS = "Courbes";
+		UNIVERSE_INFO = "Informations sur l'univers";
 		INFORMATIONS = "Informations";
 		NEW_GAME = "Nouvelle partie";
 		STOP_TO_FIGHT = "Arrêter de combattre";
@@ -905,15 +983,15 @@ public class Local {
 		LEVELS_WON = "Niveaux gagnés =";
 		LETHAL_TRAPS = "Pièges léthaux =";
 		SURVIVED_TRAPS = "Pièges défaits =";
-		YOU_HAVE_ALREADY_FINISHED_THE_GAME = "Vous avez déjà fini le jeu !";
-		YOU_HAVE_DEFEATED_THE_FINAL_BOSS = "Vous avez vaincu le boss final !";
+		YOU_HAVE_ALREADY_FINISHED_THE_GAME = "%s a déjà fini le jeu !";
+		YOU_HAVE_DEFEATED_THE_FINAL_BOSS = "%s a vaincu le boss final !";
 		TIME_PASSED = "Temps passé : %.2f secondes !";
 		AVOIDS_MONSTER = "%s évite %s (niveau %d)";
 
 		HTML_BODY = "<html><body>";
-		H2_PLAYER_STATISTICS_H2 = "<h2>Statistiques sur le joueur</h2>";
-		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %d<br>\nDéfi : %s<br>\nTemps total de jeu : %.2f secondes<br>\nOr : %.2f<br>\nCharge : %.2f / %.2f<br>\nTotal des points de compétences : %.2f<br>";
-		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>\nUnivers : %d\n<br>Nombre de voyages dimensionnels : %d\n<br>Constantes de l'univers :<ul>\n<li>Vie de départ : %.0f\n<li>Points de compétences initiaux : %.0f\n<li>Puissance maximale des enchantements : %.3f\n<li>Pénalité pour les matériaux inappropriés : de %.2f%% à %.2f%% (%.2f%% de moyenne)\n<li>Plage aléatoire (dégâts, temps, or) : de %.3f à %.3f (1,000 de moyenne)\n<li>Pénalité d'or à chaque mort (base) : %.3f%%\n<li>Pénalité de temps à chaque mort (base) : %.0f secondes\n<li>Probabilité de tomber sur un piège : %.3f%%\n<li>Probabilité de tomber sur un champion : %.1f%%\n<li>Pénalité de temps pour changer de défi (base) : %.0f secondes\n<li>Coût d'un voyage dimensionnel (base) : %.0f orbes de chaque type\n<li>Pénalité de temps pour changer d'univers (base) : %.0f secondes</ul>";
+		PLAYER_STATISTICS = "Statistiques sur le joueur";
+		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %d<br>\nDéfi : %s<br>\nTemps total de jeu : %.2f secondes<br>\nOr : %.2f<br>\nCharge : %.2f / %.2f<br>\nTotal des points de compétences : %.2f<br>\nTotal des points divins : %.2f (%.2f orbes sacrifiés)<br>";
+		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>\nUnivers : %d\n<br>Nombre de voyages dimensionnels : %d\n<br>Niveau maximal du joueur : %d\n<br>Constantes de l'univers :<ul>\n<li>Vie de départ : %.0f\n<li>Points de compétences initiaux : %.0f\n<li>Coefficient d'efficacité de base : %.3f\n<li>Puissance maximale des enchantements : %.3f\n<li>Qualité maximale des objets : %.2f%%\n<li>Pénalité pour les matériaux inappropriés : de %.2f%% à %.2f%% (%.2f%% de moyenne)\n<li>Plage aléatoire (dégâts, temps, or) : de %.3f à %.3f (1,000 de moyenne)\n<li>Pénalité d'or à chaque mort (base) : %.3f%%\n<li>Pénalité de temps à chaque mort (base) : %.0f secondes\n<li>Probabilité de tomber sur un piège (base) : %.2f%%\n<li>Probabilité de tomber sur un champion (base) : %.2f%%\n<li>Pénalité de temps pour changer de défi (base) : %.0f secondes\n<li>Coût d'un voyage dimensionnel (base) : %.0f orbes de chaque type\n<li>Pénalité de temps pour voyager (base) : %.0f secondes<li>Pénalité de temps pour changer d'univers (base) : %.0f secondes<li>Probabilité qu'un objet soit une ressource : %.2f%%</ul>";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Objets disponibles :</h3>";
 		H3_UNAVAILABLE_OBJECTS_H3 = "<h3>Objets indisponibles :</h3>";
 		BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS = "<h3>Répartition de base des points des monstres</h3><ul>";
@@ -922,9 +1000,10 @@ public class Local {
 		H3_ZONE_INFORMATION_H3 = "<h3>Informations sur les zones</h3>";
 		NUMBER_OF_ZONES = "Nombre de zones : ";
 		DL = "<dl>";
-		DT_ZONE = "<dt>%s (%d-%d)</dt>";
-		NO_LOOT_NO_TRAP = "Pas de pièges, pas de butin (arène)<br>";
-		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<dd>%sNiveau des monstres : minimum %d (%.0f points), moyen %.2f (%.0f points), maximum %d (%.0f points)";
+		DT_ZONE = "<dt>%s (%d-%d) %s</dt>";
+		NO_LOOT_Z = "(pas de butin)";
+		TRAPS_AND_CHAMPION_PROBABILITY = "<dd>Probabilité de tomber sur un piège : %.3f%%<br>Probabilité  de tomber sur un champion : %.3f%%";
+		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des monstres : minimum %d (%.0f points), moyen %.2f (%.0f points), maximum %d (%.0f points)";
 		CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des champions : minimum %d (%.0f points), moyen %.2f (%.0f points), maximum %d (%.0f points)</dd>";
 		DL_END = "</dl>";
 		H2_CRAFTING_H2 = "<h2>Crafting</h2>";
@@ -932,16 +1011,28 @@ public class Local {
 		INFORMATION_AND_STATISTICS = "Informations et statistiques";
 
 		FIGHT_STATS = "<h3>Combat</h3><ul>";
-		FIGHT_STATS_LIST = "<li>Ennemis combattus : %.0f / %.0f (%.2f%%)\n<li>Combats gagnés : %.0f / %.0f (%.2f%%)\n<li>Combats fuis : %.0f / %.0f (%.2f%%)\n<li>Mort au combat: %.0f / %.0f (%.2f%%)\n<li>Coups ayant touché : %.0f / %.0f (%.2f%%)\n<li>Tentatives de fuite réussies : %.0f / %.0f (%.2f%%)\n<li>Pièges survécus : %.0f / %.0f (%.2f%%)\n<li>Pièges évités : %.0f / %.0f (%.2f%%)</ul>\n<h3>Économie</h3>\nMarchands rencontrés : %.0f\n<br>Forges mystiques visitées : %.0f\n<br>Utilisations de la forge : %.0f\n<br>Objets trouvés : %.0f normaux, %.0f magiques, %.0f rares, %.2f ressources, %.2f orbes\n<br>Or total gagné : %.2f\n<ul><li>Ramassé sur les monstres : %.2f (%.2f%%)\n<li>Rente viagère : %.2f (%.2f%%)\n<li>Vente d'objets normaux : %.2f (%.2f%%)\n<li>Vente d'objets magiques : %.2f (%.2f%%)\n<li>Vente d'objets rares : %.2f (%.2f%%)\n<li>Vente de ressources : %.2f (%.2f%%)\n<li>Vente d'autres objets : %.2f (%.2f%%)";
+		FIGHT_STATS_LIST = "<li>Ennemis combattus : %.0f / %.0f (%.2f%%)\n<li>Combats gagnés : %.0f / %.0f (%.2f%%)\n<li>Combats fuis : %.0f / %.0f (%.2f%%)\n<li>Mort au combat: %.0f / %.0f (%.2f%%)\n<li>Coups ayant touché : %.0f / %.0f (%.2f%%)\n<li>Tentatives de fuite réussies : %.0f / %.0f (%.2f%%)\n<li>Pièges survécus : %.0f / %.0f (%.2f%%)\n<li>Pièges évités : %.0f / %.0f (%.2f%%)</ul>\n<h3>Économie</h3>\nMarchands rencontrés : %.0f\n<br>Forges mystiques visitées : %.0f\n<br>Utilisations de la forge : %.0f\n<br>Objets trouvés : %.0f normaux, %.0f magiques, %.0f rares, %.2f ressources, %.2f orbes\n<br>Or total gagné : %.2f\n<br>Or total dépensé : %.2f\n<ul><li>Ramassé sur les monstres : %.2f (%.2f%%)\n<li>Rente viagère : %.2f (%.2f%%)\n<li>Vente d'objets normaux : %.2f (%.2f%%)\n<li>Vente d'objets magiques : %.2f (%.2f%%)\n<li>Vente d'objets rares : %.2f (%.2f%%)\n<li>Vente de ressources : %.2f (%.2f%%)\n<li>Vente d'autres objets : %.2f (%.2f%%)\n<li>Pertes liées à la mort : %.2f (%.2f%%)\n<li>Achat d'objets normaux : %.2f (%.2f%%)\n<li>Achat de ressources : %.2f (%.2f%%)\n<li>Achat d'orbes : %.2f (%.2f%%)\n<li>Achat d'autres objets : %.2f (%.2f%%)";
 		UL_END = "</ul>";
 		
 		ALCHEMICAL = "%s alchimique";
 		MAX_ZONE_LEVEL = "Accès aux zone de niveau %.2f";
 		ZONE_LEVEL_MULTIPLIER = "Multiplicateur du niveau de zone accessible";
+		DIVINE_POINTS_MULTIPLIER = "Multiplicateur du nombre de points divins";
+		FIRST_STRIKE_MULTIPLIER = "Multiplicateur de dégâts sur le premier coup";
+		
+		EQUATION_CAP_MULTIPLIER = "Limite des équations (multiplicateur)";
+		CONST_CAP_MULTIPLIER =  "Limite des constantes (multiplicateur)";
+		
+		FIRST_STRIKE = "Premier coup";
 		ALLOY = "Alliage %s";
 		OF_ALLOY = "d'alliage %s";
+		ZONE_LEVEL = "Niveau de la zone";
+		RESOURCES_WEIGHT_MULTIPLIER="Muliplicateur du poids des ressources";
+		EQUIPMENT_WEIGHT_MULTIPLIER="Muliplicateur du poids de l'équipement";	
+		MAX_LEVEL="Niveau maximal";
 		
 		PLAYER_INFOS = getPlayerInfos();
+		UNIVERSE_EQUATIONS_NAME = getEquationName();
 	}
 	else if (lang == 1)
 	{
@@ -958,7 +1049,7 @@ public class Local {
 		"Speed of time","Thorns","Reprisals","Necrophagy",
 		"Speed of craft", "Craft performance", "Saving orbs", 
 		"Merchant level", "Merchant inventory", 
-		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access"};
+		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"junk","fabric/leather","metal","gemstone","conceptual","alloy"};
@@ -991,14 +1082,14 @@ public class Local {
 		"Weight", //object.weight
 		"Real price", //object.price
 		"Effective level", // object.effectiveIlvl ()
-		"Efficiency", // ilvl * material.coeffEfficiency
-		"Enchantment", // elvl * material.coeffLevel
+		"Efficiency", // ilvl * material.coeffEfficiency * base_power
+		"Enchantment", // elvl * material.coeffPuissance
 		"Basic efficiency", // object.ilvl
 		"Basic enchantment", // object.elvl
 		"Weight coefficient", // material.coeffWeight
 		"Price coefficient", // material.coeffPrice
 		"Efficiency coefficient", // material.coeffEfficiency
-		"Enchantment coefficient", // material.coeffLevel
+		"Enchantment coefficient", // material.coeffPuissance
 		"Name of the base object", // object.baseItem.name
 		"Material name", // object.material.name
 		"Equipped" // object.equiped
@@ -1062,6 +1153,27 @@ public class Local {
 		String[] tmp16 = {"Action","Condition","Value","Enabled"};
 		STOP_RULES_COLUMN_NAMES = tmp16;
 		
+		String[] tmp18 = {"Constant of the universe","Base value","Value","Modifier","Cap"};
+		EDIT_UNIVERSE_COLUMN_NAMES = tmp18;
+		
+		String[] tmp19 = {"Base health points",
+		"Trap probability",
+		"Maximum enchantment power",
+		"Initial skill points",
+		"Gold penalty at each death ",
+		"Champion probability",
+		"Cost of a dimensional trip",
+		"Random range",
+		"Penalty for inappropriate materials",
+		"Time penalty to change challenge",
+		"Time penalty to travel",
+		"Time penalty to change universe",
+		"Time penalty at each death",
+		"Basic efficiency coefficient",
+		"Probability of an object being a ressource",
+		"Objects maximal quality"};
+		UNIVERSE_STATS_NAME = tmp19;
+		
 		COLON = ":";
 		SECONDS = "seconds";
 		ALL = "All";
@@ -1069,19 +1181,19 @@ public class Local {
 		NOT_EQUIPPED = "Not equipped";
 		MONSTER_TOO_STRONG = "Monster too strong";
 		MONSTER_TOO_WEAK = "Monster too weak";
-		LIFE_ANNUITY = "You receive %.2f dollars of income (%.2f seconds x %.2f dollars/seconds)";
-		BUYING_OBJECTS = "Purchase of %s to %s for %.2f dollars";
-		SELLING_OBJECTS = "Sale of %s to %s for %.2f dollars";
-		DROPPING_OBJECTS = "You drop %s in the mystic forge";
-		PICKING_OBJECTS = "You pick %s from the mystic forge";
+		LIFE_ANNUITY = "%s receives %.2f gold coins of income (%.2f seconds x %.2f gold coins/seconds)";
+		BUYING_OBJECTS = "Purchase of %s to %s for %.2f gold coins";
+		SELLING_OBJECTS = "Sale of %s to %s for %.2f gold coins";
+		DROPPING_OBJECTS = "%s drops %s in the mystic forge";
+		PICKING_OBJECTS = "%s picks %s from the mystic forge";
 		THROW_AWAY_OBJECTS = "You throw away %s";
 		N_OBJECTS = "%d objects";
-		SHORT_INFOS = "Level %d\nTotal time: %.2f seconds\nMoney: %.2f dollars\nLoad: %.2f / %.2f\n";
+		SHORT_INFOS = "Level %d\nTotal time: %.2f seconds\nMoney: %.2f gold coins\nLoad: %.2f / %.2f\n";
 		LEVEL_N = "Level %d\n";
 		
 		LOOKING_FOR_AN_ENNEMY = "Looking for an ennemy: %.3f seconds";
 		LOOKING_FOR_A_TRADER = "Looking for a trader: %.3f seconds";
-		ENCOUNTER = "You encounter %s (level %d)";
+		ENCOUNTER = "%s encounters %s (level %d)";
 		LOOKING_FOR_A_MYSTIC_FORGE = "Looking for a mystic forge: %.3f seconds";
 		A_HITS_B = "%s hits %s in %.3f seconds (total time for %s: %.3f)\n";
 		A_VERSUS_B = "%s versus %s (level %d)";
@@ -1104,8 +1216,8 @@ public class Local {
 		END_FIGHT_DEATH = "%s looses against %s of level %d (fight duration %.3f seconds)";
 		
 		NO_LOOT = "No loot on %s";
-		GOLD_LOOT = "You loot %.2f dollars on the corpse of %s";
-		ITEMS_LOOT = "You loot %s on the corpse of %s";
+		GOLD_LOOT = "%s loots %.2f gold coins on the corpse of %s";
+		ITEMS_LOOT = "%s loots %s on the corpse of %s";
 		OBJECTS_LEFT_BEHIND = "Objects left behind: %s";
 		
 		RESET_BUILD = "Redistribution of skills points";
@@ -1114,10 +1226,10 @@ public class Local {
 		LEVEL_UP = "%s rises from level %d to level %d";
 		UNIVERSE_CHANGE = "Time penalty for universe change: %.3f seconds (%.3f × %.2f)";
 		CHALLENGE_CHANGE = "Time penalty for challenge change: %.3f seconds (%.3f × %.2f)";
-		DEATH_GOLD_LOSS = "%s loses %.2f × %.1f%% of his gold (%.3f dollars)";
+		DEATH_GOLD_LOSS = "%s loses %.2f × %.1f%% of his gold (%.3f gold coins)";
 		DEATH_TIME_PENALTY = "Time penalty for death: %.3f seconds (%.3f × %.2f)";
 		RESURRECTION_TIME = "Resurrection: %.3f seconds";
-		NECROPHAGY = "You devour the corpse of %s and recover %f points of life";
+		NECROPHAGY = "%s devours the corpse of %s and recover %f points of life";
 		
 		FIGHT = "Fight";
 		TRAPS = "Traps";
@@ -1133,6 +1245,7 @@ public class Local {
 		LOOKING_FOR_TRADER = "Looking for trader";
 		LOOKING_FOR_MYSTIC_FORGE = "Looking for forge";
 		CRAFTING = "Crafting";
+		LOSSES_AND_EXPENSES = "Losses and expenses";
 		GOLD_FROM_MONSTERS = "Gold from monsters";
 		GOLD_FROM_LIFE_ANNUITY = "Life annuity";
 		GOLD_FROM_SALES = "Gold from sales";
@@ -1141,13 +1254,31 @@ public class Local {
 		GOLD_FROM_SELLING_RARE_OBJECTS = "Selling rare objects";
 		GOLD_FROM_SELLING_RESOURCES = "Selling resources";
 		GOLD_FROM_SELLING_OTHER = "Other sales";
+		LOSS_FROM_DEATH = "Gold lost due to death";
+		LOSS_FROM_SHOPPING = "Gold spent on purchases";
 		
 		EXPERIENCE_FROM_MONSTERS = "Experience from monsters";
 		EXPERIENCE_FROM_TRAPS = "Experience from traps";
 		EXPERIENCE_FROM_ORBS = "Experience from orbs";
+		BASE_EXPERIENCE = "Base experience";
+		BASE_EXPERIENCE_TRAP_LEVEL = "Base trap experience (for a given level)";
+		BASE_EXPERIENCE_MONSTER_LEVEL = "Base monster experience (for a given level)";
 		MONSTERS_SKILLS_POINTS = "Monsters skills points";
+		MONSTER_LEVEL = "Monsters level";
+		CHAMPIONS_LEVEL = "Champions level (relative";
+		BASE_MONSTER_LEVEL = "Base monsters level (relative)";
+		
+		DIVINE_POINTS = "Divine points";
+		DIVINE_POINTS_ORBS = "Divine points (for a given number of sacrificed orbs)";
+		DIVINE_POINTS_LEVEL = "Divine points (for a given level)";
+		
+		CHAMPIONS_LEVEL = "Champions relative level";
 		CHAMPIONS_SKILLS_POINTS = "Champions skills points";
 		TRAPS_DAMAGE = "Traps damage";
+		MONSTER_GOLD_LOOT = "Gold loot (base)";
+		GOLD_DROP_MIN = "Base gold loot (minimum)";
+		GOLD_DROP_AVERAGE =  "Base gold loot (average)";
+		GOLD_DROP_MAX =  "Base gold loot (maximum)";
 		
 		ATTACKS_PER_SECOND = "Attacks per second";
 		AVERAGE_DAMAGE_OF_A_BASIC_ATTACK = "Average damage of a basic attack";
@@ -1182,7 +1313,7 @@ public class Local {
 		FINDING_A_TRADER = "Finding a trader";
 		FINDING_A_FORGE = "Finding a forge";
 
-		MAXIMUM_LOAD = "Maximum load in kilograms";
+		MAXIMUM_LOAD = "Maximum load";
 		SALE_PRICE_MULTIPLIER = "Sale price multiplier";
 		BUY_PRICE_MULTIPLIER = "Buy price multiplier";
 		PROBABILITY_TO_FLEE = "Probability to flee";
@@ -1213,15 +1344,14 @@ public class Local {
 		MAX_NUMBER_OF_MERCHANTS_ITEMS = "Maximum number of merchant's items";
 		
 		PROBABILITY_OF_DETECTING_A_TRAP = "Probability of detecting a trap";
-		INCOME_PER_SECOND = "Income in dollars per second";
+		INCOME_PER_SECOND = "Income in gold coins per second";
 		SKILL_POINTS_PER_LEVEL = "Skill points per level";
 		GENERAL_EXPERIENCE_BONUS = "General experience bonus";
 		EXPERIENCE_BONUS_ON_A_MONSTER = "Experience bonus on a monster";
 		PENALTIES_REDUCTION = "Penalties reduction";
 		MULTIPLIER_VERSUS = "Multiplier versus ";
 		HEALTH_POINTS_FOR_A_CONSTITUTION_OF = "Health points for a constitution of ";
-		REGENERATION_PER_SECOND_FOR_A_CONSTITUTION_OF = "Regeneration per second for a constitution of ";
-		RESURRECTION_TIME_FOR_LEVEL = "Resurrection time for level ";
+		RESURRECTION_TIME_CURV = "Resurrection time";
 		PROBABILITY_THAT_A_BASIC_OBJECT_BECOMES_MAGIC = "Probability that a basic object becomes magic";
 		PROBABILITY_THAT_A_MAGIC_OBJECT_BECOMES_RARE = "Probability that a magic object becomes rare";
 		AVERAGE_NUMBER_OF_ITEMS_ON_A_MONSTER = "Average number of items on a monster";
@@ -1243,13 +1373,13 @@ public class Local {
 		TIME_SHOPPING_CRAFTING = "Time (shopping/crafting)";
 		INCOME_GLOBAL = "Income (global)";
 		INCOME_SALES = "Income (sales)";
-		EXPERIENCE = "Experience";
+		EXPERIENCE = "Experience (sources)";
 		
 		WINDOW_CURVES = "Charts on the game mechanics";
 		WINDOW_INVENTORY = "Inventory";
-		WINDOW_SHOP = "%s's shop";
+		WINDOW_SHOP = "%s's shop (level %d)";
 		WINDOW_FORGE = "Mystic forge";
-		WINDOW_INVENTORY_PROMPT = "Money: %.2f dollars, load: %.2f kg / %.2f kg";
+		WINDOW_INVENTORY_PROMPT = "Money: %.2f gold coins, load: %.2f kg / %.2f kg";
 		EQUIP = "Equip";
 		UNEQUIP = "Unequip";
 		SPLIT = "Split";
@@ -1265,15 +1395,15 @@ public class Local {
 		EFFECTIVE_LEVEL_VAL = "Effective level: %d\n";
 		SLOT_VAL = "Slot: %s\n";
 		QUALITY_VAL = "Quality: %.2f%%\n";
-		EFFICIENCY_VAL = "Efficiency: %.1f (%d×%.2f)\n";
+		EFFICIENCY_VAL = "Efficiency: %.1f (%d×%.2f×%.2f)\n";
 		ENCHANTMENT_VAL = "Enchantment: %.1f (%d×%.2f)\n";
 		NUMBER_OF_ENCHANTMENTS_VAL = "Number of enchantments: %d\n";
 		SKILL_BONUS_VAL = "Skill bonus: %.1f points\n";
 		QUANTITY_VAL = "Quantity: %.4f\n";
-		WEIGHT_VAL = "Weight: %.3f kg\n";
-		REAL_PRICE_VAL = "Real price: %.2f dollars\n";
-		SELLING_PRICE_VAL = "Selling price: %.2f dollars\n";
-		PURCHASE_PRICE_VAL = "Purchase price: %.2f dollars\n\n";
+		WEIGHT_VAL = "Weight: %.3f kg (%.3f lightened)\n";
+		REAL_PRICE_VAL = "Real price: %.2f gold coins\n";
+		SELLING_PRICE_VAL = "Selling price: %.2f gold coins\n";
+		PURCHASE_PRICE_VAL = "Purchase price: %.2f gold coins\n\n";
 		FAMILY_VAL = "Family: %s\n";
 		WEIGHT_COEFFICIENT_VAL = "Weight coefficient: %.2f\n";
 		PRICE_COEFFICIENT_VAL = "Price coefficient: %.2f\n";
@@ -1302,12 +1432,12 @@ public class Local {
 		BILL_BOSS = "Bill";
 		GOAL = "\nGoal: ";
 		REACH_LEVEL = "reach level %d";
-		WIN_DOLLARS = "win %d dollars";
+		WIN_GOLD_COINS = "win %d gold coins";
 		DEFEAT_BOSS = "defeat %s";
 		LEVEL_REACHED_VICTORY = "Level %d reached, victory!";
-		YOU_MUST_BE_AT_LEAST_LEVEL = "You must be at least level %d to win.";
-		YOU_POSSESS_DOLLARS_VICTORY = "You possess %d dollars, victory!";
-		YOU_MUST_POSSESS_AT_LEAST = "You must possess at least %d dollars to win.";
+		YOU_MUST_BE_AT_LEAST_LEVEL = "%s must be at least level %d to win.";
+		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possess %d gold coins, victory!";
+		YOU_MUST_POSSESS_AT_LEAST = "%s must possess at least %d gold coins to win.";
 		
 		
 		CHOOSE_A_SEED = "Choose a seed (a natural integer)\n 0 for the classic rules";
@@ -1323,7 +1453,8 @@ public class Local {
 		CREATE = "Create";
 		CANT_WRITE_IN_HISCORES = "Can't write in hiscores (hiscores.data file).";
 		ERROR_LOADING_HISCORES = "Error loading hiscores (hiscores.data file).";
-		CONGRATULATIONS_HISCORES = "Congratulations, you get a hiscore!";
+		CANT_WRITE_IN_LOG = "Can't write in log (%s file).";
+		CONGRATULATIONS_HISCORES = "Congratulations, %s get a hiscore!";
 		HISCORES_LINE = "%s (%d seconds, seed %d)\n";
 		RULE_NEGATION = "not (%s)";
 		INVALID_RULE = "invalid rule";
@@ -1341,6 +1472,7 @@ public class Local {
 		MOUNTAINS = "Mountains";
 		ROADSTEAD = "Roadstead";
 		WOOD = "Wood";
+		ARENA = "Arena";
 		MOUTH = "Mouth";
 		JUNCTION = "Junction";
 		RIFT = "Rift";
@@ -1349,12 +1481,14 @@ public class Local {
 		LAGOON = "Lagoon";
 		BRIDGE = "Bridge";
 		
+		DISTRIBUTION_OF_GOD_POINTS =  "Distribution of %.2f God's points";
 		DISTRIBUTION_OF_SKILL_POINTS = "Distribution of %.2f skill points";
 		PLUS = "+";
 		MINUS = "-";
 		VALIDATE = "Validate";
 		CANCEL = "Cancel";
 		SKILL_POINTS_DISTRIBUTION = "Skill points distribution";
+		UNIVERSE_EDITION = "Edit universe";
 		
 		ERROR_INVALID_NUMBER = "Error: invalid number";
 		ERROR_EMPTY_NAME = "Error: empty name";
@@ -1395,7 +1529,7 @@ public class Local {
 		DELETE_A_HERO = "Delete a hero";
 		SEED_TIME = "%s (%d)\nSeed: %d\tTime: %f";
 		
-		YOU_COME_ACROSS = "You come across: %s (level %d).";
+		YOU_COME_ACROSS = "%s comes across: %s (level %d).";
 		SUCCESSFUL_TRAP_DETECTION = "Successful trap detection (trap score: %.3f, probability of detection: %.2f%%).";
 		COMPLETELY_AVOIDS = "%s completely avoids %s.";
 		FAILED_DETECTION = "Failed detection (trap score: %.3f, probability of detection: %.2f%%).";
@@ -1415,10 +1549,12 @@ public class Local {
 		CHANGE_THE_CHALLENGE = "Change the challenge";
 		COMPLETE_THE_CHALLENGE = "Complete the challenge";
 		TRAVEL = "Travel";
+		TRAVEL_TO = "%s travel to %s in %.3f seconds (%.3f × %.2f)";
 		INVENTORY = "Inventory";
 		SHOPPING = "Shopping";
 		SKILLS = "Skills";
 		CHARTS = "Charts";
+		UNIVERSE_INFO = "Universe information";
 		INFORMATIONS = "Informations";
 		NEW_GAME = "New game";
 		STOP_TO_FIGHT = "Stop to fight";
@@ -1427,15 +1563,15 @@ public class Local {
 		LEVELS_WON = "Levels won =";
 		LETHAL_TRAPS = "Lethal traps =";
 		SURVIVED_TRAPS = "Survived traps =";
-		YOU_HAVE_ALREADY_FINISHED_THE_GAME = "You have already finished the game!";
-		YOU_HAVE_DEFEATED_THE_FINAL_BOSS = "You have defeated the final boss!";
+		YOU_HAVE_ALREADY_FINISHED_THE_GAME = "%s has already finished the game!";
+		YOU_HAVE_DEFEATED_THE_FINAL_BOSS = "%s has defeated the final boss!";
 		TIME_PASSED = "Time passed: %.2f seconds!";
 		AVOIDS_MONSTER = "%s avoids %s (level %d)";
 		
 		HTML_BODY = "<html><body>";
-		H2_PLAYER_STATISTICS_H2 = "<h2>Player statistics</h2>";
-		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %d <br>\nChallenge: %s <br>\nTotal game time: %.2f seconds <br>\nGold: %.2f <br>\nLoad: %.2f / %.2f<br>\nTotal skill points: %.2f<br>";
-		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>\nUniverse: %d \n<br>Number of dimensional trips: %d\n<br>Universe constants: <ul>\n<li>Base health points: %.0f \n<li>Initial skill points: %.0f \n<li>Maximum enchantment power: %.3f \n<li>Penalty for inappropriate materials: from %.2f%% to %.2f%% (%.2f%% of average)\n<li>Random range (damage, time, gold): from %.3f to %.3f (average of 1.000)\n<li>Gold penalty at each death (base): %.3f%%\n<li>Time penalty at each death (base): %.0f seconds \n<li>Trap probability: %.3f%%\n<li>Champion probability: %.1f%%\n<li>Time penalty to change challenge (base): %.0f seconds\n<li>Cost of a dimensional trip (base): %.0f orbs of each type \n<li>Time penalty to change universe (base): %.0f seconds</ul>";
+		PLAYER_STATISTICS = "Player statistics";
+		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %d <br>\nChallenge: %s <br>\nTotal game time: %.2f seconds <br>\nGold: %.2f <br>\nLoad: %.2f / %.2f<br>\nTotal skill points: %.2f<br>Total divine points: %.2f (%.2f sacrificed orbs)";
+		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>\nUniverse: %d \n<br>Number of dimensional trips: %d\n<br>Maximum player level: %d\n<br>Universe constants: <ul>\n<li>Base health points: %.0f \n<li>Initial skill points: %.0f \n<li>Basic efficiency coefficient: %.3f \n<li>Maximum enchantment power: %.3f \n<li>Objects maximal quality: %.2f%%\n<li>Penalty for inappropriate materials: from %.2f%% to %.2f%% (%.2f%% of average)\n<li>Random range (damage, time, gold): from %.3f to %.3f (average of 1.000)\n<li>Gold penalty at each death (base): %.3f%%\n<li>Time penalty at each death (base): %.0f seconds \n<li>Trap probability (base): %.2f%%\n<li>Champion probability (base): %.2f%%\n<li>Time penalty to change challenge (base): %.0f seconds\n<li>Cost of a dimensional trip (base): %.0f orbs of each type \n<li>Time penalty to travel (base): %.0f seconds<li>Time penalty to change universe (base): %.0f seconds<li>Probability of an object being a ressource: %.2f%%</ul>";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Available objects:</h3>";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Unavailable objects:</h3>";
 		BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS = "<h3>Base distribution of monster skill points</h3><ul>";
@@ -1444,9 +1580,10 @@ public class Local {
 		H3_ZONE_INFORMATION_H3 = "<h3>Zone information</h3>";
 		NUMBER_OF_ZONES = "Number of zones:";
 		DL = "<dl>";
-		DT_ZONE = "<dt>%s (%d-%d)</dt>";
-		NO_LOOT_NO_TRAP = "No traps, no loot (arena)<br>";
-		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<dd>%sMonster level:  minimum %d (%.0f points), average %.2f (%.0f points), maximum %d (%.0f points)";
+		DT_ZONE = "<dt>%s (%d-%d) %s</dt>";
+		NO_LOOT_Z = "(no loot)";
+		TRAPS_AND_CHAMPION_PROBABILITY = "<dd>Trap probability: %.3f%%<br>Champion probability: %.3f%%";
+		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Monster level:  minimum %d (%.0f points), average %.2f (%.0f points), maximum %d (%.0f points)";
 		CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Champion level: minimum %d (%.0f points), average %.2f (%.0f points), maximum %d (%.0f points) </dd>";
 		DL_END = "</dl>";
 		H2_CRAFTING_H2 = "<h2>Crafting</h2>";
@@ -1454,16 +1591,28 @@ public class Local {
 		INFORMATION_AND_STATISTICS = "Information and statistics";
 
 		FIGHT_STATS = "<h3>Fight</h3><ul>";
-		FIGHT_STATS_LIST = "<li>Enemies fought: %.0f / %.0f (%.2f%%) \n <li>Fights won: %.0f / %.0f (%.2f%%) \n <li>Fights fled: %.0f / %.0f (%.2f%%) \n <li>Death in fight: %.0f / %.0f (%.2f%%) \n <li>Hit: %.0f / %.0f (%.2f%%) \n <li>Fleeing success: %.0f / %.0f (%.2f%%) \n <li>Survived traps: %.0f / %.0f (%.2f%%) \n <li>Traps avoided: %.0f / %.0f (%.2f%%) </ul> \n <h3> Income and trading</h3> \nMerchants encountered: %.0f \n <br> Visited mystic forges: %.0f \n <br> Mystic forge uses: %.0f \n <br> Items found: %.0f normal, %.0f magic, %.0f rare, %.2f resources, %.2f orbs\n <br> Total Gold Earned: %.2f \n <ul> <li>Collected on monsters: %.2f (%.2f%%) \n <li>Life annuity: %.2f (%.2f%%) \n <li>Sale of normal objects: %.2f (%.2f%%) \n <li>Sale of magic items: %.2f (%.2f%%) \n <li>Sale of rare items: %.2f (%.2f%%) \n <li>Sale of resources: %.2f (%.2f%%) \n <li>Sale of other objects: %.2f (%.2f%%) ";
+		FIGHT_STATS_LIST = "<li>Enemies fought: %.0f / %.0f (%.2f%%) \n <li>Fights won: %.0f / %.0f (%.2f%%) \n <li>Fights fled: %.0f / %.0f (%.2f%%) \n <li>Death in fight: %.0f / %.0f (%.2f%%) \n <li>Hit: %.0f / %.0f (%.2f%%) \n <li>Fleeing success: %.0f / %.0f (%.2f%%) \n <li>Survived traps: %.0f / %.0f (%.2f%%) \n <li>Traps avoided: %.0f / %.0f (%.2f%%) </ul> \n <h3> Income and trading</h3> \nMerchants encountered: %.0f \n <br> Visited mystic forges: %.0f \n <br> Mystic forge uses: %.0f \n <br> Items found: %.0f normal, %.0f magic, %.0f rare, %.2f resources, %.2f orbs\n <br> Total gold earned: %.2f \n <br> Total gold spent: %.2f \n <ul> <li>Collected on monsters: %.2f (%.2f%%) \n <li>Life annuity: %.2f (%.2f%%) \n <li>Sale of normal objects: %.2f (%.2f%%) \n <li>Sale of magic items: %.2f (%.2f%%) \n <li>Sale of rare items: %.2f (%.2f%%) \n <li>Sale of resources: %.2f (%.2f%%) \n <li>Sale of other objects: %.2f (%.2f%%)\n <li>Gold lost on death: %.2f (%.2f%%)\n <li>Gold spent on normal objects: %.2f (%.2f%%)\n <li>Gold spent on resources: %.2f (%.2f%%)\n <li>Gold spent on orbs: %.2f (%.2f%%)\n <li>Gold spent on other objects: %.2f (%.2f%%)";
 		UL_END = "</ul>";
 		
 		ALCHEMICAL = "alchemical %s";
 		MAX_ZONE_LEVEL = "Acces to level %.2f zones";
-		ZONE_LEVEL_MULTIPLIER = "Multiplier of the accessible zone level";
+		ZONE_LEVEL_MULTIPLIER = "Accessible zone level multiplier";
+		DIVINE_POINTS_MULTIPLIER = "Divine points multiplier";
+		FIRST_STRIKE_MULTIPLIER = "First strike damage multiplier";
+		
+		EQUATION_CAP_MULTIPLIER = "Equation cap multiplier";
+		CONST_CAP_MULTIPLIER = "Constant cap multiplier";
+		
+		FIRST_STRIKE = "First strike";
 		ALLOY = "%s alloy";
 		OF_ALLOY = "of %s alloy";
+		ZONE_LEVEL = "Zone level";
+		RESOURCES_WEIGHT_MULTIPLIER = "Resources weight multiplier";
+		EQUIPMENT_WEIGHT_MULTIPLIER = "Equipment weight multiplier";
+		MAX_LEVEL="Maximum level";
 		
 		PLAYER_INFOS = getPlayerInfos();
+		UNIVERSE_EQUATIONS_NAME = getEquationName();
 	}
 	}
 	
@@ -1524,6 +1673,8 @@ public class Local {
 		"  " + Local.TOTAL_QUANTITY_OF_RESOURCES + Local.COLON + " %.3f\n"+
 		"  " + Local.NUMBER_OF_MAGIC_OBJECTS + Local.COLON + " %.3f\n"+
 		"  " + Local.NUMBER_OF_RARE_OBJECTS + Local.COLON + " %.3f\n"+
+		Local.MINIMUM_ENCHANTMENT_POWER + Local.COLON + " %.4f\n"+
+		Local.MAXIMUM_ENCHANTMENT_POWER + Local.COLON + " %.4f\n"+
 		Local.PROBABILITY_OF_DODGING_A_FINAL_BLOW + Local.COLON + " %.3f%%\n"+
 		Local.TIME_MULTIPLIER + Local.COLON + " %.3f\n"+
 		Local.DAMAGE_INFLICTED_ON_ATTACKERS + Local.COLON + " %.3f\n"+
@@ -1547,7 +1698,85 @@ public class Local {
 		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %.3f%%\n"+
 		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %.3f%%\n"+
 		Local.PENALTIES_REDUCTION + Local.COLON + " %.3f%%\n"+
-		Local.MAX_ZONE_LEVEL;
+		Local.MAX_ZONE_LEVEL+"\n"+
+		Local.DIVINE_POINTS_MULTIPLIER + Local.COLON + " %.2f\n"+
+		Local.FIRST_STRIKE_MULTIPLIER + Local.COLON + " %.2f\n"+
+		Local.EQUATION_CAP_MULTIPLIER + Local.COLON + " %.2f\n"+
+		Local.CONST_CAP_MULTIPLIER + Local.COLON + " %.2f\n"+
+		Local.RESOURCES_WEIGHT_MULTIPLIER + Local.COLON + " %.3f\n"+
+		Local.EQUIPMENT_WEIGHT_MULTIPLIER + Local.COLON + " %.3f\n";
 		return res;
+	}
+	
+	static String[] getEquationName()
+	{
+	String[] tmpStr = {ATTACKS_PER_SECOND,
+	HEALTH_POINTS_PER_VITALITY_POINT,
+	CRITICAL_STRIKE_PROBABILITY,
+	CRITICAL_STRIKE_MULTIPLIER,
+	AVERAGE_DAMAGE_PER_ATTACK,
+	DAMAGE_REDUCTION,
+	DAMAGE_ABSORPTION ,
+	SKILLS_NAME[4] + " & " + SKILLS_NAME[5],
+	LIFE_LEECH,
+	HEALTH_POINTS_PER_SECOND,
+	MAXIMUM_LOAD,
+	FINDING_A_MONSTER,
+	FINDING_A_TRADER,
+	FINDING_A_FORGE,
+	RESURRECTION,
+	BUY_PRICE_MULTIPLIER,
+	SALE_PRICE_MULTIPLIER,
+	RESOURCES_MULTIPLIER,
+	PROBABILITY_THAT_A_BASIC_OBJECT_BECOMES_MAGIC,
+	PROBABILITY_THAT_A_MAGIC_OBJECT_BECOMES_RARE,
+	PROBABILITY_OF_AN_OBJECT_BEING_HIGH_QUALITY,
+	TOTAL_NUMBER_OF_ITEMS,
+	MINIMUM_ENCHANTMENT_POWER,
+	GOLD_MULTIPLIER,
+	DAMAGE_MULTIPLIER + " " + VERSUS + " " + TAGS_NAME[0],
+	DAMAGE_MULTIPLIER + " " + VERSUS + " " + TAGS_NAME[1],
+	DAMAGE_MULTIPLIER + " " + VERSUS + " " + TAGS_NAME[2],
+	DAMAGE_MULTIPLIER + " " + VERSUS + " " + TAGS_NAME[3],
+	DAMAGE_MULTIPLIER + " " + VERSUS + " " + TAGS_NAME[4],
+	DAMAGE_MULTIPLIER + " " + VERSUS + " " + TAGS_NAME[5],
+	PROBABILITY_TO_FLEE,
+	TIME_TO_FLEE,
+	TIME_BEFORE_THE_FIRST_ATTACK,
+	PROBABILITY_OF_DODGING_A_FINAL_BLOW,
+	TIME_MULTIPLIER,
+	DAMAGE_INFLICTED_ON_ATTACKERS,
+	DAMAGE_REFLECTED_ON_ATTACKERS,
+	PROPORTION_OF_THE_CADAVERS_HEALTH_POINTS_ABSORBED,
+	CRAFTING_TIME,
+	CRAFTING_EFFICIENCY,
+	COST_IN_ORBS_OF_AN_ORB,
+	AVERAGE_MERCHANT_LEVEL_ADDED_TO_ZONE_LEVEL,
+	NUMBER_OF_MERCHANTS_ITEMS,
+	SKILLS_NAME[42],
+	INITIATIVE_BONUS_AGAINST_A_TRAP,
+	TRAPS_REDUCTION_MULTIPLIER,
+	INCOME_PER_SECOND,
+	SKILL_POINTS_PER_LEVEL,
+	GENERAL_EXPERIENCE_BONUS,
+	SKILLS_NAME[49],
+	SKILLS_NAME[48],
+	ZONE_LEVEL,
+	GOLD_DROP_AVERAGE,
+	MONSTERS_SKILLS_POINTS,
+	CHAMPIONS_LEVEL,
+	TRAPS_DAMAGE,
+	PENALTY_COEFFICIENT,
+	ZONE_LEVEL_MULTIPLIER,
+	DIVINE_POINTS_MULTIPLIER,
+	DIVINE_POINTS_ORBS,
+	FIRST_STRIKE_MULTIPLIER,
+	BASE_EXPERIENCE_MONSTER_LEVEL,
+	EQUATION_CAP_MULTIPLIER,
+	CONST_CAP_MULTIPLIER,
+	DIVINE_POINTS_LEVEL,
+	RESOURCES_WEIGHT_MULTIPLIER,
+	EQUIPMENT_WEIGHT_MULTIPLIER};
+	return tmpStr;
 	}
 }
