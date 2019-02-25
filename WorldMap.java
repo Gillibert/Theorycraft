@@ -23,7 +23,7 @@ public class WorldMap extends javax.swing.JDialog {
 	Rectangle tmp;
 	for(int i=0; i < Monde.zonesR.length; i++)
 	    {
-		if (Joueur.level < Monde.zones[i].level)
+		if (Joueur.level < Joueur.universe.get_zone_level(Monde.zones[i].level))
 		    the_color = Color.red;
 		else the_color = Color.green;
 		g.setColor(the_color);
@@ -51,6 +51,11 @@ public class WorldMap extends javax.swing.JDialog {
 	this.repaint();
     }
 
+	public String get_zone_label(int x) {
+		if (x==-1) return "Sélectionnez une zone";
+		return Monde.zones[x].name + " (" + Joueur.universe.get_zone_level(Monde.zones[x].level) + "-" + Joueur.universe.get_zone_max_level(Monde.zones[x].level) + ")";
+	}
+		
     private void initialize() {
 	this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	this.setBounds(25, 25, 648, 453);
@@ -74,9 +79,9 @@ public class WorldMap extends javax.swing.JDialog {
 		    int z=Monde.get_zone(e.getX(),e.getY());
 		    if(z!=previous_zone)
 			{
-			    the_label = Monde.get_zone_label(z);
+			    the_label = get_zone_label(z);
 			    if(z==-1)  the_color = Color.white;
-			    else if (Joueur.level < Monde.zones[z].level)
+			    else if (Joueur.level < Joueur.universe.get_zone_level(Monde.zones[z].level))
 				the_color = Color.red;
 			    else the_color = Color.green;
 			    repaint();
@@ -90,7 +95,7 @@ public class WorldMap extends javax.swing.JDialog {
 	this.addMouseListener(new java.awt.event.MouseListener() {
 		public void mouseClicked(java.awt.event.MouseEvent e) {
 		    int z=Monde.get_zone(e.getX(),e.getY());
-		    if(z!=-1 && Joueur.level >= Monde.zones[z].level)
+		    if(z!=-1 && Joueur.level >= Joueur.universe.get_zone_level(Monde.zones[z].level))
 			{
 			    Joueur.zone=z;
 			    setVisible(false);

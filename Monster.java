@@ -9,7 +9,7 @@ class Monster extends Player {
     // ED_MV(22) ED_ANI(23) ED_HUM(24) ED_PV(25) ED_DEM(26) ED_CHAMP(27)
     // ESTI(28) FLEE(29) FLEE_SPD(30) INIT(31)
 
-public static double coeff_std[] = {1.3,2.1,0.9,0.2,0.7,0.7,0.5,0.5,0.0,2.2,0.9}; // 10 "points" sont distribués (+ ED_HUM et INIT)
+public static double[] coeff_std; // la somme fait 1
 
 public boolean masculin;
 public int prefered_level;
@@ -17,9 +17,9 @@ public int[] prefered_stats;
 public String nom_base;
 
 // Boss
-public Monster(String n, int p_level, int t_tag, int[] p_stats)
+public Monster(String n, int p_level, int t_tag, int[] p_stats, Universe u)
 {
-	super(false);
+	super(u,true);
 	tags = new boolean[nb_tags];
 	for(int t=0; t<nb_tags; t++) tags[t]=false;
 	tags[t_tag]=true;
@@ -37,24 +37,26 @@ public Monster(String n, int p_level, int t_tag, int[] p_stats)
 	prefered_stats = p_stats;
 	masculin = true;
 	
-	double pts = ptsForLevel(level);
-	for (int i=0; i<11; i++)
-	    {stats[i]= pts*coeff_std[i]*0.08;}
-  	stats[p_stats[0]]+=pts*0.80;
-  	stats[p_stats[1]]+=pts*0.80;
-  	stats[p_stats[2]]+=pts*0.80;
+	double pts = u.monster_points_for_level(level)*2.0;
 	
-	stats[24]+=pts*0.12; //ED_HUM(24)
-	stats[31]+=pts*0.15; //INIT(31)
+	// 0.5 points distribués avec coeff_std 
+	for (int i=0; i<nb_stats; i++)
+		{stats[i]= pts*coeff_std[i]*(0.7+Math.random()*0.6)*0.5;}
+
+	// 0.5 points distribués avec prefered_stats 
+	stats[p_stats[0]]+=pts*0.22;
+	stats[p_stats[1]]+=pts*0.18;
+	stats[p_stats[2]]+=pts*0.10;
 
 	for(int i=0; i<nb_stats; i++)
 		stats_with_bonus[i]=stats[i];
+	refresh();
 }
 
 // Zoo monster
 public Monster(String n, int p_level, int t_tag, int[] p_stats, boolean g)
 	{
-	super(false);
+	super(null,true);
 	name = n;
 	prefered_level = p_level;
 	prefered_stats = p_stats;
@@ -93,168 +95,181 @@ new Monster("Renard",        7, 1, new int[]{0,0,4},true),
 new Monster("Chien",         7, 1, new int[]{1,0,9},true),
 new Monster("Coyote",        8, 1, new int[]{1,0,9},true),
 new Monster("Chauve-souris", 9, 1, new int[]{0,1,4},false),
-new Monster("Chien-loup",    10+5*0, 1, new int[]{0,9,1},true),
-new Monster("Dingo",         10+5*1, 1, new int[]{0,9,1},true),
-new Monster("Loup",          10+5*2, 1, new int[]{0,9,1},true),
-new Monster("Lynx",          10+5*3, 1, new int[]{0,1,4},true),
-new Monster("Ours",          10+5*4, 1, new int[]{0,9,1},true),
-new Monster("Grizzli",       10+5*5, 1, new int[]{0,9,1},true),
-new Monster("Jaguar",        10+5*6, 1, new int[]{0,0,1},true),
-new Monster("Puma",          10+5*7, 1, new int[]{0,0,1},true),
-new Monster("Guépard",       10+5*8, 1, new int[]{0,0,1},true),
-new Monster("Tigre",         10+5*9, 1, new int[]{0,0,1},true),
-new Monster("Léopard",       10+5*10, 1, new int[]{0,0,1},true),
-new Monster("Lion",          10+5*11, 1, new int[]{0,0,1},true),
-new Monster("Rhinocéros",    10+5*12, 1, new int[]{1,9,0},true),
-new Monster("Utahraptor",    10+5*13, 1, new int[]{0,9,1},true),
-new Monster("Vélociraptor",  10+5*14, 1, new int[]{0,9,1},true),
-new Monster("Diplodocus",    10+5*15, 1, new int[]{9,9,1},true),
-new Monster("Gorgosaurus",   10+5*16, 1, new int[]{0,9,1},true),
-new Monster("Allosaure",     10+5*17, 1, new int[]{1,9,1},true),
-new Monster("Tyrannosaure",  10+5*18, 1, new int[]{1,9,0},true),
-new Monster("Spinosaure",    10+5*19, 1, new int[]{1,9,0},true),
-new Monster("Giganotosaure", 10+5*20, 1, new int[]{9,9,1},true),
-new Monster("Harpie",        10+5*21, 1, new int[]{9,9,1},false),
-new Monster("Griffon",       10+5*22, 1, new int[]{9,9,1},true),
-new Monster("Sphinx",        10+5*23, 1, new int[]{1,9,1},true),
-new Monster("Licorne",       10+5*24, 1, new int[]{1,0,9},false),
-new Monster("Alicorne",      10+5*25, 1, new int[]{1,0,9},false),
-new Monster("Manticore",     10+5*26, 1, new int[]{1,9,1},false),
-new Monster("Kraken",        10+5*27, 1, new int[]{9,9,1},true),
-new Monster("Léviathan",     10+5*28, 1, new int[]{9,1,0},true),
-new Monster("Béhémoth",      10+5*29, 1, new int[]{1,1,9},true),
-new Monster("Tarasque",      10+5*30, 1, new int[]{1,1,9},false),
-new Monster("Oxydeur",       10+5*31, 1, new int[]{1,9,0},false),
-new Monster("Demi-dragon",   10+5*32, 1, new int[]{9,1,0},true),
-new Monster("Dragon",        10+5*33, 1, new int[]{9,1,0},true),
-new Monster("Dracosire",     10+5*34, 1, new int[]{1,0,9},true),
+new Monster("Chien-loup",    10+2*0, 1, new int[]{0,9,1},true),
+new Monster("Dingo",         10+2*1, 1, new int[]{0,9,1},true),
+new Monster("Loup",          10+2*2, 1, new int[]{0,9,1},true),
+new Monster("Lynx",          10+2*3, 1, new int[]{0,1,4},true),
+new Monster("Ours",          10+2*4, 1, new int[]{0,9,1},true),
+new Monster("Grizzli",       10+2*5, 1, new int[]{0,9,1},true),
+new Monster("Jaguar",        10+2*6, 1, new int[]{0,0,1},true),
+new Monster("Puma",          10+2*7, 1, new int[]{0,0,1},true),
+new Monster("Guépard",       10+2*8, 1, new int[]{0,0,1},true),
+new Monster("Tigre",         10+2*9, 1, new int[]{0,0,1},true),
+new Monster("Léopard",       10+2*10, 1, new int[]{0,0,1},true),
+new Monster("Lion",          10+2*11, 1, new int[]{0,0,1},true),
+new Monster("Rhinocéros",    10+2*12, 1, new int[]{1,9,0},true),
+new Monster("Utahraptor",    10+2*13, 1, new int[]{0,9,1},true),
+new Monster("Vélociraptor",  10+2*14, 1, new int[]{0,9,1},true),
+new Monster("Diplodocus",    10+2*15, 1, new int[]{9,9,1},true),
+new Monster("Gorgosaurus",   10+2*16, 1, new int[]{0,9,1},true),
+new Monster("Allosaure",     10+2*17, 1, new int[]{1,9,1},true),
+new Monster("Tyrannosaure",  10+2*18, 1, new int[]{1,9,0},true),
+new Monster("Spinosaure",    10+2*19, 1, new int[]{1,9,0},true),
+new Monster("Giganotosaure", 10+2*20, 1, new int[]{9,9,1},true),
+new Monster("Harpie",        10+2*21, 1, new int[]{9,9,1},false),
+new Monster("Griffon",       10+2*22, 1, new int[]{9,9,1},true),
+new Monster("Sphinx",        10+2*23, 1, new int[]{1,9,1},true),
+new Monster("Licorne",       10+2*24, 1, new int[]{1,0,9},false),
+new Monster("Alicorne",      10+2*25, 1, new int[]{1,0,9},false),
+new Monster("Manticore",     10+2*26, 1, new int[]{1,9,1},false),
+new Monster("Kraken",        10+2*27, 1, new int[]{9,9,1},true),
+new Monster("Léviathan",     10+2*28, 1, new int[]{9,1,0},true),
+new Monster("Béhémoth",      10+2*29, 1, new int[]{1,1,9},true),
+new Monster("Tarasque",      10+2*30, 1, new int[]{1,1,9},false),
+new Monster("Oxydeur",       10+2*31, 1, new int[]{1,9,0},false),
+new Monster("Demi-dragon",   10+2*32, 1, new int[]{9,1,0},true),
+new Monster("Dragon",        10+2*33, 1, new int[]{9,1,0},true),
+new Monster("Dracosire",     10+2*34, 1, new int[]{1,0,9},true),
 
-new Monster("Sauvageon",    12+4*0, 2, new int[]{1,9,10},true),
-new Monster("Voyou",        12+4*1, 2, new int[]{1,9,10},true),
-new Monster("Cleptomane",   12+4*2, 2, new int[]{0,1,9},true),
-new Monster("Délinquant",   12+4*3, 2, new int[]{0,1,9},true),
-new Monster("Bagarreur",    12+4*4, 2, new int[]{0,1,9},true),
-new Monster("Fripon",       12+4*5, 2, new int[]{0,1,9},true),
-new Monster("Voleur",       12+4*6, 2, new int[]{1,1,1},true),
-new Monster("Pillard",      12+4*7, 2, new int[]{1,9,0},true),
-new Monster("Bandit",       12+4*8, 2, new int[]{1,0,9},true),
-new Monster("Dévaliseur",   12+4*9, 2, new int[]{0,1,9},true),
-new Monster("Malandrin",    12+4*10, 2, new int[]{1,0,7},true),
-new Monster("Pirate",       12+4*11, 2, new int[]{1,0,7},true),
-new Monster("Corsair",      12+4*12, 2, new int[]{1,6,7},true),
-new Monster("Boucanier",    12+4*13, 2, new int[]{1,6,7},true),
-new Monster("Flibustier",   12+4*14, 2, new int[]{1,0,4},true),
-new Monster("Maraudeur",    12+4*15, 2, new int[]{1,6,7},true),
-new Monster("Détrousseur",  12+4*16, 2, new int[]{1,9,0},true),
-new Monster("Gangster",     12+4*17, 2, new int[]{1,9,0},true),
-new Monster("Brigand",      12+4*18, 2, new int[]{1,0,4},true),
-new Monster("Ninja",        12+4*19, 2, new int[]{1,6,7},true),
-new Monster("Shinobi",      12+4*20, 2, new int[]{1,6,7},true),
-new Monster("Inquisiteur",  12+4*21, 2, new int[]{1,1,0},true),
-new Monster("Assassin",     12+4*22, 2, new int[]{1,1,0},true),
-new Monster("Fanatique",    12+4*23, 2, new int[]{1,6,7},true),
-new Monster("Démonologue",  12+4*24, 2, new int[]{0,1,9},true),
-new Monster("Sataniste",    12+4*25, 2, new int[]{1,0,4},true),
-new Monster("Sorcier",      12+4*26, 2, new int[]{1,0,4},true),
-new Monster("Assassin",     12+4*27, 2, new int[]{1,0,5},true),
-new Monster("Nizârien",     12+4*28, 2, new int[]{0,1,0},true),
-new Monster("Hérétique",    12+4*29, 2, new int[]{9,0,1},true),
-new Monster("Ensorceleur",  12+4*30, 2, new int[]{9,9,1},true),
-new Monster("Magicien",     12+4*31, 2, new int[]{0,1,9},true),
-new Monster("Géomancien",   12+4*32, 2, new int[]{0,1,9},true),
-new Monster("Théurge",      12+4*33, 2, new int[]{9,1,9},true),
-new Monster("Thaumaturge",  12+4*34, 2, new int[]{1,9,9},true),
-new Monster("Barbare",      12+4*35, 2, new int[]{1,9,10},true),
-new Monster("Rôdeur",       12+4*36, 2, new int[]{1,0,9},true),
-new Monster("Guerrier",     12+4*37, 2, new int[]{1,0,9},true),
-new Monster("Roublard",     12+4*38, 2, new int[]{1,1,0},true),
-new Monster("Yakuza",       12+4*39, 2, new int[]{1,1,0},true),
-new Monster("Nécromancien", 12+4*40, 2, new int[]{1,0,5},true),
-new Monster("Élémentaliste",12+4*41, 2, new int[]{1,0,5},true),
-new Monster("Mutant",       12+4*42, 2, new int[]{1,0,9},true),
+new Monster("Sauvageon",    12+2*0, 2, new int[]{1,9,10},true),
+new Monster("Voyou",        12+2*1, 2, new int[]{1,9,10},true),
+new Monster("Cleptomane",   12+2*2, 2, new int[]{0,1,9},true),
+new Monster("Délinquant",   12+2*3, 2, new int[]{0,1,9},true),
+new Monster("Bagarreur",    12+2*4, 2, new int[]{0,1,9},true),
+new Monster("Fripon",       12+2*5, 2, new int[]{0,1,9},true),
+new Monster("Voleur",       12+2*6, 2, new int[]{1,1,1},true),
+new Monster("Pillard",      12+2*7, 2, new int[]{1,9,0},true),
+new Monster("Bandit",       12+2*8, 2, new int[]{1,0,9},true),
+new Monster("Dévaliseur",   12+2*9, 2, new int[]{0,1,9},true),
+new Monster("Malandrin",    12+2*10, 2, new int[]{1,0,7},true),
+new Monster("Pirate",       12+2*11, 2, new int[]{1,0,7},true),
+new Monster("Corsair",      12+2*12, 2, new int[]{1,6,7},true),
+new Monster("Boucanier",    12+2*13, 2, new int[]{1,6,7},true),
+new Monster("Flibustier",   12+2*14, 2, new int[]{1,0,4},true),
+new Monster("Maraudeur",    12+2*15, 2, new int[]{1,6,7},true),
+new Monster("Détrousseur",  12+2*16, 2, new int[]{1,9,0},true),
+new Monster("Gangster",     12+2*17, 2, new int[]{1,9,0},true),
+new Monster("Brigand",      12+2*18, 2, new int[]{1,0,4},true),
+new Monster("Ninja",        12+2*19, 2, new int[]{1,6,7},true),
+new Monster("Shinobi",      12+2*20, 2, new int[]{1,6,7},true),
+new Monster("Inquisiteur",  12+2*21, 2, new int[]{1,1,0},true),
+new Monster("Assassin",     12+2*22, 2, new int[]{1,1,0},true),
+new Monster("Fanatique",    12+2*23, 2, new int[]{1,6,7},true),
+new Monster("Démonologue",  12+2*24, 2, new int[]{0,1,9},true),
+new Monster("Sataniste",    12+2*25, 2, new int[]{1,0,4},true),
+new Monster("Sorcier",      12+2*26, 2, new int[]{1,0,4},true),
+new Monster("Assassin",     12+2*27, 2, new int[]{1,0,5},true),
+new Monster("Nizârien",     12+2*28, 2, new int[]{0,1,0},true),
+new Monster("Hérétique",    12+2*29, 2, new int[]{9,0,1},true),
+new Monster("Ensorceleur",  12+2*30, 2, new int[]{9,9,1},true),
+new Monster("Magicien",     12+2*31, 2, new int[]{0,1,9},true),
+new Monster("Géomancien",   12+2*32, 2, new int[]{0,1,9},true),
+new Monster("Théurge",      12+2*33, 2, new int[]{9,1,9},true),
+new Monster("Thaumaturge",  12+2*34, 2, new int[]{1,9,9},true),
+new Monster("Barbare",      12+2*35, 2, new int[]{1,9,10},true),
+new Monster("Rôdeur",       12+2*36, 2, new int[]{1,0,9},true),
+new Monster("Guerrier",     12+2*37, 2, new int[]{1,0,9},true),
+new Monster("Roublard",     12+2*38, 2, new int[]{1,1,0},true),
+new Monster("Yakuza",       12+2*39, 2, new int[]{1,1,0},true),
+new Monster("Nécromancien", 12+2*40, 2, new int[]{1,0,5},true),
+new Monster("Élémentaliste",12+2*41, 2, new int[]{1,0,5},true),
+new Monster("Mutant",       12+2*42, 2, new int[]{1,0,9},true),
 
-new Monster("Snotlings",    10+10*0, 3, new int[]{0,6,7},true),
-new Monster("Kobold",       10+10*1, 3, new int[]{1,6,7},true),
-new Monster("Gobelin",      10+10*2, 3, new int[]{0,6,7},true),
-new Monster("Subterranéen", 10+10*3, 3, new int[]{1,6,7},true),
-new Monster("Hobgobelins",  10+10*4, 3, new int[]{0,6,7},true),
-new Monster("Orc",          10+10*5, 3, new int[]{0,1,2},true),
-new Monster("Uruk-hai",     10+10*6, 3, new int[]{0,1,2},true),
-new Monster("Ork",          10+10*7, 3, new int[]{0,1,2},true),
-new Monster("Demi-orc",     10+10*8, 3, new int[]{0,1,2},true),
-new Monster("Gobelours",    10+10*9, 3, new int[]{1,2,3},true),
-new Monster("Trolloïde",    10+10*10, 3, new int[]{1,9,10},true),
-new Monster("Troll",        10+10*11, 3, new int[]{1,9,10},true),
-new Monster("Gnoblars",     10+10*12, 3, new int[]{1,6,0},true),
-new Monster("Géant vert",   10+10*13, 3, new int[]{1,0,9},true),
-new Monster("Ogre",         10+10*14, 3, new int[]{1,9,0},true),
-new Monster("Ent",          10+10*15, 3, new int[]{1,9,0},true),
-new Monster("Reptilien",    10+10*16, 3, new int[]{1,6,0},true),
-new Monster("Draconien",    10+10*17, 3, new int[]{1,6,0},true),
-new Monster("Hulk",         10+10*18, 3, new int[]{1,6,0},true),
+new Monster("Snotlings",    9+5*0, 3, new int[]{0,6,7},true),
+new Monster("Kobold",       9+5*1, 3, new int[]{1,6,7},true),
+new Monster("Gobelin",      9+5*2, 3, new int[]{0,6,7},true),
+new Monster("Subterranéen", 9+5*3, 3, new int[]{1,6,7},true),
+new Monster("Hobgobelins",  9+5*4, 3, new int[]{0,6,7},true),
+new Monster("Orc",          9+5*5, 3, new int[]{0,1,2},true),
+new Monster("Uruk-hai",     9+5*6, 3, new int[]{0,1,2},true),
+new Monster("Ork",          9+5*7, 3, new int[]{0,1,2},true),
+new Monster("Demi-orc",     9+5*8, 3, new int[]{0,1,2},true),
+new Monster("Gobelours",    9+5*9, 3, new int[]{1,2,3},true),
+new Monster("Trolloïde",    9+5*10, 3, new int[]{1,9,10},true),
+new Monster("Troll",        9+5*11, 3, new int[]{1,9,10},true),
+new Monster("Gnoblars",     9+5*12, 3, new int[]{1,6,0},true),
+new Monster("Géant vert",   9+5*13, 3, new int[]{1,0,9},true),
+new Monster("Ogre",         9+5*14, 3, new int[]{1,9,0},true),
+new Monster("Ent",          9+5*15, 3, new int[]{1,9,0},true),
+new Monster("Reptilien",    9+5*16, 3, new int[]{1,6,0},true),
+new Monster("Draconien",    9+5*17, 3, new int[]{1,6,0},true),
+new Monster("Hulk",         9+5*18, 3, new int[]{1,6,0},true),
 
-new Monster("Diablotin",      30+7*1,  4, new int[]{1,0,5},true),
-new Monster("Cacodémon",      30+7*2,  4, new int[]{0,1,4},true),
-new Monster("Mancubus",       30+7*3,  4, new int[]{0,1,4},true),
-new Monster("Succube",        30+7*4,  4, new int[]{1,0,5},false),
-new Monster("Yokai",          30+7*5,  4, new int[]{1,0,5},true),
-new Monster("Ayakashi",       30+7*6,  4, new int[]{0,1,4},true),
-new Monster("Oni",            30+7*7,  4, new int[]{1,0,5},true),
-new Monster("Diable",         30+7*8,  4, new int[]{0,1,4},true),
-new Monster("Archidiable",    30+7*9,  4, new int[]{1,0,5},true),
-new Monster("Baal",           30+7*10, 4, new int[]{0,1,4},true),
-new Monster("Asmodée",        30+7*11, 4, new int[]{1,0,5},true),
-new Monster("Méphistophélès", 30+7*12, 4, new int[]{1,0,5},true),
-new Monster("Bélial",         30+7*13, 4, new int[]{1,0,5},true),
-new Monster("Belphégor",      30+7*14, 4, new int[]{0,1,4},true),
-new Monster("Baphomet",       30+7*15, 4, new int[]{1,0,5},true),
-new Monster("Satan",          30+7*16, 4, new int[]{1,0,5},true),
-new Monster("Kreegan",        30+7*17, 4, new int[]{1,0,5},true),
-new Monster("Stryge",         30+7*18, 4, new int[]{1,0,5},false),
-new Monster("Diablo",         30+7*19, 4, new int[]{1,0,5},true),
-new Monster("Balrog",         30+7*20, 4, new int[]{0,1,4},true),
-new Monster("Azazel",         30+7*21, 4, new int[]{0,1,5},true),
-new Monster("Moloch",         30+7*22, 4, new int[]{1,0,5},true),
-new Monster("Sheitan",        30+7*23, 4, new int[]{1,0,5},true),
-new Monster("Lucifer",        30+7*24, 4, new int[]{1,0,5},true),
+new Monster("Diablotin",      	25+2*1	,4, new int[]{1,0,5},true),
+new Monster("Cacodémon",      	25+2*2	,4, new int[]{0,1,4},true),
+new Monster("Mancubus",       	25+2*3	,4, new int[]{0,1,4},true),
+new Monster("Incube",         	25+2*4	,4, new int[]{0,1,4},true),
+new Monster("Succube",        	25+2*5	,4, new int[]{1,0,5},false),
+new Monster("Yokai",          	25+2*6	,4, new int[]{1,0,5},true),
+new Monster("Ayakashi",       	25+2*7	,4, new int[]{0,1,4},true),
+new Monster("Eligos",         	25+2*8	,4, new int[]{1,0,5},true),
+new Monster("Oni",            	25+2*9	,4, new int[]{1,0,5},true),
+new Monster("Diable",         	25+2*10	,4, new int[]{0,1,4},true),
+new Monster("Archidiable",    	25+2*11	,4, new int[]{1,0,5},true),
+new Monster("Baal",           	25+2*12	,4, new int[]{0,1,4},true),
+new Monster("Balaam",         	25+2*13	,4, new int[]{0,1,4},true),
+new Monster("Lilith",         	25+2*14	,4, new int[]{0,1,4},false),
+new Monster("Asmodée",        	25+2*15	,4, new int[]{1,0,5},true),
+new Monster("Méphistophélès", 	25+2*16	,4, new int[]{1,0,5},true),
+new Monster("Bélial",         	25+2*17	,4, new int[]{1,0,5},true),
+new Monster("Paimon",         	25+2*18	,4, new int[]{1,0,5},true),
+new Monster("Belphégor",      	25+2*19	,4, new int[]{0,1,4},true),
+new Monster("Belzébuth",      	25+2*20	,4, new int[]{0,1,4},true),
+new Monster("Baphomet",       	25+2*21	,4, new int[]{1,0,5},true),
+new Monster("Satanachia",     	25+2*22	,4, new int[]{1,0,5},true),
+new Monster("Satan",          	25+2*23	,4, new int[]{1,0,5},true),
+new Monster("Berith",         	25+2*24	,4, new int[]{1,0,5},false),
+new Monster("Kreegan",        	25+2*25	,4, new int[]{1,0,5},true),
+new Monster("Stryge",         	25+2*26	,4, new int[]{1,0,5},false),
+new Monster("Diablo",         	25+2*27	,4, new int[]{1,0,5},true),
+new Monster("Balrog",         	25+2*28	,4, new int[]{0,1,4},true),
+new Monster("Azazel",         	25+2*29	,4, new int[]{0,1,5},true),
+new Monster("Moloch",         	25+2*30	,4, new int[]{1,0,5},true),
+new Monster("Nergal",         	25+2*31	,4, new int[]{1,0,5},true),
+new Monster("Valefor",        	25+2*32	,4, new int[]{0,1,4},true),
+new Monster("Zagan",          	25+2*33	,4, new int[]{0,1,4},true),
+new Monster("Sheitan",        	25+2*34	,4, new int[]{1,0,5},true),
+new Monster("Astaroth",       	25+2*35	,4, new int[]{1,0,5},false),
+new Monster("Abaddon",        	25+2*36	,4, new int[]{1,0,5},true),
+new Monster("Lucifer",        	25+2*37	,4, new int[]{1,0,5},true),
 
-new Monster("Squelette",   20+1*5, 0, new int[]{9,10,1},true),
-new Monster("Décomposé",   20+2*5, 0, new int[]{9,10,1},true),
-new Monster("Zombi",       20+3*5, 0, new int[]{9,10,1},true),
-new Monster("Maccabé",     20+3*5, 0, new int[]{9,10,1},true),
-new Monster("Cadavre",     20+5*5, 0, new int[]{9,10,1},true),
-new Monster("Putréfié",    20+6*5, 0, new int[]{9,10,1},true),
-new Monster("Fantôme",     20+7*5, 0, new int[]{0,2,4},true),
-new Monster("Spectre",     20+8*5, 0, new int[]{0,2,4},true),
-new Monster("Mort-né",     20+9*5, 0, new int[]{0,2,4},true),
-new Monster("Poltergeist", 20+10*5, 0, new int[]{1,2,4},true),
-new Monster("Ectoplasme",  20+11*5, 0, new int[]{1,2,4},true),
-new Monster("Yurei",       20+12*5, 0, new int[]{1,2,4},true),
-new Monster("Revenant",    20+13*5, 0, new int[]{1,2,4},true),
-new Monster("Esprit ",     20+14*5, 0, new int[]{1,2,4},true),
-new Monster("Vampire",     20+15*5, 0, new int[]{0,1,9},true),
-new Monster("Nosferatu",   20+16*5, 0, new int[]{0,1,9},true),
-new Monster("Loogaroo",    20+17*5, 0, new int[]{0,1,9},true),
-new Monster("Nukekubi",    20+18*5, 0, new int[]{0,1,9},true),
-new Monster("Âme perdue",  20+19*5, 0, new int[]{0,2,4},false),
-new Monster("Mandurugo",   20+20*5, 0, new int[]{0,1,9},true),
-new Monster("Âme en peine",20+21*5, 0, new int[]{0,2,4},false),
-new Monster("Goule",       20+22*5, 0, new int[]{0,1,9},false),
-new Monster("Âme errante", 20+23*5, 0, new int[]{0,2,4},false),
-new Monster("Momie",       20+24*5, 0, new int[]{1,9,10},false),
-new Monster("Moroaică",    20+25*5, 0, new int[]{0,1,9},false),
-new Monster("Moroï",       20+26*5, 0, new int[]{0,1,9},true),
-new Monster("Ubume",       20+27*5, 0, new int[]{1,0,10},false),
-new Monster("Strigoi",     20+28*5, 0, new int[]{1,0,10},true),
-new Monster("Âme damnée",  20+29*5, 0, new int[]{0,2,4},false),
-new Monster("Liche",       20+30*5, 0, new int[]{1,9,10},false),
-new Monster("Ombre",       20+31*5, 0, new int[]{1,9,10},false),
-new Monster("Illusion",    20+32*5, 0, new int[]{0,0,0},false),
-new Monster("Deadite",     20+33*5, 0, new int[]{0,0,0},true),
-new Monster("Nazgûl",      20+34*5, 0, new int[]{1,0,10},true)
+new Monster("Squelette",   31+2*1, 0, new int[]{9,10,1},true),
+new Monster("Décomposé",   31+2*2, 0, new int[]{9,10,1},true),
+new Monster("Zombi",       31+2*3, 0, new int[]{9,10,1},true),
+new Monster("Maccabé",     31+2*3, 0, new int[]{9,10,1},true),
+new Monster("Cadavre",     31+2*5, 0, new int[]{9,10,1},true),
+new Monster("Putréfié",    31+2*6, 0, new int[]{9,10,1},true),
+new Monster("Fantôme",     31+2*7, 0, new int[]{0,2,4},true),
+new Monster("Spectre",     31+2*8, 0, new int[]{0,2,4},true),
+new Monster("Mort-né",     31+2*9, 0, new int[]{0,2,4},true),
+new Monster("Poltergeist", 31+2*10, 0, new int[]{1,2,4},true),
+new Monster("Ectoplasme",  31+2*11, 0, new int[]{1,2,4},true),
+new Monster("Yurei",       31+2*12, 0, new int[]{1,2,4},true),
+new Monster("Revenant",    31+2*13, 0, new int[]{1,2,4},true),
+new Monster("Esprit ",     31+2*14, 0, new int[]{1,2,4},true),
+new Monster("Vampire",     31+2*15, 0, new int[]{0,1,9},true),
+new Monster("Nosferatu",   31+2*16, 0, new int[]{0,1,9},true),
+new Monster("Loogaroo",    31+2*17, 0, new int[]{0,1,9},true),
+new Monster("Nukekubi",    31+2*18, 0, new int[]{0,1,9},true),
+new Monster("Âme perdue",  31+2*19, 0, new int[]{0,2,4},false),
+new Monster("Mandurugo",   31+2*20, 0, new int[]{0,1,9},true),
+new Monster("Âme en peine",31+2*21, 0, new int[]{0,2,4},false),
+new Monster("Goule",       31+2*22, 0, new int[]{0,1,9},false),
+new Monster("Âme errante", 31+2*23, 0, new int[]{0,2,4},false),
+new Monster("Momie",       31+2*24, 0, new int[]{1,9,10},false),
+new Monster("Moroaică",    31+2*25, 0, new int[]{0,1,9},false),
+new Monster("Moroï",       31+2*26, 0, new int[]{0,1,9},true),
+new Monster("Ubume",       31+2*27, 0, new int[]{1,0,10},false),
+new Monster("Strigoi",     31+2*28, 0, new int[]{1,0,10},true),
+new Monster("Âme damnée",  31+2*29, 0, new int[]{0,2,4},false),
+new Monster("Liche",       31+2*30, 0, new int[]{1,9,10},false),
+new Monster("Ombre",       31+2*31, 0, new int[]{1,9,10},false),
+new Monster("Illusion",    31+2*32, 0, new int[]{0,0,0},false),
+new Monster("Deadite",     31+2*33, 0, new int[]{0,0,0},true),
+new Monster("Nazgûl",      31+2*34, 0, new int[]{1,0,10},true)
 };
 
-public static double ptsForLevel(int lvl) { return Math.pow(lvl,1.9)*0.15 + 4.0*lvl + 10.0; }
+
 //(12+3 x+0.15 x^1.9)
 
 public ArrayList<Item> drop(Player p)
@@ -271,9 +286,12 @@ public ArrayList<Item> drop(Player p)
 return res;
 }
 
- public static void initZoo()
+
+public static void initZoo()
     {
-	int ZooByLevelSize = 200;
+	coeff_std = new double[nb_stats];
+	
+	int ZooByLevelSize = 100;
 	ZooByLevel = new MonsterSet[ZooByLevelSize];
 	for (int i=0; i< ZooByLevel.length; i++)
 	    ZooByLevel[i] = new MonsterSet();
@@ -283,7 +301,7 @@ return res;
 	    {
 		mlv = zoo[i].prefered_level;
 		for(int j=-2; j < 3; j++)
-		    if(mlv+j > 0 && mlv+j < ZooByLevelSize)
+		    if(mlv+j >= 0 && mlv+j < ZooByLevelSize)
 			ZooByLevel[mlv+j].list.add(zoo[i]);
 	    }
 	MonsterNames = new String[zoo.length];
@@ -294,7 +312,7 @@ return res;
 		MonsterNamesList.add(zoo[i].name);
 		}
 
-	/*	
+	/*
 	for (int i=0; i< ZooByLevel.length; i++)
 	    {
 	    System.out.print(i+" ");
@@ -303,18 +321,24 @@ return res;
 		System.out.print(it.name + " ");
 		}
 	    System.out.println("");
-	    }*/
+	    }
+	*/
     }
 
 // Crée un monstre de niveau lev au hazard
-public Monster(int lev)
+public Monster(int lev, Universe u)
 	{
-	super(false);
+	super(u,true);
 	stats_with_bonus = new double[nb_stats];
 	stats = new double[nb_stats];
 
 	// Sélectionne les monstres de bon niveau
-	ArrayList<Monster> t_list = ZooByLevel[lev].list;
+	double max_thorical_level = u.get_zone_max_level(18);
+	int normalized_lev = (int)(100*(lev/max_thorical_level));
+	if(normalized_lev>=99) normalized_lev = 99;
+	ArrayList<Monster> t_list = ZooByLevel[normalized_lev].list;
+	//System.out.println("wanted_lev=" + lev + " max_thorical_level="+max_thorical_level + " normalized_lev=" + normalized_lev);
+		
 	Monster m = t_list.get((int)(Math.random()*t_list.size()));
 	
 	// Crée le monstre
@@ -331,42 +355,35 @@ public Monster(int lev)
 
 	double pts;
 
-	if(Math.random()>0.1) // Normal
+	if(Math.random() > u.proba_champion()) // Normal
 		{
-		pts = ptsForLevel(level);
 		tags[5]=false;
-		for (int i=0; i<11; i++)
-		    {stats[i]= pts*coeff_std[i]*(Math.random()+3.0)*0.025;}
-
-	  	stats[m.prefered_stats[0]]+=pts*0.25;
-	  	stats[m.prefered_stats[1]]+=pts*0.20;
-	  	stats[m.prefered_stats[2]]+=pts*0.15;
-
-	  	stats[24]+=pts*0.12; //ED_HUM(24)
-	  	stats[31]+=pts*0.15; //INIT(31)
+		pts = u.monster_points_for_level(level);
 		}
 	else // Champion
 		{
 		tags[5]=true;
 		name = StaticItem.nameGenerator.getName() + " " + adj_m[(int)(Math.random()*adj_m.length)];
 
-		level = (int)(Math.pow(level,1.1)+1.0);
-		pts = ptsForLevel(level);
-		for (int i=0; i<11; i++)
-		    {stats[i]= pts*coeff_std[i]*(Math.random()+5.0)*0.025;}
-	  	stats[m.prefered_stats[0]]+=pts*0.35;
-	  	stats[m.prefered_stats[1]]+=pts*0.34;
-	  	stats[m.prefered_stats[2]]+=pts*0.33;
-	
-	  	stats[24]+=pts*0.20; //ED_HUM(24)
-	  	stats[31]+=pts*0.20; //INIT(31)
+		level = (int)u.boss_level(level);
+		pts = u.monster_points_for_level(level)*1.5;
 		}
-		
+	
+	// 0.5 points distribués avec coeff_std 
+	for (int i=0; i<nb_stats; i++)
+		{stats[i]= pts*coeff_std[i]*(0.7+Math.random()*0.6)*0.5;}
+
+	// 0.5 points distribués avec prefered_stats 
+	stats[m.prefered_stats[0]]+=pts*0.22;
+	stats[m.prefered_stats[1]]+=pts*0.18;
+	stats[m.prefered_stats[2]]+=pts*0.10;
+
+	// pas de bonus d'équipement
 	for(int i=0; i<nb_stats; i++)
 		stats_with_bonus[i]=stats[i];
+	
 	refresh();
 	}
-
 
 public String faible(boolean m)
 	{
@@ -379,5 +396,371 @@ public String fort(boolean m)
 	if(m) return fo_m[(int)(Math.random()*fo_m.length)];
 	else return fo_f[(int)(Math.random()*fo_f.length)];
 	}
+
+	
+/////////////////////////////////////////////////////////////////////////
+// Optimal build tools
+
+
+public static double EstimateMonsterVictory(Player p)
+{
+	int mob_victory = 0;
+	for(int i=0; i<10000;i++)
+		{
+		p.refresh();
+		p.mob.refresh();
+		if(p.combat(false,false)) mob_victory++;
+		}
+	return mob_victory/10000.0;
+}
+
+// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7) VDV(8) VITA(9) CON(10)
+// ED_HUM(24) INIT(31) IMUN_FINAL(32) EPIN(34) REP(35)
+public static double ImproveMonster2(Player p,double best_mob_victory,double finesse)
+{
+	double best_mob_victory_backup = best_mob_victory;
+	int source[] = new int[]{0,1,2,3,4,5,6,7,8,9,10,24,31,32,34,35};
+	int target[] = new int[]{8,31,34,35};
+
+	double pts;
+	double backup[] = new double[nb_stats];
+	double best[] = new double[nb_stats];
+	
+	System.arraycopy(p.mob.stats, 0, backup, 0,  nb_stats); // backup
+	System.arraycopy(p.mob.stats, 0, best, 0,  nb_stats); // best
+	
+	int best_idx=-1;
+	int stat_dec, stat_inc;
+	for(int idc=0; idc<source.length; idc++)
+	{
+		stat_dec=source[idc];
+		if (p.mob.stats[stat_dec] < 0.01)  continue;
+		pts = p.mob.stats[stat_dec]*finesse;
+		
+		for(int idx=0; idx<target.length+2; idx++)
+		{
+			p.mob.stats[stat_dec] -= pts;
+			p.mob.stats_with_bonus[stat_dec] -= pts;
+			
+			if (idx==target.length)
+			{
+				// IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24)
+				for(int i=0; i<50; i++) DistToDPS(p, pts/50.0);
+			}
+			else if (idx==target.length+1)
+			{
+				//REDUC(2) ABS(3) ESQ(4) VITA(9) CON(10) IMUN_FINAL(32)
+				for(int i=0; i<50; i++) DistToHP(p, pts/50.0, true);
+			}
+			else if (idx < target.length)
+			{
+				p.mob.stats[target[idx]] += pts;
+			}
+			//double mob_victory = 0.0;
+			double mob_victory = EstimateMonsterVictory(p);
+			
+			if (mob_victory > best_mob_victory) 
+			{
+				best_idx = idx;
+				best_mob_victory = mob_victory;
+				System.arraycopy(p.mob.stats, 0, best, 0,  nb_stats);
+			}
+			System.arraycopy(backup, 0, p.mob.stats, 0,  nb_stats); // restore backup
+			System.arraycopy(backup, 0, p.mob.stats_with_bonus, 0,  nb_stats);
+		}
+	}
+	
+	// Apply change
+	System.arraycopy(best, 0, p.mob.stats, 0,  nb_stats);
+	System.arraycopy(best, 0, p.mob.stats_with_bonus, 0,  nb_stats);
+	
+	System.out.println("\nBest mob victory = " + 100*best_mob_victory + "%" + "(" + best_idx + ")");
+	for(int i=0; i<nb_stats; i++)
+		if( p.mob.stats[i] > 0.1)
+		{
+			System.out.println(Player.stats_name[i] + " [" + i + "]=" + p.mob.stats[i]);
+		}
+	dispTot("Best", p);
+	
+	if(best_mob_victory_backup == best_mob_victory) return -1.0;
+	return best_mob_victory;
+}
+
+// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7) VDV(8) VITA(9) CON(10)
+// ED_HUM(24) INIT(31) IMUN_FINAL(32) EPIN(34) REP(35)
+public static double ImproveMonster(Player p,double best_mob_victory,double finesse)
+{
+	int to_dec=0;
+	int to_inc=0;
+	double pts, backup1, backup2;
+	int target[] = new int[]{0,1,2,3,4,5,6,7,8,9,10,24,31,32,34,35};
+	
+	int stat_dec, stat_inc;
+	for(int idc=0; idc<target.length; idc++)
+	{
+		stat_dec=target[idc];
+		if (p.mob.stats[stat_dec] < 0.01)  continue;
+		for(int idi=0; idi<target.length; idi++)
+		{
+			stat_inc = target[idi];
+			if (stat_inc == stat_dec) continue;
+			
+			pts = p.mob.stats[stat_dec]*finesse;
+			backup1=p.mob.stats[stat_dec];
+			backup2=p.mob.stats[stat_inc];
+			
+			p.mob.stats[stat_dec] -= pts;
+			p.mob.stats[stat_inc] += pts;
+			p.mob.stats_with_bonus[stat_dec]-= pts;
+			p.mob.stats_with_bonus[stat_inc]+= pts;
+			
+			double mob_victory = EstimateMonsterVictory(p);
+			if (mob_victory > best_mob_victory) 
+			{
+			best_mob_victory = mob_victory;
+			to_dec = stat_dec;
+			to_inc = stat_inc;
+			}
+			
+			p.mob.stats[stat_dec] = backup1;
+			p.mob.stats[stat_inc] = backup2;
+			p.mob.stats_with_bonus[stat_dec] = backup1;
+			p.mob.stats_with_bonus[stat_inc] = backup2;
+		}
+	}
+	
+	// Apply change
+	pts = p.mob.stats[to_dec]*finesse;
+	p.mob.stats[to_dec] -= pts;
+	p.mob.stats[to_inc] += pts;
+	p.mob.stats_with_bonus[to_dec]-= pts;
+	p.mob.stats_with_bonus[to_inc]+= pts;
+	
+	System.out.println("\nBest mob victory = " + 100*best_mob_victory + "% (" + Player.stats_name[to_dec] + "->" + Player.stats_name[to_inc] + ")");
+	for(int i=0; i<nb_stats; i++)
+		if( p.mob.stats[i] > 0.1)
+		{
+			System.out.println(Player.stats_name[i] + " [" + i + "]=" + p.mob.stats[i]);
+		}
+	
+	if(to_dec==0 && to_inc==0) return -1.0;
+	return best_mob_victory;
+}
+
+public static double AverageDPH(Player p1, Player p2)
+{
+	double p2_vie = p2.vie_max();
+	double crit_proba = p1.crit_proba();
+	double defender_reduc = p2.reduc();
+	double defender_absorption = p2.absorption();
+	double dm_bas = p1.dmg_base()*p1.ed_versus_tag(2);
+	double dm_crit = dm_bas*p1.multi_crit();
+	double dm_per_att = Math.min(Math.max(dm_bas*defender_reduc-defender_absorption,0.0),p2_vie)*(1.0-crit_proba) + 
+		Math.min(Math.max(dm_crit*defender_reduc-defender_absorption,0.0),p2_vie)*(crit_proba);
+	if(dm_per_att == 0.0) dm_per_att = Math.min(dm_bas*defender_reduc-defender_absorption,p2_vie)*(1.0-crit_proba) + 
+		Math.min(dm_crit*defender_reduc-defender_absorption,p2_vie)*(crit_proba);
+	return dm_per_att;
+}
+// Approximation pour les combats courts
+// Todo estimer le nombre de coups dans un combat
+public static double AttPerSec(Player p1)
+{
+	return 1.0/(1.0/p1.att_per_sec()+ p1.initiative());
+}
+
+// Prends en compte (p1) : IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24)
+// Prends en compte (p2) : REDUC(2) ABS(3) ESQ(4)
+public static double AverageDPS(Player p1, Player p2)
+{
+	double dph = AverageDPH(p1, p2);
+	double defender_esquive = p2.universe.esquive_proba(p2.ESQ(),p1.PRC());
+	return dph*(1.0-defender_esquive)*AttPerSec(p1);
+}
+
+// Prends en compte (p1) : REDUC(2) ABS(3) ESQ(4) VITA(9) CON(10) IMUN_FINAL(32)
+// Prends en compte (p2) : DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24)
+// TODO : proba_immunite_final devrait etre géré
+public static double AverageTimeAlive(Player p1, Player p2)
+{
+	double vie = p1.vie_max();
+	
+	// Coups ennemis
+	double esquive = p1.universe.esquive_proba(p1.ESQ(),p2.PRC());
+	double average_dmg_per_attack = (AverageDPH(p2, p1)*(1.0-esquive));
+	//average_hits_e = average_hits_e + p1.proba_immunite_final(); 
+	
+	// Epines et représailles 
+	double esquive_p2 = p1.universe.esquive_proba(p1.ESQ(),p2.PRC());
+	double reduc = p1.reduc();
+	double represailles = Math.min((p2.represailles() * AverageDPH(p1,p2)) * reduc + p2.epines()*reduc,vie);
+	double average_dmg_per_given_attack = (represailles*(1.0-esquive_p2));
+
+	/*System.out.println("represailles = " + represailles);
+	System.out.println("average_dmg_per_hit = " + AverageDPH(p2, p1));
+	System.out.println("average_dmg_per_given_attack = " + average_dmg_per_given_attack);
+	System.out.println("average_dmg_per_attack = " + average_dmg_per_attack);*/
+	
+	return vie / (average_dmg_per_attack*AttPerSec(p2) + average_dmg_per_given_attack*AttPerSec(p1));
+}
+
+public static void DistToDPS(Player p, double pts)
+{
+	//IAS(0) DMG(1) PRC(5) LCK(6) CRT(7) ED_HUM(24) INIT(31)
+	int target[] = new int[]{0,1,5,6,7,24,31};
+	
+	int index;
+	double a_score;
+	double best_score = -Double.MAX_VALUE;
+	int best_index = 1;
+	for(int i=0; i<target.length; i++)
+	{
+		index = target[i];
+		p.mob.stats[index] += pts;
+		p.mob.stats_with_bonus[index] += pts;
+		a_score = AverageDPS(p.mob,p);
+		if (a_score > best_score)
+		{
+			best_index = index;
+			best_score = a_score;
+		}
+		p.mob.stats[index] -= pts;
+		p.mob.stats_with_bonus[index] -= pts;
+		//System.out.println(" ["+ Player.stats_name[index] + "] score="+a_score);
+	}
+	//System.out.println("best: "+ Player.stats_name[best_index] + " best_score="+best_score);
+	p.mob.stats[best_index] += pts;
+	p.mob.stats_with_bonus[best_index] += pts;
+}
+
+public static void dispTot(String str, Player p)
+{
+	int dps_target[] = new int[]{0,1,5,6,7,24};
+	int hp_target[] = new int[]{2,3,4,9,10,32};
+	
+	double dps = 0.0;
+	double hp = 0.0;
+	double tot = 0.0;
+	for(int i=0; i<nb_stats; i++) tot+=p.mob.stats[i];
+	for(int i=0; i<hp_target.length; i++) hp+=p.mob.stats[hp_target[i]];
+	for(int i=0; i<dps_target.length; i++) dps+=p.mob.stats[dps_target[i]];
+	
+	System.out.println(str + " DPS:" + dps + " HP:" + hp + " total:" + tot);
+}
+public static void DistToHP(Player p, double pts, boolean full)
+{
+	int target[];
+	int best_index;
+	if(full)
+	{
+		//REDUC(2) ABS(3) ESQ(4) VITA(9) CON(10) IMUN_FINAL(32)
+		target = new int[]{2,3,4,9,10,32};
+	}
+	else
+	{
+		//REDUC(2) ABS(3) VITA(9) CON(10)
+		target = new int[]{9,2,3,10};
+	}
+	
+	int index;
+	double a_score;
+	double best_score=0.0;
+	best_index = 0;
+	for(int i=0; i<target.length; i++)
+	{
+		index = target[i];
+		p.mob.stats[index] += pts;
+		p.mob.stats_with_bonus[index] += pts;
+		a_score = AverageTimeAlive(p.mob,p);
+		if (a_score > best_score + best_score/1000.0)
+		{
+			best_index = index;
+			best_score = a_score;
+		}
+		p.mob.stats[index] -= pts;
+		p.mob.stats_with_bonus[index] -= pts;
+		
+		//System.out.println(" (" + Player.stats_name[index] +"), AverageTimeAlive = " + a_score);
+	}
+	
+	p.mob.stats[best_index] += pts;
+	p.mob.stats_with_bonus[best_index] += pts;
+	//System.out.println("Final (" + Player.stats_name[best_index] +"), AverageTimeAlive = " + best_score);
+}
+
+
+public static void SetOptimalDistribution(Universe u)
+{
+	Player pof = new Player(u,true);
+	pof.stats = new double[nb_stats];
+	pof.stats_with_bonus = new double[nb_stats];
+	pof.tags= new boolean[nb_tags];
+		for(int t=0; t<nb_tags; t++) pof.tags[t]=false;
+	pof.tags[2]=true; // Humain
+	
+	for(int i=0; i<nb_stats; i++) 
+		{pof.stats[i]=100; pof.stats_with_bonus[i]=100;}
+	GetOptimumKiller(pof);
+}
+
+public static void GetOptimumKiller(Player p)
+{
+	Monster mob = new Monster("NEMESIS",p.level,4, new int[]{1,1,1},true);
+	mob.level = p.level;
+	mob.stats_with_bonus = new double[nb_stats];
+	mob.stats = new double[nb_stats];
+	mob.universe = p.universe;
+	p.mob = mob;
+	
+	double nb_pts_ref = 0;
+	for(int i=0; i<nb_stats; i++)
+		nb_pts_ref += p.stats_with_bonus[i];
+	
+	nb_pts_ref = nb_pts_ref*0.25;
+
+	// Optimised distribution
+	double c1 = 1.0/3.0;
+	double c2 = 2.0/3.0;
+	double hp_pts = c1*nb_pts_ref;
+	double dps_pts = c2*nb_pts_ref;
+	
+	for(int i=0; i<50; i++) {DistToHP(p, hp_pts/100.0, false);}
+	for(int i=0; i<100; i++) {DistToDPS(p, dps_pts/100.0);}
+	for(int i=0; i<50; i++) {DistToHP(p, hp_pts/100.0, true);}
+	
+	for(int i=0; i<nb_stats; i++)
+		coeff_std[i] = mob.stats[i] / nb_pts_ref;
+	
+	//double best_mob_victory = EstimateMonsterVictory(p);
+	//System.out.println("\nInitial mob victory = " + 100*best_mob_victory + "%");
+	
+	/*for(int i=0; i<nb_stats; i++)
+	if( p.mob.stats[i] > 0.1)
+		{
+			System.out.println(Player.stats_name[i] + " [" + i + "]=" + p.mob.stats[i]);
+		}
+	*/
+/*
+	int count_bad = 0;
+	double step = 1.0;
+	while (step > 0.1)
+	{
+		System.out.println("Step = " + step);
+		if (count_bad > 5) {step = step/1.2; count_bad = 0;}
+		double tmp_result = ImproveMonster2(p,best_mob_victory,step);
+		if(tmp_result < 0) count_bad++;
+		else best_mob_victory = tmp_result;
+	}
+	System.out.println("BEST BUILD END");
+	
+	for(int i=0; i<nb_stats; i++)
+		if( p.mob.stats[i] > 0.1 || p.mob.stats[i] <  nb_pts_ref*coeff_std[i] -1.0)
+		{
+			String str = " constant";
+			if(p.mob.stats[i] <  nb_pts_ref*coeff_std[i] -1.0) str = " diminué (" + nb_pts_ref*coeff_std[i] + ")";
+			if(p.mob.stats[i] >  nb_pts_ref*coeff_std[i] +1.0) str = " augmenté (" + nb_pts_ref*coeff_std[i] + ")";
+			System.out.println(Player.stats_name[i] + " [" + i + "]=" + p.mob.stats[i] + str);
+		}
+		*/
+}
 
 }

@@ -20,13 +20,14 @@ public class MainWindow extends javax.swing.JFrame {
     static private final long serialVersionUID = 1338162012;
     public Player Joueur;
     public World Monde;
-    public LevelUp2 DistWindow;
+    public LevelUp DistWindow;
     public Courbes CurvWindow;
     public InventoryWindow InvWindow;
     public WorldMap WorldMapWindow;
+	public UniversWindow UnivWindow;
     public RuleWindow RuleWin;
     private String[] lines;
-    private static int max_lines=60;
+    private static int max_lines=50;
     private int index_line;
 
     private boolean infight=false;
@@ -47,6 +48,7 @@ public class MainWindow extends javax.swing.JFrame {
     private JButton inventaire_cmd;
     private JButton prog_cmd;
     private JButton finir;
+	private JButton univers_cmd;
     private JScrollPane scroll;
     public JTextArea log;
 
@@ -64,16 +66,17 @@ public class MainWindow extends javax.swing.JFrame {
 	lines = new String[max_lines];
 	index_line=0;
 
-	DistWindow = new LevelUp2(Joueur);
+	DistWindow = new LevelUp(Joueur);
 	CurvWindow = new Courbes(Joueur);
 	InvWindow = new InventoryWindow(Joueur);
 	WorldMapWindow = new WorldMap(Monde,Joueur);
 	RuleWin = new RuleWindow(Joueur);
+	UnivWindow = new UniversWindow(Joueur, Monde);
 
 	this.setContentPane(getJFrameContentPane());
 	this.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 	this.setLocation(new Point(0, 0));
-	this.setSize(new Dimension(795, 580));		
+	this.setSize(new Dimension(795, 680));		
 	this.setResizable(false);
 
 	this.setTitle("Theorycraft - " + Joueur.name + " - " + Joueur.defi.name);
@@ -152,7 +155,7 @@ public class MainWindow extends javax.swing.JFrame {
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 			System.out.println("Sauvegarde");
-		    Joueur.save();
+		    Joueur.universe.save();
 		}});
 	  	
 	xp_bar = new JProgressBar();
@@ -222,18 +225,8 @@ public class MainWindow extends javax.swing.JFrame {
 	    });
 	combat_cmd.setMnemonic('c');
 
-	prog_cmd = new JButton();
-	prog_cmd.setBounds(new Rectangle(145, 285, 135, 15));
-	prog_cmd.setText("Programmation");
-	prog_cmd.addActionListener(new java.awt.event.ActionListener() {
-		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    RuleWin.montre();
-		}
-	    });
-	prog_cmd.setMnemonic('p');
-
 	inventaire_cmd = new JButton();
-	inventaire_cmd.setBounds(new Rectangle(5, 285+40, 135, 15));
+	inventaire_cmd.setBounds(new Rectangle(145, 285, 135, 15));
 	inventaire_cmd.setText("Inventaire");
 	inventaire_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -242,6 +235,17 @@ public class MainWindow extends javax.swing.JFrame {
 		}
 	    });
 	inventaire_cmd.setMnemonic('i');
+	
+	prog_cmd = new JButton();
+	prog_cmd.setBounds(new Rectangle(5, 285+40, 135, 15));
+	prog_cmd.setText("Programmation");
+	prog_cmd.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    RuleWin.montre();
+		}
+	    });
+	prog_cmd.setMnemonic('p');
+
 
 	shop_cmd = new JButton();
 	shop_cmd.setBounds(new Rectangle(145, 285+20, 135, 15));
@@ -288,9 +292,19 @@ public class MainWindow extends javax.swing.JFrame {
 	    });
 	courbes.setMnemonic('b');
 	
+	univers_cmd = new JButton();
+	univers_cmd.setBounds(new Rectangle(285, 285+40, 135, 15));
+	univers_cmd.setText("Univers");
+	univers_cmd.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		   UnivWindow.montre();
+		}
+	});
+	univers_cmd.setMnemonic('u');
+	
 	finir = new JButton();
-	finir.setBounds(new Rectangle(285, 285+40, 135, 15));
-	finir.setText("Finir");
+	finir.setBounds(new Rectangle(705, 325, 80, 15));
+	finir.setText("Finir jeu");
 	finir.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    end_game();
@@ -307,7 +321,7 @@ public class MainWindow extends javax.swing.JFrame {
 
 	scroll = new JScrollPane(log);
 	scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	scroll.setBounds(new Rectangle(5, 345, 785, 205));
+	scroll.setBounds(new Rectangle(5, 365-20, 785, 285+20));
 
 	rowData = new String[5][4];
 
@@ -361,9 +375,10 @@ public class MainWindow extends javax.swing.JFrame {
 	ivjJFrameContentPane.add(toggle);
 	ivjJFrameContentPane.add(scroll);
 	ivjJFrameContentPane.add(finir);
+	ivjJFrameContentPane.add(univers_cmd);
 	return ivjJFrameContentPane;
     }
-
+	
     private void plus()
     {
 	Joueur.conditionValues[conditionTable.getSelectedRow()]++;
@@ -397,11 +412,10 @@ public class MainWindow extends javax.swing.JFrame {
 			infight = true;
 			Thread thread = new Thread() {
 				public void run() {
-					Joueur.mob = Joueur.defi.boss;
-					Joueur.mob.reset();
+					Joueur.mob = new Monster(Joueur.defi.boss_name, Joueur.defi.boss_level, Joueur.defi.boss_tag, Joueur.defi.boss_p_stats, Joueur.universe);
 					refresh();
 					
-					if(!Joueur.combat(true)) 
+					if(!Joueur.combat(true,true)) 
 						{
 							Game.MW.addLog("Vous avez vaincu le boss final !");
 							victory();
@@ -419,7 +433,7 @@ public class MainWindow extends javax.swing.JFrame {
 		Joueur.jeu_fini = true;
 		Game.MW.addLog(String.format("Temps passé : %.2f secondes !",Joueur.temps_total));
 		Game.HI = HiScore.loadScore();
-		Game.HI.addScore(new Score(Joueur.defi.name,Joueur.name,Joueur.temps_total));
+		Game.HI.addScore(new Score(Joueur.defi.name,Joueur.name,Joueur.temps_total,Joueur.universe.seed));
 	}
 
     private boolean combatAuto(int defaite_count, int victory_count, int trap_count, int trap_death_count, int lvl_start)
@@ -535,7 +549,7 @@ public class MainWindow extends javax.swing.JFrame {
 				if(!eviteAuto())
 				    {
 					refresh();
-					if(Joueur.combat(true)) defaite_count++;
+					if(Joueur.combat(true,true)) defaite_count++;
 					else victory_count++;
 				    }
 				else

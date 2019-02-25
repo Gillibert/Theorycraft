@@ -1,14 +1,9 @@
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.DefaultListModel;
+import javax.swing.*;
 import java.util.ArrayList;
-import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Dimension;
 import java.awt.Point;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
 
 public class ChallengeWindow extends javax.swing.JDialog  {
 
@@ -16,23 +11,35 @@ public class ChallengeWindow extends javax.swing.JDialog  {
     private JLabel titre;
     private JTextArea desc;
     private JButton choisir;
+	private JButton set_seed;
     private DefaultListModel defi_list;
 	private JList challenges;
 	private JScrollPane scroll;
-	public Player Joueur;
+	public Universe universe;
 	
     public ChallengeWindow() {
 	super();
 	this.setContentPane(getJFrameContentPane());
 	this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	this.setLocation(new Point(0, 0));
-	this.setSize(new Dimension(300, 400));
+	this.setSize(new Dimension(565, 345));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setTitle("Choix du défi");
     }
-
-
+	
+	public void set_seed()
+	{
+		String s = JOptionPane.showInputDialog(null, "Choisissez une graine (un entier naturel)\n 0 pour les règles classiques", "Création d'un univers", 1);
+		int sd = 0;
+		try { sd = Integer.parseInt(s);}
+		catch (Exception e) {}
+		String backupName = universe.joueur.name;
+		universe = new Universe(sd);
+		universe.joueur.name = backupName;
+		refresh();
+	}
+	
     public void refresh()
     {
 	if (challenges.getSelectedIndex() != -1)
@@ -41,6 +48,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 			desc.setText(chal.desc() + "\nHiscores :\n" + Game.HI.bestScoresString(chal.name));
 		}
 	choisir.setEnabled(challenges.getSelectedIndex() != -1);
+	set_seed.setText("Graine : " + universe.seed);
     }
 
 
@@ -55,9 +63,10 @@ public class ChallengeWindow extends javax.swing.JDialog  {
     public void choisir()
     {
 	if (challenges.getSelectedIndex() == -1)
-		Joueur.defi = ChallengeList.list.get(0);
+		universe.joueur.defi = ChallengeList.list.get(0);
 	else
-		Joueur.defi = ChallengeList.list.get(challenges.getSelectedIndex());
+		universe.joueur.defi = ChallengeList.list.get(challenges.getSelectedIndex());
+	
 	this.setVisible(false);
     }
 
@@ -79,7 +88,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 
     scroll = new JScrollPane(challenges);
     scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scroll.setBounds(new Rectangle(10, 40, 280, 195));
+    scroll.setBounds(new Rectangle(5, 40, 275, 240));
 
 	javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
 		public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh();}};
@@ -87,18 +96,29 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	challenges.addListSelectionListener(refresher);
 
 	desc = new JTextArea();
-	desc.setBounds(new Rectangle(10, 240, 280, 100));
+	desc.setBounds(new Rectangle(285, 40, 265, 240));
+	desc.setFont(new Font("Times New Roman", Font.PLAIN, 12));
 	desc.setEditable(false);
 	
+	set_seed = new JButton();
+	set_seed.setBounds(new Rectangle(5, 240+45, 275, 25));
+	set_seed.setText("Graine ...");
+	set_seed.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    set_seed();
+		}
+	    });
+	set_seed.setMnemonic('g');
+	
 	choisir = new JButton();
-	choisir.setBounds(new Rectangle(10, 345, 280, 30));
-	choisir.setText("Valider");
+	choisir.setBounds(new Rectangle(285, 240+45, 265, 25));
+	choisir.setText("Créer");
 	choisir.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    choisir(); refresh();
 		}
 	    });
-	choisir.setMnemonic('v');
+	choisir.setMnemonic('c');
 
 
 	ivjJFrameContentPane = new javax.swing.JPanel();
@@ -106,6 +126,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	ivjJFrameContentPane.add(titre);
 	ivjJFrameContentPane.add(scroll);
 	ivjJFrameContentPane.add(choisir);
+	ivjJFrameContentPane.add(set_seed);
 	ivjJFrameContentPane.add(desc);
 	
     this.addWindowListener(new java.awt.event.WindowAdapter() {

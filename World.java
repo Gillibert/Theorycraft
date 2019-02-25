@@ -73,7 +73,7 @@ public class World {
 		zones[18]= new Zone("Failles de Mokiss");
 
 		for(int i=0; i<zones.length; i++)
-			zones[i].level=10*i;
+			zones[i].level=i;
 		}
 
 	public int get_zone(int x, int y) {
@@ -82,9 +82,4 @@ public class World {
 				if (pr.intersects(zonesR[i])) return i;
 		return -1;
 	}
-
-	public String get_zone_label(int x) {
-		if (x==-1) return "Sélectionnez une zone";
-		return zones[x].name + " (" + zones[x].level + ")";
-		}
 }

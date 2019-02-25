@@ -156,11 +156,11 @@ public class InventoryWindow extends javax.swing.JDialog  {
 			if(x > -1)
 			    liste_shop.setSelectedIndex(Math.min(idx_tmp3,x));
 		    }
+		ObjectRule therule = null;
+		if (liste_s.getSelectedIndex() > 0)
+			therule = rules.get(liste_s.getSelectedIndex());
 		for(Item the_object : Joueur.inventory)
 			{
-				ObjectRule therule = null;
-				if (liste_s.getSelectedIndex() > 0)
-					therule = rules.get(liste_s.getSelectedIndex());
 		    	if(liste_s.getSelectedIndex()<=0 || therule.IsTrue(Joueur,the_object,null))
 				{
 			    	if(the_object.equiped)

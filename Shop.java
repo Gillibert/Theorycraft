@@ -9,7 +9,11 @@ public static String[] SurNames = {"l'Escroc","le Grippe-sou","le Radin","le Rap
 
 public Shop(Player p)
 	{
-	level = 10*p.zone + StaticItem.getRandomInt(p.niveau_boutique());
+	double levelD = p.niveau_boutique_base() + p.niveau_boutique();
+	level = (int) levelD;
+    double fPart = levelD - level;
+	if(Math.random() < fPart) {level++;}
+	
 	int nbitem =  StaticItem.getRandomInt(p.taille_boutique());
 	name = StaticItem.nameGenerator.getName() + " " + SurNames[(int)(Math.random()*SurNames.length)];
 	Item it;

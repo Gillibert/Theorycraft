@@ -14,8 +14,8 @@ class Trap {
 		level = lev;
 		masculin = g;
 		name = n;
-		speed = Math.pow(lev*2,1.2);
-		damage = Math.pow(lev*2.5,2.3)*0.03;
+		speed = Math.pow(lev*3,1.3);
+		damage = Math.pow(lev*2.5,2.5)*0.03;
 		hidden = lev*0.9 + 0.2*Math.random(); // Doit être centré sur le niveau du piège
 	}
 
@@ -112,7 +112,7 @@ public boolean trapEncounter(Player p, boolean disp)
 		if(disp) Game.MW.addLog(String.format("Échec de la détection (score du piège : %.2f, probabilité de détection : %.2f%%).",hidden, 100*trap_find_proba));
 		double dmg_base = damage * (0.9+Math.random()*0.2);
 		double bonus = p.bonus_initiative_piege();
-		double trap_init = Player.initiative(speed) ;
+		double trap_init = p.universe.initiative(speed) ;
 		double player_init = p.plage_random()*p.initiative_piege();
 		if(disp) Game.MW.addLog(String.format("Initiative face à un piège : %.2f secondes versus %.2f secondes.",player_init,trap_init));
 		p.personal_wait(player_init,TimeStats.ACTIVITY_PIEGE);
@@ -131,10 +131,10 @@ public boolean trapEncounter(Player p, boolean disp)
 	}
 	if (p.vie <= 0) {
 		if(disp) Game.MW.addLog(p.name + " est mort.");
-		p.meurt();
+		p.meurt(disp);
 	}
 	else {
-		p.gain_xp((int)Math.pow(50*level/Math.max(1,p.level-level),0.85));
+		p.gain_xp((int)Math.pow(50*level,0.85), 1, level);
 		res = false;
 		}
 	return res;

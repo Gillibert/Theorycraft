@@ -4,9 +4,13 @@ class Challenge implements Serializable {
 
     public String name;
     public int type; // 0 niveau, 1 gold, 2 monstre
-	public Monster boss;
 	public double param;
-
+	
+	public String boss_name;
+	public int boss_level;
+	public int boss_tag;
+	public int[] boss_p_stats;
+	
     public Challenge(String n, int ty, double p)
     {
 	name=n;
@@ -22,7 +26,7 @@ class Challenge implements Serializable {
 		if (type == 1)
 			res += "gagner " + (int)param + " pièces d'or";
 		if (type == 2)
-			res += "vaincre " + boss.name;
+			res += "vaincre " + boss_name;
 		return res;
 	}
 

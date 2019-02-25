@@ -1,19 +1,13 @@
 import java.util.ArrayList;
 import java.io.Serializable;
 
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 
 public class Player implements Serializable {
     static private final long serialVersionUID = 100;
     //***********************
-	public static double points_initiaux = 20;
 	public boolean jeu_fini = false;
     public static String[] TagsName = 
-		{"Mort-vivant","Animal","Humain","Peau-verte","Démon","Champion","Piège"}; // nom des tags 
+		{"Mort-vivant","Animal","Humain","Peau-verte","Démon","Champion"}; // nom des tags 
 	
 	public static int nb_tags = TagsName.length; // nombre de statistiques
    
@@ -29,20 +23,21 @@ public class Player implements Serializable {
     // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14) 
     // RESF(15) MF(16) RF(17) QALF(18) QTYF(19) POWF(20) GF(21)
     // ED_MV(22) ED_ANI(23) ED_HUM(24) ED_PV(25) ED_DEM(26) ED_CHAMP(27)
-    // ESTI(28) FLEE(29) FLEE_SPD(30) INIT(31) BONUS_XP(32) TIME_SPD(33) 
+    // ESTI(28) FLEE(29) FLEE_SPD(30) INIT(31) IMUN_FINAL(32) TIME_SPD(33) 
 	// EPIN(34) REP(35) NECRO(36) CRAFT_SPD(37) CRAFT_REND(38) ECO_ORB(39) 
 	// SHOP_LEVEL(40) SHOP_SIZE(41) TRAP_DET(42) TRAP_INIT(43) TRAP_RES(44)
-	// RENTE(45) EDUC(46)
+	// RENTE(45) EDUC(46) BONUS_XP(47) BONUS_LOWLEV(48) BONUS_HLEV(49)
 
-    public static String[] stats_name = {"Vitesse d'attaque", "Dégâts", "Réduction", "Absorption", "Esquive", "Précision", 
+    public static String[] stats_name = {"Vitesse d'attaque", "Dégâts", "Réduction", "Absorption", "Esquive", "Précision",
 		"Chance de coup critique", "Dégâts des coups critiques", "Vol de vie", "Vitalité", "Constitution", "Régénération", 
 		"Résurrection", "Encombrement maximal", "Vitesse de marche", "Recherche de ressources","Recherche d'objets magiques",
 		"Recherche d'objets rares","Recherche de qualité","Recherche de quantité","Recherche de puissance","Recherche d'or",
 		"Dégâts aux morts-vivants","Dégâts aux animaux","Dégâts aux humains","Dégâts aux peaux-vertes","Dégâts aux démons",
-		"Dégâts aux champions","Estimation","Chance de fuite","Vitesse de fuite","Initiative","Apprentissage","Vitesse du temps",
-		"Épines","Représailles","Nécrophagie", "Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
+		"Dégâts aux champions","Estimation","Chance de fuite","Vitesse de fuite","Initiative","Immunité au coup final",
+		"Vitesse du temps","Épines","Représailles","Nécrophagie",
+		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
 		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation"}; // nom des compétences 
+		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse"}; // nom des compétences 
 
 
     public boolean[] conditionToggle;
@@ -66,6 +61,7 @@ public class Player implements Serializable {
     public int xp_pt; // exp
     public Shop shop; // the shop
     public Monster mob; // the mob
+	public Universe universe; // the universe
     public int crit_taken;
     public TimeStats t_stats ;
 
@@ -262,58 +258,13 @@ public class Player implements Serializable {
 	    }
     }
 	
-    public static double att_per_sec(double IAS) {return Math.pow(IAS+10,0.50)-2.16227766017;}
-    public static double pv_per_vita(double CON) {return Math.pow(CON+10,0.40)-1.51188643151;}
-    public static double vie_max(double VITA, double CON) {return 5.0 + pv_per_vita(CON)*VITA;}
-    public static double crit_proba(double LCK) {return (2.0+LCK)/(LCK+120.0);}
-    public static double multi_crit(double CRT) {return Math.pow(CRT+5.0,0.6)-1.3265278;}
-    public static double dmg_base(double DMG) {return 1.2*Math.pow(DMG+0.7,0.7);}
-    public static double reduc(double REDUC) {return 1.0/Math.sqrt(1.0+REDUC/4.0);}
-    public static double absorption(double ABS) {return Math.pow(ABS+7,0.80)/4.7432763938 -1.0;}
-    public static double esquive_proba(double ESQ,double PRC) {return (ESQ+20.0)/(ESQ+PRC+80.0);}
-    public static double vol_de_vie(double VDV) {return Math.pow(VDV,0.75)/(Math.pow(VDV,0.75)+200.0);}
-    public static double regen(double REGEN, double CON) {return 2.0 + (pv_per_vita(CON) * REGEN)/1.5;}
-    public static double charge_max(double LOAD) {return 6.0*Math.pow(LOAD+6.0,0.80)-0.15777627577;}
-    public static double temps_traque(double RUN) {return 5.25771612961 / Math.pow(RUN+6.0,0.70);}
-    public static double temps_shop(double RUN) {return 11.5912359471 / Math.pow(RUN+8.0,0.65);}
-    public static double temps_forge(double RUN) {return 15.4549812628 / Math.pow(RUN+8.0,0.65);}
-    public static double temps_res(double RESUR, int niveau) {return 40.0 / (3.0+Math.pow((4.0*RESUR+4.0)/(niveau),0.70));}
-    public static double coeff_achat(double ESTI) {return 1.0 + 6.0 / (10.0+ESTI);}
-    public static double coeff_vente(double ESTI) {return (10.0+ESTI) / (20.0+ESTI);}
-    public static double multiplicateur_res(double RESF) {return (Math.pow(RESF+30.0,0.50) - 4.47722558)/4.0;} 
-    public static double chance_magique(double MF) {return (12.0+MF)/(MF+180.0);}
-    public static double chance_rare(double RF) {return 1.0 - 6.0/Math.pow(40.0+RF,0.50);}
-    public static double chance_qualite(double QALF) {return 1.0 - 3.6/Math.pow(30.0+QALF,0.40);}
-    public static double quantite_drop(double QTYF) {return 0.3*Math.pow(QTYF+8.0,0.50);} 
-    public static double puissance_ench_inf(double POWF) {return 0.25*(1.0 - 2.0/Math.pow(10.0+POWF,0.65));} 
-    public static double puissance_ench_sup(double POWF) {return 0.25;} 
-    public static double multiplicateur_or(double GF) {return Math.pow(GF+10.0,0.90)/7.94328234724;} 
-    public static double ed_specific_monster(double STAT) {return Math.pow(STAT+10.0,0.40) - 1.51188643151;}
-    public static double chance_fuite(double FLEE) {return (30.0+FLEE)/(FLEE+100.0);}
-    public static double temps_fuite(double FLEE_SPD)  {return 10.0 / (FLEE_SPD+10.0);}
-    public static double initiative(double INIT) {return 20.0 / Math.pow(INIT+10.0,0.80);}
-    public static double bonus_xp(double BONUS_XP) {return Math.pow(BONUS_XP+10.0,0.20)-0.58489319;}
-    public static double facteur_temps(double TIME_SPD) {return Math.pow(TIME_SPD+20.0,0.20)-0.8205642;}
-    public static double epines(double EPIN) {return Math.pow(EPIN+6.0,0.75) - 3.833658625477634855132095;}
-    public static double represailles(double REP) {return 2.000001-29.7560651785/Math.pow(90.0+REP,0.60);}
-    public static double necrophagie(double NECRO) {return Math.pow(NECRO+20,0.80)/20.0-0.54928027164;}
-    public static double temps_craft(double CRAFT_SPD) {return 16.0 / Math.pow(CRAFT_SPD+7.0,0.70);}
-    public static double rendement(double CRAFT_REND) {return 1.0 - 4.0/Math.pow(12.0+CRAFT_REND,0.90);}
-    public static double economie_orbe(double ECO_ORB) {return 9.14610103855/Math.pow(40.0+ECO_ORB,0.60);}
-    public static double niveau_boutique(double SHOP_LEVEL) {return 0.8*Math.pow(SHOP_LEVEL+10.0,0.50);}
-    public static double taille_boutique(double SHOP_SIZE) {return Math.pow(SHOP_SIZE+8.0,0.65);}
-	public static double detection_piege(double TRAP_DET) {return TRAP_DET*0.4;}
-	public static double bonus_initiative_piege(double TRAP_INIT) {return Math.pow(TRAP_INIT+10.0,0.40) - 1.51188643151;}
-	public static double bonus_resistance_vs_piege(double TRAP_RES) {return Math.pow(TRAP_RES+12.0,0.40)-1.70192007704;}
-	public static double rente_par_seconde(double RENTE) {return Math.pow(RENTE+2.0,1.3)*0.1-0.24622888266;}
-	public static double points_par_niveau(double EDUC) {return Math.pow(EDUC+20.0,0.28)*2.161133550289;}	
-
 	public String infos()
 	{
 		double dmpa = dmpa();
-		int lvl1=Math.max(level-5,1);
-		int lvl2= lvl1+5;
-		int lvl3= lvl2+10;
+		int lvl0=Math.max(level-10,1);
+		int lvl1=lvl0+5;
+		int lvl2= lvl0+10;
+		int lvl3= lvl0+20;
 		
 		return String.format("Temps total de jeu : %.2f secondes"+
 			"\nAttaques par seconde : %.3f"+
@@ -371,7 +322,7 @@ public class Player implements Serializable {
 			"\n  Quantité totale de ressources : %.3f"+
 			"\n  Nombre d'objets magiques : %.3f"+
 			"\n  Nombre d'objets rares : %.4f"+
-			"\nBonus d'expérience : %.2f%%"+
+			"\nProbabilité d'esquiver un coup final : %.3f%%"+
 			"\nMultiplicateur du temps : %.3f"+
 			"\nDégats infligés aux attaquants : %.2f"+
 			"\nDégats réfléchis sur les attaquants : %.2f%%"+
@@ -379,23 +330,29 @@ public class Player implements Serializable {
 			"\nTemps du crafting : %.3f secondes"+
 			"\nRendement du crafting : %.3f%%"+
 			"\nUn orbe coûte %.2f%% d'orbe"+	
-			"\nNiveau moyen des marchands : %.0f+%.2f"+
+			"\nNiveau moyen des marchands : %d+%.2f"+
 			"\nNombre d'objets chez les marchands : %.2f"+
 			"\nProbabilité de détecter un piège :"+
 			"\n  De niveau %d : %.3f%%"+
 			"\n  De niveau %d : %.3f%%"+
 			"\n  De niveau %d : %.3f%%"+
 			"\nRente par seconde : %.3f écus"+
-			"\nPoints à distibuer par niveau : %.3f",
+			"\nPoints à distibuer par niveau : %.3f"+
+			"\nBonus général d'expérience : %.2f%%"+
+			"\nBonus d'expérience sur un monstre :"+
+			"\n  De niveau %d : %.3f%%"+
+			"\n  De niveau %d : %.3f%%"+
+			"\n  De niveau %d : %.3f%%"+
+			"\n  De niveau %d : %.3f%%",
 			temps_total,att_per_sec(),dmg_base(),100.0*crit_proba(),multi_crit(),
 			dmpa,att_per_sec()*dmpa,
 			ed_versus_tag(0),ed_versus_tag(1),ed_versus_tag(2),ed_versus_tag(3),ed_versus_tag(4),ed_versus_tag(5),
-			lvl1,100.0-esquive_proba(Monster.ptsForLevel(lvl1)*Monster.coeff_std[4]*0.1,PRC())*100.0,
-			lvl2,100.0-esquive_proba(Monster.ptsForLevel(lvl2)*Monster.coeff_std[4]*0.1,PRC())*100.0,
-			lvl3,100.0-esquive_proba(Monster.ptsForLevel(lvl3)*Monster.coeff_std[4]*0.1,PRC())*100.0,
-			lvl1,esquive_proba(ESQ(),Monster.ptsForLevel(lvl1)*Monster.coeff_std[5]*0.1)*100.0,
-			lvl2,esquive_proba(ESQ(),Monster.ptsForLevel(lvl2)*Monster.coeff_std[5]*0.1)*100.0,
-			lvl3,esquive_proba(ESQ(),Monster.ptsForLevel(lvl3)*Monster.coeff_std[5]*0.1)*100.0,
+			lvl1,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl1)*Monster.coeff_std[4]*0.1,PRC())*100.0,
+			lvl2,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl2)*Monster.coeff_std[4]*0.1,PRC())*100.0,
+			lvl3,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl3)*Monster.coeff_std[4]*0.1,PRC())*100.0,
+			lvl1,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl1)*Monster.coeff_std[5]*0.1)*100.0,
+			lvl2,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl2)*Monster.coeff_std[5]*0.1)*100.0,
+			lvl3,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl3)*Monster.coeff_std[5]*0.1)*100.0,
 			100.0-(100.0*reduc()),bonus_resistance_vs_piege(),100.0-(100.0*resistance_vs_piege()),absorption(),
 			pv_per_vita(),vie_max(),vie_max()/reduc(),
 			regen(),vie_max()/regen(),100*vol_de_vie(),
@@ -408,244 +365,247 @@ public class Player implements Serializable {
 			quantite_drop()*(1-StaticItem.PROBA_RES_BASE)*multiplicateur_res(),
 			quantite_drop()*(1-StaticItem.PROBA_RES_BASE)*chance_magique(), // Nombre d'objets magiques
 			quantite_drop()*(1-StaticItem.PROBA_RES_BASE)*chance_magique()*chance_rare(), // Nombre d'objets rares
-			100.0*(bonus_xp()-1),facteur_temps(),epines(),100*represailles(),100*necrophagie(),
-			temps_craft(),100*rendement(),100*economie_orbe(),10.0*zone,niveau_boutique(),taille_boutique(),
+			100.0*proba_immunite_final(),facteur_temps(),epines(),100*represailles(),100*necrophagie(),
+			temps_craft(),100*rendement(),100*economie_orbe(),niveau_boutique_base(),niveau_boutique(),taille_boutique(),
 			lvl1,100.0*proba_trouver_piege(lvl1),
 			lvl2,100.0*proba_trouver_piege(lvl2),
 			lvl3,100.0*proba_trouver_piege(lvl3),
-			rente_par_seconde(),points_par_niveau());
+			rente_par_seconde(),points_par_niveau(),
+			100.0*(bonus_xp()-1),
+			lvl0,100.0*modif_exp_lvl(lvl0-level)-100.0,
+			lvl1,100.0*modif_exp_lvl(lvl1-level)-100.0,
+			lvl2,100.0*modif_exp_lvl(lvl2-level)-100.0,
+			lvl3,100.0*modif_exp_lvl(lvl3-level)-100.0);
 	}
 
     public double dmpa()
     {return dmg_base() + dmg_base()*(multi_crit()-1.0)*crit_proba();}
     
     public double IAS()
-    {return stats_with_bonus[0];}
+    {return stats_with_bonus[Universe.IAS];}
 
     public double DMG()
-    {return stats_with_bonus[1];}
+    {return stats_with_bonus[Universe.DMG];}
 
     public double REDUC()
-    {return stats_with_bonus[2];}
+    {return stats_with_bonus[Universe.REDUC];}
 
     public double ABS()
-    {return stats_with_bonus[3];}
+    {return stats_with_bonus[Universe.ABS];}
 
     public double ESQ()
-    {return stats_with_bonus[4];}
+    {return stats_with_bonus[Universe.ESQ];}
 
     public double PRC()
-    {return stats_with_bonus[5];}
+    {return stats_with_bonus[Universe.PRC];}
 
     public double LCK()
-    {return stats_with_bonus[6];}
+    {return stats_with_bonus[Universe.LCK];}
 
     public double CRT()
-    {return stats_with_bonus[7];}
+    {return stats_with_bonus[Universe.CRT];}
 
     public double VDV()
-    {return stats_with_bonus[8];}
+    {return stats_with_bonus[Universe.VDV];}
 
     public double VITA()
-    {return stats_with_bonus[9];}
+    {return stats_with_bonus[Universe.VITA];}
 
     public double CON()
-    {return stats_with_bonus[10];}
+    {return stats_with_bonus[Universe.CON];}
 
     public double REGEN()
-    {return stats_with_bonus[11];}
+    {return stats_with_bonus[Universe.REGEN];}
 
     public double RESUR()
-    {return stats_with_bonus[12];}
+    {return stats_with_bonus[Universe.RESUR];}
 
     public double LOAD()
-    {return stats_with_bonus[13];}
+    {return stats_with_bonus[Universe.LOAD];}
 
     public double RUN()
-    {return stats_with_bonus[14];}
+    {return stats_with_bonus[Universe.RUN];}
 
     public double RESF()
-    {return stats_with_bonus[15];}
+    {return stats_with_bonus[Universe.RESF];}
 
     public double MF()
-    {return stats_with_bonus[16];}
+    {return stats_with_bonus[Universe.MF];}
 
     public double RF()
-    {return stats_with_bonus[17];}
+    {return stats_with_bonus[Universe.RF];}
 
     public double QALF()
-    {return stats_with_bonus[18];}
+    {return stats_with_bonus[Universe.QALF];}
 
     public double QTYF()
-    {return stats_with_bonus[19];}
+    {return stats_with_bonus[Universe.QTYF];}
 
     public double POWF()
-    {return stats_with_bonus[20];}
+    {return stats_with_bonus[Universe.POWF];}
 
     public double GF()
-    {return stats_with_bonus[21];}
+    {return stats_with_bonus[Universe.GF];}
 
     public double ED_MV()
-    {return stats_with_bonus[22];}
+    {return stats_with_bonus[Universe.ED_MV];}
 
     public double ED_ANI()
-    {return stats_with_bonus[23];}
+    {return stats_with_bonus[Universe.ED_ANI];}
 
     public double ED_HUM()
-    {return stats_with_bonus[24];}
+    {return stats_with_bonus[Universe.ED_HUM];}
 
     public double ED_PV()
-    {return stats_with_bonus[25];}
+    {return stats_with_bonus[Universe.ED_PV];}
 
     public double ED_DEM()
-    {return stats_with_bonus[26];}
+    {return stats_with_bonus[Universe.ED_DEM];}
 
     public double ED_CHAMP()
-    {return stats_with_bonus[27];}
+    {return stats_with_bonus[Universe.ED_CHAMP];}
 
     public double ESTI()
-    {return stats_with_bonus[28];}
+    {return stats_with_bonus[Universe.ESTI];}
 
     public double FLEE()
-    {return stats_with_bonus[29];}
+    {return stats_with_bonus[Universe.FLEE];}
 
     public double FLEE_SPD()
-    {return stats_with_bonus[30];}
+    {return stats_with_bonus[Universe.FLEE_SPD];}
 
     public double INIT()
-    {return stats_with_bonus[31];}
+    {return stats_with_bonus[Universe.INIT];}
 
-    public double BONUS_XP()
-    {return stats_with_bonus[32];}
+	public double IMUN_FINAL()
+	{return stats_with_bonus[Universe.IMUN_FINAL];}
 
     public double TIME_SPD()
-    {return stats_with_bonus[33];}
+    {return stats_with_bonus[Universe.TIME_SPD];}
 
     public double EPIN()
-    {return stats_with_bonus[34];}
+    {return stats_with_bonus[Universe.EPIN];}
 
 	public double REP()
-	{return stats_with_bonus[35];}
+	{return stats_with_bonus[Universe.REP];}
 
 	public double NECRO()
-	{return stats_with_bonus[36];}
+	{return stats_with_bonus[Universe.NECRO];}
 
 	public double CRAFT_SPD()
-	{return stats_with_bonus[37];}
+	{return stats_with_bonus[Universe.CRAFT_SPD];}
 	
 	public double CRAFT_REND()
-	{return stats_with_bonus[38];}
+	{return stats_with_bonus[Universe.CRAFT_REND];}
 	
 	public double ECO_ORB()
-	{return stats_with_bonus[39];}
+	{return stats_with_bonus[Universe.ECO_ORB];}
 	
 	public double SHOP_LEVEL()
-	{return stats_with_bonus[40];}
+	{return stats_with_bonus[Universe.SHOP_LEVEL];}
 
 	public double SHOP_SIZE()
-	{return stats_with_bonus[41];}	
+	{return stats_with_bonus[Universe.SHOP_SIZE];}	
 
 	public double TRAP_DET()
-	{return stats_with_bonus[42];}
+	{return stats_with_bonus[Universe.TRAP_DET];}
 
 	public double TRAP_INIT()
-	{return stats_with_bonus[43];}
+	{return stats_with_bonus[Universe.TRAP_INIT];}
 
 	public double TRAP_RES()
-	{return stats_with_bonus[44];}
+	{return stats_with_bonus[Universe.TRAP_RES];}
 	
 	public double RENTE()
-	{return stats_with_bonus[45];}
+	{return stats_with_bonus[Universe.RENTE];}
 	
 	public double EDUC()
-	{return stats_with_bonus[46];}
+	{return stats_with_bonus[Universe.EDUC];}
 	
-	public double proba_rencontrer_piege() {return 0.20;}
+    public double BONUS_XP()
+    {return stats_with_bonus[Universe.BONUS_XP];}
+	
+    public double BONUS_LOWLEV()
+    {return stats_with_bonus[Universe.BONUS_LOWLEV];}
+	
+    public double BONUS_HLEV()
+    {return stats_with_bonus[Universe.BONUS_HLEV];}
+		
+	
+	public double proba_rencontrer_piege() {return universe.proba_rencontrer_piege();}
     public double vie() {return vie;}
-    public double vie_max() {return vie_max(VITA(),CON());}
-    public double att_per_sec() {return att_per_sec(IAS());}
-    public double pv_per_vita() {return pv_per_vita(CON());}
-    public double crit_proba() {return crit_proba(LCK());}
-    public double multi_crit() {return multi_crit(CRT());}
-    public double dmg_base() {return dmg_base(DMG());}
-    public double reduc() {return reduc(REDUC());}
-    public double absorption() {return absorption(ABS());}
-    public double vol_de_vie() {return vol_de_vie(VDV());}
-    public double regen() {return regen(REGEN(),CON());}
-    public double charge_max() {if(Game.DEBUG) return 900000; else return charge_max(LOAD());}
-    public double temps_traque() {return temps_traque(RUN());}
-    public double temps_shop() {return temps_shop(RUN());}
-    public double temps_forge() {return temps_forge(RUN());}
-    public double temps_res() {return temps_res(RESUR(),level);}
-    public double coeff_achat() {return coeff_achat(ESTI());}
-    public double coeff_vente() {return coeff_vente(ESTI());}
-    public double multiplicateur_res() {return multiplicateur_res(RESF());}
-    public double chance_magique() {return chance_magique(MF());}
-    public double chance_rare() {return chance_rare(RF());}
-    public double chance_qualite() {return chance_qualite(QALF());}
-    public double quantite_drop() {return quantite_drop(QTYF());}
-    public double multiplicateur_or() {return multiplicateur_or(GF());}
-    public double puissance_ench_inf() {return puissance_ench_inf(POWF());}
-    public double puissance_ench_sup() {return puissance_ench_sup(POWF());}
-    public double ed_versus_tag(int tag) {return ed_specific_monster(stats_with_bonus[22+tag]);}
-    public double chance_fuite() {return chance_fuite(FLEE());}
-    public double temps_fuite() {return temps_fuite(FLEE_SPD());}
-    public double temps_craft() {return temps_craft(CRAFT_SPD());}
-    public double initiative() {return initiative(INIT());}
-    public double bonus_xp() {return bonus_xp(BONUS_XP());}
-    public double facteur_temps() {return facteur_temps(TIME_SPD());}
-    public double epines() {return epines(EPIN());}
-    public double represailles() {return represailles(REP());}
-    public double necrophagie() {return necrophagie(NECRO());}
+    public double vie_max() {return universe.vie_max(VITA(),CON());}
+    public double att_per_sec() {return universe.att_per_sec(IAS());}
+    public double pv_per_vita() {return universe.pv_per_vita(CON());}
+    public double crit_proba() {return universe.crit_proba(LCK());}
+    public double multi_crit() {return universe.multi_crit(CRT());}
+    public double dmg_base() {return universe.dmg_base(DMG());}
+    public double reduc() {return universe.reduc(REDUC());}
+    public double absorption() {return universe.absorption(ABS());}
+    public double vol_de_vie() {return universe.vol_de_vie(VDV());}
+    public double regen() {return universe.regen(REGEN(),CON());}
+    public double charge_max() {if(Game.DEBUG) return 900000; else return universe.charge_max(LOAD());}
+    public double temps_traque() {return universe.temps_traque(RUN());}
+    public double temps_shop() {return universe.temps_shop(RUN());}
+    public double temps_forge() {return universe.temps_forge(RUN());}
+    public double temps_res() {return universe.temps_res(RESUR(),level);}
+    public double coeff_achat() {return universe.coeff_achat(ESTI());}
+    public double coeff_vente() {return universe.coeff_vente(ESTI());}
+    public double multiplicateur_res() {return universe.multiplicateur_res(RESF());}
+    public double chance_magique() {return universe.chance_magique(MF());}
+    public double chance_rare() {return universe.chance_rare(RF());}
+    public double chance_qualite() {return universe.chance_qualite(QALF());}
+    public double quantite_drop() {return universe.quantite_drop(QTYF());}
+    public double multiplicateur_or() {return universe.multiplicateur_or(GF());}
+    public double puissance_ench_inf() {return universe.puissance_ench_inf(POWF());}
+    public double puissance_ench_sup() {return universe.puissance_ench_sup(POWF());}
+    public double ed_versus_tag(int tag) {return universe.ed_specific_monster(stats_with_bonus[22+tag]);}
+    public double chance_fuite() {return universe.chance_fuite(FLEE());}
+    public double temps_fuite() {return universe.temps_fuite(FLEE_SPD());}
+    public double temps_craft() {return universe.temps_craft(CRAFT_SPD());}
+    public double initiative() {return universe.initiative(INIT());}
+	public double proba_immunite_final() {return universe.proba_immunite_final(IMUN_FINAL());}
+		
+    public double facteur_temps() {return universe.facteur_temps(TIME_SPD());}
+    public double epines() {return universe.epines(EPIN());}
+    public double represailles() {return universe.represailles(REP());}
+    public double necrophagie() {return universe.necrophagie(NECRO());}
 
-    public double rendement() {return rendement(CRAFT_REND());}
-    public double economie_orbe() {return economie_orbe(ECO_ORB());}
-    public double niveau_boutique() {return niveau_boutique(SHOP_LEVEL());}
-    public double taille_boutique() {return taille_boutique(SHOP_SIZE());}
+    public double rendement() {return universe.rendement(CRAFT_REND());}
+    public double economie_orbe() {return universe.economie_orbe(ECO_ORB());}
+	public int niveau_boutique_base() {return (int)(universe.get_zone_level(zone)+universe.get_zone_max_level(zone))/2;}
+    public double niveau_boutique() {return universe.niveau_boutique(SHOP_LEVEL());}
+    public double taille_boutique() {return universe.taille_boutique(SHOP_SIZE());}
 
-	public double detection_piege() {return detection_piege(TRAP_DET());}
-	public double bonus_initiative_piege() {return bonus_initiative_piege(TRAP_INIT());}
-	public double initiative_piege() {return initiative(INIT()*bonus_initiative_piege(TRAP_INIT()));}
-	public double bonus_resistance_vs_piege() {return bonus_resistance_vs_piege(TRAP_RES());}
-	public double resistance_vs_piege() {return reduc(REDUC()*bonus_resistance_vs_piege(TRAP_RES()));}
-	public double rente_par_seconde() {return rente_par_seconde(RENTE());}
-	public double points_par_niveau() {return points_par_niveau(EDUC());}	
-	public double points_totaux() {return points_par_niveau()*level + points_initiaux;}
+	public double detection_piege() {return universe.detection_piege(TRAP_DET());}
+	public double bonus_initiative_piege() {return universe.bonus_initiative_piege(TRAP_INIT());}
+	public double initiative_piege() {return universe.initiative(INIT()*universe.bonus_initiative_piege(TRAP_INIT()));}
+	public double bonus_resistance_vs_piege() {return universe.bonus_resistance_vs_piege(TRAP_RES());}
+	public double resistance_vs_piege() {return universe.reduc(REDUC()*universe.bonus_resistance_vs_piege(TRAP_RES()));}
+	public double rente_par_seconde() {return universe.rente_par_seconde(RENTE());}
+	public double points_par_niveau() {return universe.points_par_niveau(EDUC());}	
+	
+	public double points_totaux() {return points_par_niveau()*level + universe.points_initiaux();}
 	public double points_a_distribuer() {return points_totaux()-points_distribues();}
-	
-    public void distribue(int x,double y) {stats[x]+=y;}
-	
-	public static double proba_trouver_piege(double td, double hidden_lvl)
-	{
-		double dp = detection_piege(td);
-		return dp/(hidden_lvl+dp);
-	}
-	
-	public double proba_trouver_piege(double hidden_lvl)
-	{
-		return proba_trouver_piege(TRAP_DET(), hidden_lvl);
-	}
+	public double bonus_xp() {return universe.bonus_xp(BONUS_XP());}
+	public double modif_exp_lvl(int levdiff) {return universe.modif_exp_lvl(BONUS_LOWLEV(), BONUS_HLEV(), levdiff);}
+	public double proba_trouver_piege(double hidden_lvl) {return universe.proba_trouver_piege(TRAP_DET(), hidden_lvl);}
 
+	    public void distribue(int x,double y) {stats[x]+=y;}
+	
     public void personal_wait(double time_w, int ACT)
     {
 	try
 	    {
-		double adjusted_time = time_w*facteur_temps();
+		double adjusted_time = time_w/facteur_temps();
 		temps_total += adjusted_time;
-		t_stats.addActivity(time_w,ACT);
+		t_stats.addActivity(adjusted_time,ACT);
 		if(!Game.FAST) Thread.currentThread().sleep((int)(adjusted_time*1000));
 	    }
 	catch (Exception e)
 	    {
 	    }
 	Game.MW.refreshInFight();
-    }
-
-    public Player(boolean b) // constructeur presque vide....
-    {
-	shop = null;
-	mob = null;
-	defi = null;
     }
 
 	public void addDefaultRules()
@@ -670,7 +630,7 @@ public class Player implements Serializable {
 
 		// Monster rules
 		tmp = new ObjectRule(0,2,5,ObjectRule.MONSTER_RULE);
-		tmp.avoid_rule = true;
+		//tmp.avoid_rule = true;
 		tmp.name = "Monstre trop fort"; rules.add(tmp);
 		tmp = new ObjectRule(0,1,1,ObjectRule.MONSTER_RULE);
 		tmp.avoid_rule = true;
@@ -680,14 +640,26 @@ public class Player implements Serializable {
 	/*	tmp = new ObjectRule(2,1,2,ObjectRule.PLAYER_RULE);
 		tmp.shopping_rule = true;
 		tmp.name = "Inventaire plein"; rules.add(tmp);*/
-/*		tmp = new ObjectRule(1,0,0,ObjectRule.ITEM_RULE);
+	/*	tmp = new ObjectRule(1,0,0,ObjectRule.ITEM_RULE);
 		tmp.sell_rule = true;
 		tmp.name = "Vente des déchets"; rules.add(tmp);*/
 
-		for (int i=0; i< StaticItem.nb_pos ; i++)
+		for (int i=0; i< StaticItem.nb_pos-1 ; i++)
 		{
+			if(universe.slot_est_disponible(i))
+			{
 			tmp = new ObjectRule(2,0,i,ObjectRule.ITEM_RULE);
 			tmp.name = StaticItem.Emplacement[i];
+			tmp.filter_rule = true;
+			rules.add(tmp);
+			}
+		}
+		
+		for (int i=0; i< StaticItem.Rarete.length ; i++)
+		{
+			tmp = new ObjectRule(0,0,i,ObjectRule.ITEM_RULE);
+			String name  =StaticItem.Rarete[i];
+			tmp.name = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
 			tmp.filter_rule = true;
 			rules.add(tmp);
 		}
@@ -697,8 +669,11 @@ public class Player implements Serializable {
 
 	}
 
-    public Player()
+    public Player(Universe u, boolean light)
     {
+	universe = u;
+	if(!light)
+	{
 	temps_total = 0;
 	temps_depuis_derniere_rente = 0;
 	t_stats = new TimeStats();
@@ -728,6 +703,13 @@ public class Player implements Serializable {
 	for(int i=0; i<nb_stats; i++) 
 		{stats[i]=0; stats_with_bonus[i]=0; item_bonus[i]=0;}
 	refresh();
+	}
+	else
+	{
+		shop = null;
+		mob = null;
+		defi = null;
+	}
     }
 
     public String short_stats()
@@ -758,7 +740,7 @@ public class Player implements Serializable {
 	for(int j=0; j<StaticItem.ORB.length; j++)	
 	    {
 		it = new Item(StaticItem.ORB[j],StaticItem.RESSOURCE_CRAFT);
-		it.qty = 200.0;
+		it.qty = 1000.0;
 		it.update();
 		inventory.add(it);
 		charge += it.poids;
@@ -781,10 +763,13 @@ public class Player implements Serializable {
 		}
 		}
     }
-
+	
 	public int get_mob_level()
 	{
-		return 10*zone + 1 + (int)(Math.random() * 10);
+		int zl = universe.get_zone_level(zone);
+		int diff = universe.get_zone_max_level(zone)-zl+1;
+		int zlevel = zl + (int)(Math.random() * diff);
+		return zlevel;
 	}
 	
     // rencontre aléatoire
@@ -796,7 +781,7 @@ public class Player implements Serializable {
 	Game.MW.addLog(String.format("Recherche d'un ennemi : %.3f secondes",tt));
 	personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_ENNEMI);
 	int mob_level = get_mob_level();
-	mob = new Monster(mob_level);
+	mob = new Monster(mob_level,universe);
     }
 
     // trouver un marchand
@@ -836,7 +821,7 @@ public class Player implements Serializable {
 	double dmg, dmg_base, dmg_abs, dmg_red;
 	double dmg_base2, dmg_red2;
 
-	esquive = esquive_proba(p.ESQ(),PRC());
+	esquive = universe.esquive_proba(p.ESQ(),PRC());
 
 	if (Math.random() < esquive)
 	    {
@@ -869,7 +854,17 @@ public class Player implements Serializable {
 		dmg = Math.max(dmg_base*dmg_red - dmg_abs,0.0); // pas de dégâts négatifs
 
 		res+=String.format("   %s inflige %.3f points de dégâts à %s (%.2f de base, %.2f%% de réduction, %.2f d'absorption)",this.name,dmg,p.name,dmg_base,100*(1.0-dmg_red),dmg_abs);
-		p.vie -= dmg;
+
+		if(dmg >= p.vie && p.vie > 0.1 && Math.random() < p.proba_immunite_final())
+		{
+			res+=String.format("\n   L'immunité au coup final sauve %s, il conserve 0.1 point de vie (probabilité : %.2f%%)", 
+				p.name, p.proba_immunite_final()*100.0);
+			p.vie = 0.1;
+		}
+		else
+		{
+			p.vie -= dmg;
+		}
 		
 		dmg_base2 = p.plage_random() * p.epines();
 		dmg_red2 = reduc();
@@ -885,7 +880,7 @@ public class Player implements Serializable {
 				this.vie -= rep*dmg_red2;
 	    	}
 							
-		double vdv = Math.min(this.vie_max()-this.vie(),dmg*vol_de_vie(VDV()));
+		double vdv = Math.min(this.vie_max()-this.vie(),dmg*vol_de_vie());
 		if (vdv > 0.01)
 		    {
 		    res+="\n   "+String.format("%s récupère %.3f points de vie (vol de vie)",this.name,vdv);
@@ -901,7 +896,7 @@ public class Player implements Serializable {
 	temps = 0;
     }
 
-    public boolean combat(boolean disp)
+    public boolean combat(boolean disp, boolean real)
     {
 	boolean has_flee = false;
 	crit_taken = 0;
@@ -918,7 +913,7 @@ public class Player implements Serializable {
 	p2.temps += i2;
 
 	double tmp_temps = temps;
-	personal_wait(i1,TimeStats.ACTIVITY_INITIATIVE);
+	if(real) personal_wait(i1,TimeStats.ACTIVITY_INITIATIVE);
 
 	if (i1<i2) {t1=this; t2=p2;}
 	else {t1=p2; t2=this;}
@@ -926,7 +921,7 @@ public class Player implements Serializable {
   
 	while (vie() >0 && p2.vie() >0)
 	    {
-		if(this == t1 && must_flee())
+		if(this == t1 && real && must_flee())
 		    {
 			double t_att = plage_random()*temps_fuite(); // Durée de la fuite
 			temps += t_att;
@@ -947,7 +942,7 @@ public class Player implements Serializable {
 			tmp = t1.cogne(t2);
 			if(disp) Game.MW.addLog(tmp);
 		    }
-		personal_wait(temps-tmp_temps,TimeStats.ACTIVITY_COGNE);
+		if(real) personal_wait(temps-tmp_temps,TimeStats.ACTIVITY_COGNE);
 		tmp_temps = temps;
 		if(temps < p2.temps) {t1=this; t2=p2;}
 		else {t1=p2; t2=this;}
@@ -960,15 +955,18 @@ public class Player implements Serializable {
 		}
 		else{
 		    if(disp) Game.MW.addLog(String.format("%s tue %s (temps du combat %.3f secondes, vie restante %.3f)",name,p2.name,temps,vie()));
-		    gain_xp_mob(p2);
-		    loot((Monster)p2);
+			if(real)
+			{
+				gain_xp((int)Math.pow(100*p2.level,0.85), 0, p2.level);
+				loot((Monster)p2);
+			}
 		    lost = false;
 		}
 	    }
 	else
 	    {
 		if(disp) Game.MW.addLog(String.format("%s est tombé face à %s de niveau %d (temps du combat %.3f secondes)",name,p2.name,p2.level,temps));
-		meurt();
+		if(real) meurt(disp);
 		lost = true;
 	    }
 	temps = 0;
@@ -988,7 +986,7 @@ public class Player implements Serializable {
     public void loot(Monster p2)
     {
 	ArrayList<Item> loot = p2.drop(this);
-	double fric = Math.random()*(Math.pow((double)(p2.level),1.5) * multiplicateur_or());
+	double fric = Math.random() * universe.gold_drop(p2.level) * multiplicateur_or();
 	if(fric < 1.0) fric = 0;
 	if (loot.isEmpty() && fric <= 0.1) 
 	    Game.MW.addLog(String.format("Pas de butin sur %s", p2.name));
@@ -1027,12 +1025,12 @@ public class Player implements Serializable {
 		}
     }
 
-    public void meurt()
+    public void meurt(boolean disp)
     {
 	double res = temps_res();
-	double perte = money/10.0;
-	Game.MW.addLog(String.format("%s perd 10%% de son or (%.3f)", name, perte));
-	Game.MW.addLog(String.format("Résurrection : %.3f secondes",res));
+	double perte = money*universe.gold_death_penalty();
+	if(disp) Game.MW.addLog(String.format("%s perd %.1f%% de son or (%.3f)", name, 100*universe.gold_death_penalty(), perte));
+	if(disp) Game.MW.addLog(String.format("Résurrection : %.3f secondes",res));
 	money -= perte;
 	vie = vie_max();
 	personal_wait(res,TimeStats.ACTIVITY_RESURRECTION);
@@ -1047,7 +1045,7 @@ public class Player implements Serializable {
     public void heal()
     {
 	double hp_tg = vie_max()-vie;
-	double res = hp_tg / regen(REGEN(),CON());
+	double res = hp_tg / regen();
 	if (hp_tg > 0.001)
 	    {
 		vie = vie_max();
@@ -1077,25 +1075,19 @@ public class Player implements Serializable {
 	return 1000+((x-1)*(x-2)*1000);
     }
 
-    public void gain_xp_mob(Player M)
-    {
-	int gain = (int)Math.pow(140*M.level/Math.max(1,level-M.level),0.85);
-	if (M.tags[5]) gain = gain + gain/2; // Champion
-	gain_xp(gain);
-    }
 
-    public void gain_xp(int sx)
+    public void gain_xp(int sx,int type, int gainLevel)
     {
-	int x = (int)(bonus_xp()*sx);
+	int x = (int)(sx*bonus_xp()*modif_exp_lvl(gainLevel-level));
 	int levelback=level;
 	xp_pt+=x;
-	Game.MW.addLog(name + " reçoit "+sx+" points d'expérience ("+x+" avec les bonus).");
+	t_stats.addXp((double)x, type);
+	Game.MW.addLog(String.format("%s reçoit %d points d'expérience (%d × %.2f × %.2f).",
+		name,x,sx,bonus_xp(),modif_exp_lvl(gainLevel-level)));
 	while(xp_pt>=next_level())
 	    {
 		level++;
 		Game.MW.addLog(name + " passe au niveau " + level + ".");
-		//save();
-		//Game.MW.addLog("Joueur sauvegardé...");
 		refresh();
 	    }
 	if(levelback != level)
@@ -1111,22 +1103,6 @@ public class Player implements Serializable {
 	inventory.add(rit);
     }
 
-    public void save()
-    {
-	try{
-	    //use buffering
-	    OutputStream file = new FileOutputStream( name+".theory" );
-	    OutputStream buffer = new BufferedOutputStream( file );
-	    ObjectOutput output = new ObjectOutputStream( buffer );
-	    mob = null;
-	    output.writeObject(this);
-	    output.close();
-	} 
-	catch(Exception ex){
-	    System.out.println(ex);
-	    System.out.println("Can't write in \"" +name +".theory\"");
-	}
-    }
 
 	public void craft()
 	{

@@ -66,7 +66,7 @@ public class ObjectRule implements Serializable {
 
     public static String[] YesOrNo = {"non","oui"};
     public static String[] RuleLogic = {"et","ou","non"};
-    public static String[] RuleOperator = {"=","<",">"};
+    public static String[] RuleOperator = {"=","<",">","≠"};
     public static String[] RuleItemTypeName = 
     {
 	"Type d'objet", // objet.rare
@@ -287,11 +287,12 @@ public class ObjectRule implements Serializable {
 
 	public boolean Check(double a)
 	{
-	switch (operator) //  "=","<",">"
+	switch (operator) //  "=","<",">","!="
 		{
     	case 0: return Math.abs(a-param) < 0.0001;
-    	case 1: return a<param;
-    	case 2: return a>param;
+    	case 1: return a < param;
+    	case 2: return a > param;
+    	case 3: return Math.abs(a-param) > 0.0001;
     	}
 	return false;
 	}
@@ -300,7 +301,9 @@ public class ObjectRule implements Serializable {
 	{
 	if(operator==0) //  "="
 		return (t[(int)param] == true) ;
-	else return false;
+	else if(operator==3)
+		return (t[(int)param] == false) ;
+	return false;
 	}
 	
    public boolean IsTrue(Player p, Item i, Monster m)

@@ -9,7 +9,7 @@ public class CurveObject {
 		}
 		public CurveObject()
 			{
-			arr_x = new double[50];
-			arr_y = new double[50];
+			arr_x = new double[100];
+			arr_y = new double[100];
 			}
 }

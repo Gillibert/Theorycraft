@@ -54,7 +54,7 @@ public boolean addScore(Score news)
 {
 	boolean res = false;
 	ArrayList<Score> tmp = bestScores(news.challenge_name);
-	if(tmp.size() >= 3)
+	if(tmp.size() >= 10)
 	{
 		Score rem = tmp.get(tmp.size() - 1);
 		if(news.time < rem.time)
@@ -89,7 +89,7 @@ public String bestScoresString(String challenge_name)
 	ArrayList<Score> tmp = bestScores(challenge_name);
 	String res = "";
 	for(Score s : tmp)
-		res = res + s.name + " (" + (int)s.time + " secondes)\n";
+		res = res + s.name + " (" + (int)s.time + " secondes, graine "+ (int)s.seed +")\n";
 	return res;
 }
 }

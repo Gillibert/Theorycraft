@@ -1,146 +1,168 @@
-ï»¿CHANGE LOG
+CHANGE LOG
 
-Version 0.8 "Traps and stuff"
-FEATURE : Ajout de piÃ¨ges.
-FEATURE : Condition d'arrÃªt sur les piÃ¨ges.
+Version 0.9 15/02/2017 "Random universe"
+FEATURE : Il y a maintenant la possibilité de jouer dans un univers dont les règles sont aléatoires.
+FEATURE : Ajout d'une fenêtre d'information sur l'univers.
+FEATURE : Il est possible de changer d'univers via une formule de la forge.
+FEATURE : Les équations régissant les compétences sont aléatoires et liées à l'univers.
+FEATURE : Les types d'objets disponibles sont aléatoires et liés à l'univers. On trouve cependant toujours des armes.
+FEATURE : La vie de départ, les points d'expérience initiaux, la probabilité de croiser un champion, la probabilité de croiser un piège, le niveau des zones, la puissance maximale des enchantements et le pourcentage d'or perdu à chaque décès sont aléatoires et liés à l'univers.
+FEATURE : L'univers par défaut, univers 0, est maintenu.
+FEATURE : Ajout de la possibilité de faire une règle "?" en plus de ">", "=" et "<".
+FEATURE : Ajout de statistiques sur l'expérience gagnée.
+FEATURE : Si on a plus de 100 points à distribuer, on peut les distribuer 50 par 50 (avec "MAJ").
+FEATURE : Les monstres n'ont plus un niveau prédéfini mais dynamique dépendant de la gamme des niveaux de l'univers. Ainsi, on peut avoir des monstres de niveau 2000 dans certains univers.
+FEATURE : Ajouter par défaut des filtres suivants : objet normal, objet magique, objet rare, objet légendaire, ressource élémentaire, ressource primordiale et orbe.
+FEATURE : Ajout d'un algorithme optimisant les monstres pour un univers donné, utilisé pour choisir la répartition par défaut des points des monstres.
+FEATURE : Ajout des compétences "Immunité au coup final", "Overkilling" et "Hardiesse".
+
+CHANGE : L'alliage de 3 ressources primordiales produit désormais une ressource primordiale.
+CHANGE : Ajustement des pièges (plus durs).
+CHANGE : Ajustement des courbes (pas de temps plus fin).
+CHANGE : Ajustement des compétences.
+
+FIX : Vitesse du temps ne fonctionnait pas correctement.
+
+Version 0.8 21/08/2016 "Traps and stuff"
+FEATURE : Ajout des pièges.
+FEATURE : Condition d'arrêt sur les pièges.
 FEATURE : Plus de formules de craft.
-FEATURE : Ajout des compÃ©tences "Rente viagÃ¨re" et "Ã‰ducation".
-FEATURE : Ajout des compÃ©tences "DÃ©tection des piÃ¨ges", "Bonus d'initiative face aux piÃ¨ges" et "Bonus de rÃ©sistance aux piÃ¨ges".
+FEATURE : La touche "MAJ" permet de distribuer 5 points d'un coup.
+FEATURE : La touche "MAJ" permet de vendre, déposer ou ramasser le contenu complet d'une liste.
+FEATURE : Ajout des compétences "Rente viagère" et "Éducation".
+FEATURE : Ajout des compétences "Détection des pièges", "Bonus d'initiative face aux pièges" et "Bonus de résistance aux pièges".
 
-CHANGE : Nouvelle carte (libre de droit).
+CHANGE : Nouvelle carte (libre de droits).
 CHANGE : Ajustement des formules de craft.
 CHANGE : Ajustement des monstres.
 CHANGE : Ajustement des objets.
 
-FIX : EmpÃªche le joueur d'entrer plusieurs fois dans les hiscores en cliquant terminer plusieurs fois.
+FIX : Empêche le joueur d'entrer plusieurs fois dans les highscores en cliquant terminer plusieurs fois.
 
-CHANGE : Ajustement des compÃ©tences.
+CHANGE : Ajustement des compétences.
+
 Version 0.7 22/12/2013 "The big craft update"
-FEATURE : Ajout de la fonction Â« Jeter Â».
+FEATURE : Ajout de la fonction « Jeter ».
 FEATURE : Plus de formules de craft.
-FEATURE : Ajout des compÃ©tences "Vitesse du craft", "Rendement du craft" et "Ã‰conomie d'orbes".
-FEATURE : Ajout des compÃ©tences "Niveau des marchands" et "Inventaire des marchands".
 FEATURE : Zoom sur les graphiques (avec la molette).
 FEATURE : Plus de graphiques (revenus).
+FEATURE : Ajout des compétences "Vitesse du craft", "Rendement du craft" et "Économie d'orbes".
+FEATURE : Ajout des compétences "Niveau des marchands" et "Inventaire des marchands".
 
-CHANGE : Ajustement de plusieurs compÃ©tences.
-CHANGE : Le craft n'est plus instantanÃ©.
-CHANGE : Beaucoup de formules de craft ont Ã©tÃ© ajustÃ©es pour que le prix du rÃ©sultat soit proportionnel Ã  la somme des prix des ingrÃ©dients.
-CHANGE : Les formules ont Ã©tÃ© ajustÃ©es pour tenir compte du rendement du craft.
-CHANGE : Il est dÃ©sormais impossible de gagner de l'argent en fusionnant des matÃ©riaux.
-CHANGE : Refactoring des tags des monstres, possibilitÃ© de monstres multi-tags (DÃ©mon/Animal, par exemple).
+CHANGE : Ajustement de plusieurs compétences.
+CHANGE : Le craft n'est plus instantané.
+CHANGE : Beaucoup de formules de craft ont été ajustées pour que le prix du résultat soit proportionnel à la somme des prix des ingrédients.
+CHANGE : Les formules ont été ajustées pour tenir compte du rendement du craft.
+CHANGE : Il est désormais impossible de gagner de l'argent en fusionnant des matériaux.
+CHANGE : Refactoring des tags des monstres, possibilité de monstres multi-tags (Démon/Animal, par exemple).
 
 Version 0.6 20/11/2013 "The rules update"
-FEATURE : Importation et exportation de rÃ¨gles.
-FEATURE : RÃ¨gles sur les monstres.
-FEATURE : RÃ¨gles sur le joueur.
-FEATURE : RÃ¨gles de fuite et de non-engagement.
-FEATURE : RÃ¨gles de recherche de marchand.
-FEATURE : Nouvelle interface pour l'Ã©dition des rÃ¨gles.
-FEATURE : Statistiques dÃ©taillÃ©es sur l'utilisation du temps.
-FEATURE : Affichage du nom du hÃ©ros et du dÃ©fi dans le titre de la fenÃªtre principale.
-FEATURE : Nouvelle stat : reprÃ©sailles.
-FEATURE : Nouvelle stat : nÃ©crophagie.
+FEATURE : Importation et exportation de règles.
+FEATURE : Règles sur les monstres.
+FEATURE : Règles sur le joueur.
+FEATURE : Règles de fuite et de non-engagement.
+FEATURE : Règles de recherche de marchand.
+FEATURE : Nouvelle interface pour l'édition des règles.
+FEATURE : Statistiques détaillées sur l'utilisation du temps.
+FEATURE : Affichage du nom du héros et du défi dans le titre de la fenêtre principale.
 FEATURE : Plus de raccourcis clavier.
-FEATURE : Gestion de la touche Ã©chap dans les sous-fenÃªtres du jeu (comme la croix de fermeture).
+FEATURE : Gestion de la touche échap dans les sous-fenêtres du jeu (comme la croix de fermeture).
+FEATURE : Ajout des compétences "Nécrophagie" et "Représailles".
 
-CHANGE : Les capes font dÃ©sormais de l'initiative (c'est plus classieux).
-CHANGE : CrÃ©er un hÃ©ros enchaÃ®ne directement sur le jeu.
-CHANGE : Condition d'arrÃªt sur le nombre de dÃ©faites.
-CHANGE : Ajustement du craft et des matÃ©riaux.
+CHANGE : Les capes font désormais de l'initiative (c'est plus classieux).
+CHANGE : Créer un héros enchaîne directement sur le jeu.
+CHANGE : Condition d'arrêt sur le nombre de défaites.
+CHANGE : Ajustement du craft et des matériaux.
 CHANGE : Ajustement des objets.
 CHANGE : Ajustement des monstres.
-CHANGE : Les objets Ã©quipÃ©s sont dÃ©sormais exclus de la vente automatique.
+CHANGE : Les objets équipés sont désormais exclus de la vente automatique.
 
-FIX : Scroll dans la fenÃªtre de sÃ©lection du hÃ©ros.
-FIX : L'annulation est dÃ©sormais correctement gÃ©rÃ©e lors de la crÃ©ation des hÃ©ros.
-FIX : Les hiscores ne sont plus Ã©ditables.
-FIX : Il est dÃ©sormais impossible de vaincre les boss en fuyant.
-FIX : Il est dÃ©sormais impossible d'avoir deux rÃ¨gles avec le mÃªme nom.
-FIX : Les hiscores sont mieux gÃ©rÃ©s en cas de 2 instances du jeu lancÃ©es en parallÃ¨le.
-FIX : Correction d'un bug Ã©trange sur la sÃ©lection des objets dans l'inventaire.
-FIX : Un marchand niveau X peut dÃ©sormais vendre des objets de niveau X mÃªme si X est impair.
+FIX : Scroll dans la fenêtre de sélection du héros.
+FIX : L'annulation est désormais correctement gérée lors de la création des héros.
+FIX : Les highscores ne sont plus éditables.
+FIX : Il est désormais impossible de vaincre les boss en fuyant.
+FIX : Il est désormais impossible d'avoir deux règles avec le même nom.
+FIX : Les highscores sont mieux gérés en cas de 2 instances du jeu lancées en parallèle.
+FIX : Correction d'un bug étrange sur la sélection des objets dans l'inventaire.
+FIX : Un marchand niveau X peut désormais vendre des objets de niveau X même si X est impair.
 
 
 Version 0.5 11/07/2013 "The challenge update"
-FEATURE : Ajout de la rÃ¨gle "Tout".
-FEATURE : Ajout des rÃ¨gles de ramassage.
-FEATURE : SystÃ¨me de dÃ©fis.
-FEATURE : Trois types de dÃ©fis (niveau, or et boss).
-FEATURE : SystÃ¨me de hiscores pour les dÃ©fis.
+FEATURE : Ajout de la règle "Tout".
+FEATURE : Ajout des règles de ramassage.
+FEATURE : Système de défis.
+FEATURE : Trois types de défis (niveau, or et boss).
+FEATURE : Système de highscores pour les défis.
 FEATURE : Autosave au level up...
 
 CHANGE : Ajustement des statistiques des monstres.
-CHANGE : Les champions font dÃ©sormais deux fois plus d'expÃ©rience.
+CHANGE : Les champions font désormais deux fois plus d'expérience.
 CHANGE : Ajustement du prix des alliages (diminution).
-CHANGE : Ajustement des Ã©pines (diminution).
-CHANGE : SÃ©lection automatique dans MenuWindow.
+CHANGE : Ajustement des épines (diminution).
+CHANGE : Sélection automatique dans MenuWindow.
 
-FIX : Suppression d'un crash avec les rÃ¨gles du type "nÃ©gation".
-FIX : Suppression d'un problÃ¨me de rafraichissement dans l'inventaire.
+FIX : Suppression d'un crash avec les règles du type "négation".
+FIX : Suppression d'un problème de rafraichissement dans l'inventaire.
 
 
 Version 0.4 14/06/2013 "Introducing rules"
-FEATURE : Il est dÃ©sormais possible d'obtenir un orbe en recyclant un objet.
-FEATURE : Les alliages ont dÃ©sormais un nom.
-FEATURE : Il existe maintenant une fenÃªtre de programmation permettant de crÃ©er des rÃ¨gles d'achat, de vente et des filtres d'inventaire.
+FEATURE : Il est désormais possible d'obtenir un orbe en recyclant un objet.
+FEATURE : Les alliages ont désormais un nom.
+FEATURE : Il existe maintenant une fenêtre de programmation permettant de créer des règles d'achat, de vente et des filtres d'inventaire.
 
-CHANGE : Suppression de l'ancien systÃ¨me d'achat et de vente automatique, remplacÃ© par le systÃ¨me de programmation, bien plus souple.
-CHANGE : Le temps "accÃ©lÃ©rÃ©" est dÃ©sormais dÃ©comptÃ© correctement 
+CHANGE : Suppression de l'ancien système d'achat et de vente automatique, remplacé par le système de programmation, bien plus souple.
+CHANGE : Le temps "accéléré" est désormais décompté correctement 
 CHANGE : Le jeu ne sauvegarde plus votre adversaire quand vous quittez...
 CHANGE : Ajustement des formules de craft.
-CHANGE : Les objets rares ont dÃ©sormais toujours au moins 3 enchantements.
-CHANGE : Les objets rares sont maintenant limitÃ©s Ã  5 enchantements.
-CHANGE : Le niveau des enchantements est dÃ©sormais toujours affichÃ©.
-CHANGE : La pÃ©nalitÃ© liÃ©e Ã  l'usage de mauvais matÃ©riaux dans le craft est augmentÃ©e.
+CHANGE : Les objets rares ont désormais toujours au moins 3 enchantements.
+CHANGE : Les objets rares sont maintenant limités à 5 enchantements.
+CHANGE : Le niveau des enchantements est désormais toujours affiché.
+CHANGE : La pénalité liée à l'usage de mauvais matériaux dans le craft est augmentée.
 
 
 Version 0.3 18/01/2013
-CHANGE : Les nouveaux personnages commencent avec 0 points dans chaque compÃ©tence.
-CHANGE : Les nouveaux personnages commencent avec 30 points Ã  distribuer.
-CHANGE : Les orbes font dÃ©sormais moins d'expÃ©rience.
-CHANGE : Les monstres font dÃ©sormais moins d'expÃ©rience (diminishing return).
+CHANGE : Les nouveaux personnages commencent avec 0 points dans chaque compétence.
+CHANGE : Les nouveaux personnages commencent avec 30 points à distribuer.
+CHANGE : Les orbes font désormais moins d'expérience.
+CHANGE : Les monstres font désormais moins d'expérience (diminishing return).
 CHANGE : Augmentation de la puissance des monstres.
 CHANGE : Augmentation de la puissance des champions.
 CHANGE : Ajustement de la puissance des objets.
 
 FEATURE : De nouveaux raccourcis clavier sont disponibles, notamment pour les "-" et les "+".
-FEATURE : Ajout des compÃ©tences "Apprentissage", "Epines" et "Vitesse du temps".
-FEATURE : Ajout de nombreuses statistiques clarifiant l'effet des compÃ©tences.
+FEATURE : Ajout de nombreuses statistiques clarifiant l'effet des compétences.
 FEATURE : Clarification de la carte.
 FEATURE : Ajout de zones de haut niveau (jusqu'au niveau 170).
-FEATURE : Ajout de nombreux monstres rÃ©partis jusqu'au niveau 180.
+FEATURE : Ajout de nombreux monstres répartis jusqu'au niveau 180.
 FEATURE : Ajout de l'achat automatique.
+FEATURE : Ajout des compétences "Apprentissage", "Epines" et "Vitesse du temps".
 
-BUG FIX : "SÃ©parer" fonctionne maintenant correctement sur les ressources primordiales.
-BUG FIX : Correction de certaines courbes dont les lÃ©gendes Ã©taient interverties.
-BUG FIX : La ligne "enchantements" n'est plus affichÃ©e sur les orbes.
-BUG FIX : Les orbes peuvent dÃ©sormais Ãªtres trouvÃ©s sur les monstres...
+BUG FIX : "Séparer" fonctionne maintenant correctement sur les ressources primordiales.
+BUG FIX : Correction de certaines courbes dont les légendes étaient interverties.
+BUG FIX : La ligne "enchantements" n'est plus affichée sur les orbes.
+BUG FIX : Les orbes peuvent désormais êtres trouvés sur les monstres...
 
 
 Version 0.2 15/01/2013
-CHANGE : Le prix des orbes a Ã©tÃ© augmentÃ©.
-CHANGE : AmÃ©lioration du niveau moyen des drops.
-CHANGE : Les drops d'orbes et de matÃ©riaux sont plus frÃ©quents.
-CHANGE : Les drops d'objets sont moins frÃ©quents.
-CHANGE : Ajustement des formules basÃ©es sur les ressources primordiales.
-CHANGE : Pas de vente automatique pour les objets Ã©quipÃ©s mÃªme s'ils remplissent toutes les conditions.
-CHANGE : Nouvelles Ã©quations pour la Constitution, la RÃ©gÃ©nÃ©ration et la RÃ©surrection.
+CHANGE : Le prix des orbes a été augmenté.
+CHANGE : Amélioration du niveau moyen des drops.
+CHANGE : Les drops d'orbes et de matériaux sont plus fréquents.
+CHANGE : Les drops d'objets sont moins fréquents.
+CHANGE : Ajustement des formules basées sur les ressources primordiales.
+CHANGE : Pas de vente automatique pour les objets équipés même s'ils remplissent toutes les conditions.
+CHANGE : Nouvelles équations pour la Constitution, la Régénération et la Résurrection.
 
-FEATURE : Les marchands vendent dÃ©sormais des matÃ©riaux et des orbes.
-FEATURE : Le jeu se contrÃ´le mieux au clavier. Pressez alt pour voir les raccourcis.
+FEATURE : Les marchands vendent désormais des matériaux et des orbes.
+FEATURE : Le jeu se contrôle mieux au clavier. Pressez alt pour voir les raccourcis.
 FEATURE : Ajout de l'orbe de redistribution permettant de refaire son build quand on l'utilise dans une forge mystique.
-FEATURE : Les orbes d'augmentation et d'Ã©volution donnent de l'expÃ©rience si ils sont utilisÃ©s dans une forge mystique.
-FEATURE : Ajout d'un bouton pour arrÃªter de combattre.
+FEATURE : Les orbes d'augmentation et d'évolution donnent de l'expérience si ils sont utilisés dans une forge mystique.
+FEATURE : Ajout d'un bouton pour arrêter de combattre.
 
-BUG FIX : AmÃ©lioration de l'esthÃ©tique du menu de chargement.
-BUG FIX : Les courbes sont dÃ©sormais disponibles pendant les combats.
-BUG FIX : Les boutons + - sont dÃ©sormais visibles sous Windows.
-BUG FIX : La condition d'arrÃªt sur le nombre de coups critiques encaissÃ©s fonctionne dÃ©sormais correctement.
-BUG FIX : L'Ã©cran des compÃ©tences est dÃ©sormais correctement rafraÃ®chi pendant les combats
+BUG FIX : Amélioration de l'esthétique du menu de chargement.
+BUG FIX : Les courbes sont désormais disponibles pendant les combats.
+BUG FIX : Les boutons + - sont désormais visibles sous Windows.
+BUG FIX : La condition d'arrêt sur le nombre de coups critiques encaissés fonctionne désormais correctement.
+BUG FIX : L'écran des compétences est désormais correctement rafraîchi pendant les combats
 BUG FIX : Les alliages ne sont plus des orbes.
-BUG FIX : L'Ã©quipement est dÃ©sormais pris en compte lors de l'affichage des statistiques sur l'Ã©cran principal.
-BUG FIX : Correction de divers problÃ¨mes d'esthÃ©tique sur les courbes.
-
-
-=================================
+BUG FIX : L'équipement est désormais pris en compte lors de l'affichage des statistiques sur l'écran principal.
+BUG FIX : Correction de divers problèmes d'esthétique sur les courbes.

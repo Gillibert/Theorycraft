@@ -190,7 +190,8 @@ public String item_description(Player p)
 
 static public Item get_ressouce_base(int il)
 {
-	if(Math.random() < il/1000.0 && il >= 50)
+	int obj_lev = Math.min(StaticItem.max_level-1,il);
+	if(Math.random() < il/2000.0 && il >= 50)
 	{
 		return new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_ELEM);
 	}
@@ -199,7 +200,7 @@ static public Item get_ressouce_base(int il)
 	ArrayList<Item> totallist = new ArrayList<Item>();
 	int totalsize = 0;
 	
-    int i = il;
+    int i = obj_lev;
     while(totalsize < 15 && i > 0)
 	{
 		totalsize += StaticItem.RessourceByLevel[i].list.size();
@@ -222,6 +223,7 @@ public double bonus(int i)
 
 public Item get_normal_base(int il)
 {
+	il = Math.min(StaticItem.max_level-1,il);
     ItemSet its = StaticItem.WhiteItemByLevel[il];
     int i = il;
     while(its.list.size() == 0)
@@ -229,7 +231,8 @@ public Item get_normal_base(int il)
 	    i--;
 	    its = StaticItem.WhiteItemByLevel[i];
 	}
-    return its.list.get((int)(Math.random()*its.list.size()));
+    Item res = its.list.get((int)(Math.random()*its.list.size()));
+	return res;
 }
 
     // sert à remplir l'inventaire d'un marchand
@@ -358,7 +361,7 @@ static class ComparateurItem implements Comparator<Item> {
 				{
 					int xp = (int)(5000 * p.rendement());
 					Game.MW.addLog(String.format("Vous obtenez %d points d'expérience",xp));	
-					p.gain_xp(xp);
+					p.gain_xp(xp, 2, p.level);
 				}
 				else if (a.name.equals("Orbe de transfert") || a.name.equals("Orbe de transmutation"))
 				{
@@ -543,7 +546,15 @@ static class ComparateurItem implements Comparator<Item> {
 			{
 				ArrayList<Material> mats = new ArrayList<Material>();
 				mats.add(a.material); mats.add(b.material); mats.add(c.material);
-				Item rit = new Item(materialFusion(mats),StaticItem.RESSOURCE_CRAFT);
+				Item rit;
+				if(a.rare == 5) // les trois resources sont primordiales
+				{
+					rit = new Item(materialFusion(mats),StaticItem.RESSOURCE_PRIM);
+				}
+				else
+				{
+					rit = new Item(materialFusion(mats),StaticItem.RESSOURCE_CRAFT);
+				}
 				double prix = a.prix()+b.prix()+c.prix();
 				rit.aligner_qty(p, prix); 
 				rlist.add(rit);
@@ -632,6 +643,38 @@ static class ComparateurItem implements Comparator<Item> {
 				rlist.add(c);
 			}
 		}
+		// 5 orbes, tous différents
+		if(lisize == 5)
+		{
+			if(LI.get(0).rare == 6 && LI.get(4).rare == 6)
+			{
+				double orb_cost = p.universe.travel_cost();
+				boolean allOk = true;
+				for (int idx = 0; idx < lisize; idx++)
+				{
+				if(LI.get(idx).qty < orb_unit*orb_cost)
+					{
+					allOk = false;
+					break;
+					}
+				}
+				if(allOk)
+				{
+					Game.MW.addLog(String.format("Changement d'univers, coûte %.3f orbes (%.3f × %.1f)",orb_unit*orb_cost*5,orb_unit,orb_cost*5));
+					for (int idx = 0; idx < lisize; idx++)
+					{
+					LI.get(idx).set_qty(LI.get(idx).qty-orb_unit*orb_cost);
+					}
+					Universe universe = new Universe(p.universe.seed+1);
+					universe.joueur = p;
+					universe.number_of_travel = p.universe.number_of_travel+1;
+					p.universe = universe;
+					p.zone = 0;
+					Monster.SetOptimalDistribution(universe);
+					StaticItem.init(universe);
+				}
+			}
+		}
 		// Fusion de N objets avec N orbes de fusion
 		if(lisize > 3)
 		{
@@ -641,12 +684,12 @@ static class ComparateurItem implements Comparator<Item> {
 			for (int idx = 0; idx < lisize-1; idx++)
 			{
 				Item theItem = LI.get(idx);
-				totalNbEnch += theItem.nb_ench();
 				if(theItem.rare < 1 || theItem.rare > 3)
 				{
 					allOk = false;
 					break;
 				}
+				totalNbEnch += theItem.nb_ench();
 			}
 			double orbcost = lisize*orb_unit;
 			if (allOk && last.name.equals("Orbe de fusion") &&  last.qty >= orbcost)

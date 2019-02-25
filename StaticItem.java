@@ -26,18 +26,12 @@ class StaticItem {
     public static String[] MaterialFamily = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
     public static String[] Rarete = {"objet normal","objet magique","objet rare","objet légendaire","ressource élémentaire","ressource primordiale","orbe"};
     public static String[] Emplacement = {"Casque","Boucles d'oreilles","Plastron", "Cape", "Ceinture", "Jambières", "Bottes", "Chaussettes", "Amulette", "Bague", "Brassards", "Gantelets", "Arme", "Fourreau","Lunettes","Ressources"};
-    public static String[] RareNames = {"légende","héritage","relique","trophée","souvenir","réminiscence","vestige","trésor","richesse","perfection","prodige","idéal"};
+    public static String[] RareNames = {"légende","héritage","relique","trophée","souvenir","réminiscence","vestige","trésor","richesse","prodige","idéal","miracle","fortune"};
 
     public static int nb_pos = Emplacement.length;
     public static int max_level = 301;
     public static NameGenerator nameGenerator = new NameGenerator(false);
     public static NameGenerator matNameGenerator = new NameGenerator(true);
-
-// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
-// VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14)
-// RESF(15) MF(16) RF(17) QALF(18) QTYF(19) POWF(20) GF(21)
-// ED_MV(22) ED_ANI(23) ED_HUM(24) ED_PV(25) ED_DEM(26) ED_CHAMP(27)
-// ESTI(28) 
 
     public static ItemSet[] WhiteItemByPosition;
     public static ItemSet[] WhiteItemByLevel;
@@ -319,8 +313,8 @@ class StaticItem {
     new BaseItem("canne","MS",             2,12,1,7,     1.40),
     new BaseItem("nunchaku","MS",          2,12,1,8,     1.00),
     new BaseItem("tomahawk","MS",          2,12,1,9,     1.20),
-    new BaseItem("gourdin","MS",           2,12,1,10,     2.00),
-    new BaseItem("fléau","MS",             2,12,1,11,     4.00),
+    new BaseItem("gourdin","MS",           2,12,1,10,    2.00),
+    new BaseItem("fléau","MS",             2,12,1,11,    4.00),
     new BaseItem("masse","FS",             2,12,1,12,    4.00),
     new BaseItem("faux","FS",              2,12,1,13,    2.00),
     new BaseItem("kriss","MS",             2,12,1,14,    0.60),
@@ -330,22 +324,28 @@ class StaticItem {
     new BaseItem("canif","MS",             2,12,1,18,    0.30),
     new BaseItem("faucille","FS",          2,12,1,19,    0.50),
     new BaseItem("serpe","FS",             2,12,1,20,    0.50),
-    new BaseItem("couteau","MS",           2,12,1,22,    0.40),
-    new BaseItem("bistouri","MS",          2,12,1,24,    0.10),
-    new BaseItem("dague","FS",             2,12,1,26,    0.20),
-    new BaseItem("baïonnette","FS",        2,12,1,28,    0.30),
-    new BaseItem("poignard","MS",          2,12,1,30,    0.30),
-    new BaseItem("tantö","MS",             2,12,1,32,    0.30),
-    new BaseItem("wakizashi","MS",         2,12,1,34,    0.40),
-    new BaseItem("sabre","MS",             2,12,1,36,    1.20),
-    new BaseItem("épée","FS",              2,12,1,38,    1.20),
-    new BaseItem("fleuret","MS",           2,12,1,40,    0.80),
-    new BaseItem("katana","MS",            2,12,1,42,    1.10),
-    new BaseItem("hachette","FS",          2,12,1,44,    1.90),
-    new BaseItem("hache","FS",             2,12,1,46,    1.90),
-    new BaseItem("bardiche","FS",          2,12,1,48,    2.00),
-    new BaseItem("francisque","FS",        2,12,1,50,    2.00),
-    new BaseItem("lance","FS",             2,12,1,55,    1.40),
+    new BaseItem("couteau","MS",           2,12,1,21,    0.40),
+    new BaseItem("bistouri","MS",          2,12,1,22,    0.10),
+    new BaseItem("dague","FS",             2,12,1,23,    0.20),
+    new BaseItem("baïonnette","FS",        2,12,1,24,    0.30),
+    new BaseItem("poignard","MS",          2,12,1,26,    0.30),
+    new BaseItem("tantö","MS",             2,12,1,28,    0.30),
+    new BaseItem("wakizashi","MS",         2,12,1,30,    0.40),
+    new BaseItem("sabre","MS",             2,12,1,32,    1.20),
+    new BaseItem("épée","FS",              2,12,1,34,    1.20),
+    new BaseItem("fleuret","MS",           2,12,1,36,    0.80),
+	new BaseItem("morgenstern","MS",       2,12,1,38,    2.30),	
+	new BaseItem("espadon","FS",           2,12,1,40,    1.30),	
+	new BaseItem("javeline","FS",          2,12,1,42,    1.40),
+	new BaseItem("javelot","MS",           2,12,1,44,    1.20),
+	new BaseItem("claymore","FS",          2,12,1,46,    1.80),	
+	new BaseItem("flamberge","FS",         2,12,1,48,    1.80),	
+    new BaseItem("katana","MS",            2,12,1,50,    1.10),
+    new BaseItem("hachette","FS",          2,12,1,52,    1.90),
+    new BaseItem("hache","FS",             2,12,1,54,    1.90),
+    new BaseItem("bardiche","FS",          2,12,1,56,    2.00),
+    new BaseItem("francisque","FS",        2,12,1,58,    2.00),
+    new BaseItem("lance","FS",             2,12,1,59,    1.40),
     new BaseItem("hallebarde","FS",        2,12,1,60,    2.50),
 
     new BaseItem("sangle","FS",            1,13,6,30,    0.10),
@@ -372,7 +372,7 @@ class StaticItem {
     return MA[(int)(Math.random()*MA.length)];
     }
 
-    public static void init()
+    public static void init(Universe universe)
     {    
     MaterialNames = new String[MA.length];
     BaseItemNames = new String[BA.length];
@@ -405,6 +405,8 @@ class StaticItem {
         }
 
     for(int i=0; i < BA.length; i++)
+	{
+		if (universe.slot_est_disponible(BA[i].pos) == false) continue;
         for(int j=0; j < MA.length; j++)
 		{
 		if ((MA[j].type == 0 && BA[i].pref_level < 10 && BA[i].mat <= 2) 
@@ -415,6 +417,8 @@ class StaticItem {
             WhiteItemByLevel[it.effectiveIlvl()].list.add(it);
             }
 		}
+	}
+	
     for(int j=0; j < MA.length; j++)
         {
         Item it = new Item(MA[j],RESSOURCE_ELEM);
@@ -424,7 +428,7 @@ class StaticItem {
         }
 
 
-    /*
+       /*
         for(int i=0; i< max_level; i++)
             {
             if(RessourceByLevel[i].list.size() > 0)
@@ -435,8 +439,8 @@ class StaticItem {
             }
             }
         
-        */
-        /*
+        
+        
     for(int i=0; i< max_level; i++)
         {
         if(WhiteItemByLevel[i].list.size() > 0)
@@ -445,8 +449,8 @@ class StaticItem {
         for(Item it : WhiteItemByLevel[i].list)
             System.out.print(it.name + " ");
         }
-        }*/
-
+        }
+	*/
     /*
     for(int i=5; i<=45; i+=10)
     {
