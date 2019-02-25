@@ -21,18 +21,23 @@ public class LevelUp extends javax.swing.JDialog  {
     private String[][] rowData;
     private JTable table;
 
-    public LevelUp(Player JJ) {
+    public LevelUp(Player J) {
 	super();
-	Joueur = JJ;
+	Joueur = J;
 	stats_tmp = new double[Joueur.nb_stats];
 	initialize();
     }
 
+	public void SetPlayer(Player J)
+	{
+		Joueur = J;
+		refresh();
+	}
 
     public void refresh()
     {
 	Joueur.refresh_stats_with_bonus();
-	prompt.setText(String.format("Distribution de %.2f points de compétences",Joueur.points_a_distribuer()));
+	prompt.setText(String.format(Local.DISTRIBUTION_OF_SKILL_POINTS,Joueur.points_a_distribuer()));
 	for (int i=0; i< Joueur.nb_stats ; i++)
 	    {
 		rowData[i][1] = String.format("%.1f",Joueur.stats[i]);
@@ -55,8 +60,7 @@ public class LevelUp extends javax.swing.JDialog  {
 		    rowData[i][0] = Joueur.stats_name[i];
 		}
 
-	    String[] columnNames = {"Compétence","Points","Equipement","Total"};
-	    AbstractTableModel mytm = new MyTableModel(rowData,columnNames);
+	    AbstractTableModel mytm = new MyTableModel(rowData,Local.LEVEL_UP_COLUMN_NAMES);
 
 	    table = new JTable(mytm);
 	    //table.setEnabled(false);
@@ -89,12 +93,14 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    plus = new JButton();
 	    plus.setBounds(new Rectangle(245, 365, 44, 21));
-	    plus.setText("+");
+	    plus.setText(Local.PLUS);
 	    plus.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) 
 				{
-					if(Joueur.points_a_distribuer() >= 100) plus(50);
+					if(Joueur.points_a_distribuer() >= 20000) plus(5000);
+					else if(Joueur.points_a_distribuer() >= 2000) plus(500);
+					else if(Joueur.points_a_distribuer() >= 200) plus(50);
 					else plus(5);
 				}
 				else plus(1);
@@ -104,12 +110,14 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    moins = new JButton();
 	    moins.setBounds(new Rectangle(294, 365, 44, 21));
-	    moins.setText("-");
+	    moins.setText(Local.MINUS);
 	    moins.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0)
 				{
-					if(Joueur.points_a_distribuer() >= 100) moins(50);
+					if(Joueur.points_a_distribuer() >= 20000) moins(5000);
+					else if(Joueur.points_a_distribuer() >= 2000) moins(500);
+					else if(Joueur.points_a_distribuer() >= 200) moins(50);
 					else moins(5);
 				}
 				else moins(1);
@@ -119,7 +127,7 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    ok = new JButton();
 	    ok.setBounds(new Rectangle(10, 365, 110, 21));
-	    ok.setText("Valider");
+	    ok.setText(Local.VALIDATE);
 	    ok.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {valider();
 		    }
@@ -127,15 +135,15 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    anu = new JButton();
 	    anu.setBounds(new Rectangle(125, 365, 110, 21));
-	    anu.setText("Annuler");
+	    anu.setText(Local.CANCEL);
 	    anu.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {cancel();
 		    }
 		});
 
-	    prompt.setFont(new Font("Times Roman", Font.BOLD, 14));
-	    table.setFont(new Font("Times Roman", Font.BOLD, 11));
-	    infos.setFont(new Font("Times Roman", Font.PLAIN, 11));
+	    prompt.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 14));
+	    table.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
+	    infos.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
 
 	    ivjJFrameContentPane = new javax.swing.JPanel();
 	    ivjJFrameContentPane.setLayout(null);
@@ -161,7 +169,7 @@ public class LevelUp extends javax.swing.JDialog  {
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	this.setTitle("Répartition des points de compétences");
+	this.setTitle(Local.SKILL_POINTS_DISTRIBUTION);
 	this.setContentPane(getJFrameContentPane());
 
     getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -187,11 +195,14 @@ public class LevelUp extends javax.swing.JDialog  {
 	// RESTORE BACKUP
 	for(int i=0; i<Joueur.nb_stats; i++) 
 	    Joueur.stats[i] = stats_tmp[i];
+	Joueur.refresh_stats_with_bonus();
+	Joueur.refresh();
 	this.setVisible(false);
     }
 
     private void valider()
     {
+	Joueur.refresh_stats_with_bonus();
 	Joueur.refresh();
 	this.setVisible(false);
     }

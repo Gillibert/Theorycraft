@@ -53,18 +53,27 @@ public class RuleWindow extends javax.swing.JDialog  {
 
 	public boolean listener_off;
 	
-    public RuleWindow(Player JJ) {
+    public RuleWindow(Player J) {
 	super();
-	Joueur = JJ;
+	Joueur = J;
 	initialize();
     }
 
+	public void SetPlayer(Player J)
+	{
+		Joueur = J;
+		refreshRulesList();
+	}
+
+	
    public void montre()
     {
 	if(current_rule == null)
 	{
 		refreshRulesList();
-		liste_r.setSelectedIndex(rule_list.indexOf("Tout"));
+		int defaultRule = rule_list.indexOf(Local.ALL);
+		if (defaultRule == -1) defaultRule = 0;
+		liste_r.setSelectedIndex(defaultRule);
 		refreshRule();
 	}	
 	this.setVisible(true);
@@ -235,11 +244,11 @@ public class RuleWindow extends javax.swing.JDialog  {
 		if(current_rule==null)
 			warning.setText("");
 		else if(current_rule.param < 0)
-			warning.setText("Erreur : nombre invalide");
+			warning.setText(Local.ERROR_INVALID_NUMBER);
 		else if(current_rule.name==null || current_rule.name.length()==0)
-			warning.setText("Erreur : nom vide");
+			warning.setText(Local.ERROR_EMPTY_NAME);
 		else if(!isOk)
-			warning.setText("Erreur : autoréférence");
+			warning.setText(Local.ERROR_SELF_REFERENCE);
 		else
 			warning.setText("");
 
@@ -353,9 +362,9 @@ public class RuleWindow extends javax.swing.JDialog  {
 		listener_off = false;
 		current_rule = null;
 	    prompt = new JLabel();
-	    prompt.setText("Règles");
+	    prompt.setText(Local.RULES);
 	    prompt.setBounds(new Rectangle(10, 3, 600, 23));
-	    prompt.setFont(new Font("Dialog", Font.BOLD, 14));
+	    prompt.setFont(new Font(Local.FONT_DIALOG, Font.BOLD, 14));
 		
 	    rule_list = new DefaultListModel();
 
@@ -371,14 +380,14 @@ public class RuleWindow extends javax.swing.JDialog  {
 	    logic_combo = new DefaultComboBoxModel();
 	    type = new DefaultComboBoxModel();
 
-		type.addElement("Règle sur un objet");
-		type.addElement("Règle sur un monstre");
-		type.addElement("Règle sur le joueur");
-		type.addElement("Règle composée");
-		type.addElement("Négation");
+		type.addElement(Local.RULE_ON_AN_OBJECT);
+		type.addElement(Local.RULE_ON_A_MONSTER);
+		type.addElement(Local.RULE_ON_THE_PLAYER);
+		type.addElement(Local.COMPOUND_RULE);
+		type.addElement(Local.NEGATION);
 
-	    logic_combo.addElement("et");
-	    logic_combo.addElement("ou");
+	    logic_combo.addElement(Local.AND);
+	    logic_combo.addElement(Local.OR);
 
 	    rule_name = new JTextField("");
 	    rule_name.setBounds(new Rectangle(150, 28, 230, 25));
@@ -395,25 +404,25 @@ public class RuleWindow extends javax.swing.JDialog  {
 	    rl2 = new JComboBox(rule_combo2);
 	    rl2.setBounds(new Rectangle(460, 88, 150, 25));
 	
-		is_sell_rule = new JCheckBox("Règle de vente");
+		is_sell_rule = new JCheckBox(Local.SELL_RULE);
 		is_sell_rule.setBounds(new Rectangle(150, 118, 190, 25));
 			
-		is_buy_rule = new JCheckBox("Règle d'achat");
+		is_buy_rule = new JCheckBox(Local.PURCHASE_RULE);
 		is_buy_rule.setBounds(new Rectangle(150, 148, 190, 25));
 		
-		is_pickup_rule = new JCheckBox("Règle de ramassage");
+		is_pickup_rule = new JCheckBox(Local.PICKUP_RULE);
 		is_pickup_rule.setBounds(new Rectangle(150, 178, 190, 25));
 		
-		is_inventory_rule = new JCheckBox("Filtre d'inventaire");
+		is_inventory_rule = new JCheckBox(Local.INVENTORY_FILTER);
 		is_inventory_rule.setBounds(new Rectangle(150, 208, 190, 25));
 		
-		is_flee_rule = new JCheckBox("Règle de fuite");
+		is_flee_rule = new JCheckBox(Local.FLEE_RULE);
 		is_flee_rule.setBounds(new Rectangle(150+190+10, 118, 220, 25));
 
-		is_avoid_rule = new JCheckBox("Règle de non-engagement");
+		is_avoid_rule = new JCheckBox(Local.NON_INVOLVEMENT_RULE);
 		is_avoid_rule.setBounds(new Rectangle(150+190+10, 148, 220, 25));
 
-		is_shopping_rule = new JCheckBox("Recherche de marchand");
+		is_shopping_rule = new JCheckBox(Local.MERCHANT_SEARCH);
 		is_shopping_rule.setBounds(new Rectangle(150+190+10, 148+30, 220, 25));
 		
 	    opt1 = new JComboBox(option1_list);
@@ -475,13 +484,13 @@ public class RuleWindow extends javax.swing.JDialog  {
 
 	    warning = new JLabel();
 	    warning.setText("");
-	    warning.setFont(new Font("Dialog", Font.BOLD, 14));
+	    warning.setFont(new Font(Local.FONT_DIALOG, Font.BOLD, 14));
 		warning.setForeground(Color.red);
 	    warning.setBounds(new Rectangle(150, 365-30, 200, 21));
 	
 	    edit = new JButton();
 	    edit.setBounds(new Rectangle(480, 365+24, 110, 21));
-	    edit.setText("Enregister");
+	    edit.setText(Local.SAVE);
 	    edit.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {editRule();
 		    }
@@ -490,7 +499,7 @@ public class RuleWindow extends javax.swing.JDialog  {
 	
 	    add = new JButton();
 	    add.setBounds(new Rectangle(5, 317, 140, 21));
-	    add.setText("Nouvelle règle");
+	    add.setText(Local.NEW_RULE);
 	    add.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {addRule();
 		    }
@@ -499,16 +508,16 @@ public class RuleWindow extends javax.swing.JDialog  {
 
 	    del = new JButton();
 	    del.setBounds(new Rectangle(5, 341, 140, 21));
-	    del.setText("Supprimer");
+	    del.setText(Local.REMOVE);
 	    del.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {deleteRule();
 		    }
 		});
-	    del.setMnemonic('s');
+	    del.setMnemonic('r');
 	
 	    export = new JButton();
 	    export.setBounds(new Rectangle(5, 365, 140, 21));
-	    export.setText("Exporter");
+	    export.setText(Local.EXPORT);
 	    export.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {exportRules();
 		    }
@@ -517,7 +526,7 @@ public class RuleWindow extends javax.swing.JDialog  {
 	
 	    importer = new JButton();
 	    importer.setBounds(new Rectangle(5, 365+24, 140, 21));
-	    importer.setText("Importer");
+	    importer.setText(Local.IMPORT);
 	    importer.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {importRules();
 		    }
@@ -525,15 +534,15 @@ public class RuleWindow extends javax.swing.JDialog  {
 	    importer.setMnemonic('i');
 	
 
-	    prompt.setFont(new Font("Times Roman", Font.BOLD, 16));
-	    liste_r.setFont(new Font("Times Roman", Font.PLAIN, 11));
-	    rl1.setFont(new Font("Times Roman", Font.PLAIN, 11));
-	    rl2.setFont(new Font("Times Roman", Font.PLAIN, 11));
-		logic.setFont(new Font("Times Roman", Font.PLAIN, 11));
-	    opt1.setFont(new Font("Times Roman", Font.PLAIN, 11));
-		opt2txt.setFont(new Font("Times Roman", Font.PLAIN, 11));
-	    opt2.setFont(new Font("Times Roman", Font.PLAIN, 11));
-		symbol.setFont(new Font("Times Roman", Font.PLAIN, 11));
+	    prompt.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 16));
+	    liste_r.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    rl1.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    rl2.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+		logic.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    opt1.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+		opt2txt.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    opt2.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+		symbol.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
 		
 	
 	    ivjJFrameContentPane = new javax.swing.JPanel();
@@ -578,7 +587,7 @@ public class RuleWindow extends javax.swing.JDialog  {
     {
 	ObjectRule tmp = new ObjectRule(0,0,0,ObjectRule.ITEM_RULE);
 	int num = (int)(999999*Math.random());
-	tmp.name = "Règle " +  String.valueOf( num );
+	tmp.name = Local.RULE +  String.valueOf( num );
 	current_rule = tmp;
 	Joueur.rules.add(tmp);
 	refreshRulesList();
@@ -630,7 +639,7 @@ public class RuleWindow extends javax.swing.JDialog  {
     }
 
     private void initialize() {
-	this.setTitle("Programmation");
+	this.setTitle(Local.PROGRAMMING);
 	this.setLocation(new Point(15, 15));
 	this.setSize(new Dimension(625, 442));
 	this.setResizable(false);

@@ -1,0 +1,201 @@
+﻿CHANGE LOG
+
+Version 1.0 21/06/2018 "Fluidity"
+FEATURE : Création automatique des highscores à partir de vraie parties jouées par un algorithme.. Les joueurs peuvent maintenant essayer de battre les meilleurs temps "officiels".
+FEATURE : Ajout d'un menu permettant de charger une partie ou de créer une nouvelle partie sans quitter le jeu.
+FEATURE : Ajout d'un menu pour changer de défi en cours de jeu (moyennant une pénalité de temps).
+FEATURE : Possibilité d'accéder directement aux meilleurs temps depuis le jeu. 
+FEATURE : Les caractéristiques des pièges dépendent désormais de l'univers.
+FEATURE : La plage aléatoire dépend désormais de l'univers.
+FEATURE : La liste des régions dépend désormais de l'univers.
+FEATURE : Si on a plus de 200 points à distribuer on peut les distribuer 50 par 50, si on a plus de 2000 points à distribuer on peut les distribuer 500 par 500, et si on a plus de 20000 points à distribuer on peut les distribuer 5000 par 5000 (avec "MAJ").
+FEATURE : Ajout d'informations sur le craft.
+FEATURE : Ajout de statistiques sur les rencontres (combats gagnés, perdus, fuis, coups portés, pièges rencontrés, évités, survécus).
+FEATURE : Ajout de statistiques sur le commerce (marchands rencontrés, crafting).
+FEATURE : Ajout de statistiques sur les drops (objets normaux, magiques, rares, ressources, orbes).
+FEATURE : Ajout de statistiques sur les sources de revenu.
+FEATURE : Ajout des compétences "Réduction des pénalités" et "Accès étendu".
+
+CHANGE : Rafraîchissement périodique de l'écran, plus de clignotement.
+CHANGE : Carte du monde plus peuplée.
+CHANGE : Révision du système d'alliage, pour des alliages plus puissants et dépendant de l'univers.
+CHANGE : Le temps de fuite est désormais pris en compte dans les courbes de statistiques sur les combats.
+CHANGE : Ajustement des compétences.
+CHANGE : Le temps de crafting dépend désormais du nombre d'objets placés dans la forge.
+CHANGE : Les informations sur l'univers sont désormais affichées en HTML.
+CHANGE : Ajustement du nombre de points de compétences des monstres (augmentation).
+CHANGE : On peut désormais jeter un objet directement depuis la forge.
+
+FIX : Correction d'un bug concernant la disponibilité des casques dans les univers aléatoires.
+FIX : Correction d'un bug empêchant d'effacer des sauvegardes corrompues ou écrites avec une ancienne version du jeu.
+FIX : Correction d'un bug limitant l'affichage des régions dans la description de l'univers.
+FIX : Correction d'un bug avec les personnages dont l'expérience dépasse la capacité d'un entier 32 bits.
+FIX : Correction d'un bug permettant de profiter des points de compétences distribués après une annulation dans la fenêtre de distribution.
+
+Version 0.9 15/02/2017 "Random universe"
+FEATURE : Il y a maintenant la possibilité de jouer dans un univers dont les règles sont aléatoires.
+FEATURE : Ajout d'une fenêtre d'information sur l'univers.
+FEATURE : Il est possible de changer d'univers via une formule de la forge.
+FEATURE : Les équations régissant les compétences sont aléatoires et liées à l'univers.
+FEATURE : Les types d'objets disponibles sont aléatoires et liés à l'univers. On trouve cependant toujours des armes.
+FEATURE : La vie de départ, les points d'expérience initiaux, la probabilité de croiser un champion, la probabilité de croiser un piège, le niveau des zones, la puissance maximale des enchantements et le pourcentage d'or perdu à chaque décès sont aléatoires et liés à l'univers.
+FEATURE : L'univers par défaut, univers 0, est maintenu.
+FEATURE : Ajout de la possibilité de faire une règle "≠" en plus de ">", "=" et "<".
+FEATURE : Ajout de statistiques sur l'expérience gagnée.
+FEATURE : Si on a plus de 100 points à distribuer, on peut les distribuer 50 par 50 (avec "MAJ").
+FEATURE : Les monstres n'ont plus un niveau prédéfini mais dynamique dépendant de la gamme des niveaux de l'univers. Ainsi, on peut avoir des monstres de niveau 2000 dans certains univers.
+FEATURE : Ajouter par défaut des filtres suivants : objet normal, objet magique, objet rare, objet légendaire, ressource élémentaire, ressource primordiale et orbe.
+FEATURE : Ajout d'un algorithme optimisant les monstres pour un univers donné, utilisé pour choisir la répartition par défaut des points des monstres.
+FEATURE : Ajout des compétences "Immunité au coup final", "Overkilling" et "Hardiesse".
+
+CHANGE : L'alliage de 3 ressources primordiales produit désormais une ressource primordiale.
+CHANGE : Ajustement des pièges (plus durs).
+CHANGE : Ajustement des courbes (pas de temps plus fin).
+CHANGE : Ajustement des compétences.
+
+FIX : Vitesse du temps ne fonctionnait pas correctement.
+
+Version 0.8 21/08/2016 "Traps and stuff"
+FEATURE : Ajout des pièges.
+FEATURE : Condition d'arrêt sur les pièges.
+FEATURE : Plus de formules de craft.
+FEATURE : La touche "MAJ" permet de distribuer 5 points d'un coup.
+FEATURE : La touche "MAJ" permet de vendre, déposer ou ramasser le contenu complet d'une liste.
+FEATURE : Ajout des compétences "Rente viagère" et "Éducation".
+FEATURE : Ajout des compétences "Détection des pièges", "Bonus d'initiative face aux pièges" et "Bonus de résistance aux pièges".
+
+CHANGE : Nouvelle carte (libre de droits).
+CHANGE : Ajustement des formules de craft.
+CHANGE : Ajustement des monstres.
+CHANGE : Ajustement des objets.
+
+FIX : Empêche le joueur d'entrer plusieurs fois dans les hiscores en cliquant terminer plusieurs fois.
+
+CHANGE : Ajustement des compétences.
+
+Version 0.7 22/12/2013 "The big craft update"
+FEATURE : Ajout de la fonction « Jeter ».
+FEATURE : Plus de formules de craft.
+FEATURE : Ajout des compétences "Vitesse du craft", "Rendement du craft" et "Économie d'orbes".
+FEATURE : Ajout des compétences "Niveau des marchands" et "Inventaire des marchands".
+FEATURE : Zoom sur les graphiques (avec la molette).
+FEATURE : Plus de graphiques (revenus).
+
+CHANGE : Ajustement de plusieurs compétences.
+CHANGE : Le craft n'est plus instantané.
+CHANGE : Beaucoup de formules de craft ont été ajustées pour que le prix du résultat soit proportionnel à la somme des prix des ingrédients.
+CHANGE : Les formules ont été ajustées pour tenir compte du rendement du craft.
+CHANGE : Il est désormais impossible de gagner de l'argent en fusionnant des matériaux.
+CHANGE : Refactoring des tags des monstres, possibilité de monstres multi-tags (Démon/Animal, par exemple).
+
+Version 0.6 20/11/2013 "The rules update"
+FEATURE : Importation et exportation de règles.
+FEATURE : Règles sur les monstres.
+FEATURE : Règles sur le joueur.
+FEATURE : Règles de fuite et de non-engagement.
+FEATURE : Règles de recherche de marchand.
+FEATURE : Nouvelle interface pour l'édition des règles.
+FEATURE : Statistiques détaillées sur l'utilisation du temps.
+FEATURE : Affichage du nom du héros et du défi dans le titre de la fenêtre principale.
+FEATURE : Nouvelle stat : représailles.
+FEATURE : Nouvelle stat : nécrophagie.
+FEATURE : Plus de raccourcis clavier.
+FEATURE : Gestion de la touche échap dans les sous-fenêtres du jeu (comme la croix de fermeture).
+
+CHANGE : Les capes font désormais de l'initiative (c'est plus classieux).
+CHANGE : Créer un héros enchaîne directement sur le jeu.
+CHANGE : Condition d'arrêt sur le nombre de défaites.
+CHANGE : Ajustement du craft et des matériaux.
+CHANGE : Ajustement des objets.
+CHANGE : Ajustement des monstres.
+CHANGE : Les objets équipés sont désormais exclus de la vente automatique.
+
+FIX : Scroll dans la fenêtre de sélection du héros.
+FIX : L'annulation est désormais correctement gérée lors de la création des héros.
+FIX : Les hiscores ne sont plus éditables.
+FIX : Il est désormais impossible de vaincre les boss en fuyant.
+FIX : Il est désormais impossible d'avoir deux règles avec le même nom.
+FIX : Les hiscores sont mieux gérés en cas de 2 instances du jeu lancées en parallèle.
+FIX : Correction d'un bug étrange sur la sélection des objets dans l'inventaire.
+FIX : Un marchand niveau X peut désormais vendre des objets de niveau X même si X est impair.
+
+
+Version 0.5 11/07/2013 "The challenge update"
+FEATURE : Ajout de la règle "Tout".
+FEATURE : Ajout des règles de ramassage.
+FEATURE : Système de défis.
+FEATURE : Trois types de défis (niveau, or et boss).
+FEATURE : Système de hiscores pour les défis.
+FEATURE : Autosave au level up...
+
+CHANGE : Ajustement des statistiques des monstres.
+CHANGE : Les champions font désormais deux fois plus d'expérience.
+CHANGE : Ajustement du prix des alliages (diminution).
+CHANGE : Ajustement des épines (diminution).
+CHANGE : Sélection automatique dans MenuWindow.
+
+FIX : Suppression d'un crash avec les règles du type "négation".
+FIX : Suppression d'un problème de rafraichissement dans l'inventaire.
+
+
+Version 0.4 14/06/2013 "Introducing rules"
+FEATURE : Il est désormais possible d'obtenir un orbe en recyclant un objet.
+FEATURE : Les alliages ont désormais un nom.
+FEATURE : Il existe maintenant une fenêtre de programmation permettant de créer des règles d'achat, de vente et des filtres d'inventaire.
+
+CHANGE : Suppression de l'ancien système d'achat et de vente automatique, remplacé par le système de programmation, bien plus souple.
+CHANGE : Le temps "accéléré" est désormais décompté correctement 
+CHANGE : Le jeu ne sauvegarde plus votre adversaire quand vous quittez...
+CHANGE : Ajustement des formules de craft.
+CHANGE : Les objets rares ont désormais toujours au moins 3 enchantements.
+CHANGE : Les objets rares sont maintenant limités à 5 enchantements.
+CHANGE : Le niveau des enchantements est désormais toujours affiché.
+CHANGE : La pénalité liée à l'usage de mauvais matériaux dans le craft est augmentée.
+
+
+Version 0.3 18/01/2013
+CHANGE : Les nouveaux personnages commencent avec 0 points dans chaque compétence.
+CHANGE : Les nouveaux personnages commencent avec 30 points à distribuer.
+CHANGE : Les orbes font désormais moins d'expérience.
+CHANGE : Les monstres font désormais moins d'expérience (diminishing return).
+CHANGE : Augmentation de la puissance des monstres.
+CHANGE : Augmentation de la puissance des champions.
+CHANGE : Ajustement de la puissance des objets.
+
+FEATURE : De nouveaux raccourcis clavier sont disponibles, notamment pour les "-" et les "+".
+FEATURE : Ajout des compétences "Apprentissage", "Epines" et "Vitesse du temps".
+FEATURE : Ajout de nombreuses statistiques clarifiant l'effet des compétences.
+FEATURE : Clarification de la carte.
+FEATURE : Ajout de zones de haut niveau (jusqu'au niveau 170).
+FEATURE : Ajout de nombreux monstres répartis jusqu'au niveau 180.
+FEATURE : Ajout de l'achat automatique.
+
+BUG FIX : "Séparer" fonctionne maintenant correctement sur les ressources primordiales.
+BUG FIX : Correction de certaines courbes dont les légendes étaient interverties.
+BUG FIX : La ligne "enchantements" n'est plus affichée sur les orbes.
+BUG FIX : Les orbes peuvent désormais êtres trouvés sur les monstres...
+
+
+Version 0.2 15/01/2013
+CHANGE : Le prix des orbes a été augmenté.
+CHANGE : Amélioration du niveau moyen des drops.
+CHANGE : Les drops d'orbes et de matériaux sont plus fréquents.
+CHANGE : Les drops d'objets sont moins fréquents.
+CHANGE : Ajustement des formules basées sur les ressources primordiales.
+CHANGE : Pas de vente automatique pour les objets équipés même s'ils remplissent toutes les conditions.
+CHANGE : Nouvelles équations pour la Constitution, la Régénération et la Résurrection.
+
+FEATURE : Les marchands vendent désormais des matériaux et des orbes.
+FEATURE : Le jeu se contrôle mieux au clavier. Pressez alt pour voir les raccourcis.
+FEATURE : Ajout de l'orbe de redistribution permettant de refaire son build quand on l'utilise dans une forge mystique.
+FEATURE : Les orbes d'augmentation et d'évolution donnent de l'expérience si ils sont utilisés dans une forge mystique.
+FEATURE : Ajout d'un bouton pour arrêter de combattre.
+
+BUG FIX : Amélioration de l'esthétique du menu de chargement.
+BUG FIX : Les courbes sont désormais disponibles pendant les combats.
+BUG FIX : Les boutons + - sont désormais visibles sous Windows.
+BUG FIX : La condition d'arrêt sur le nombre de coups critiques encaissés fonctionne désormais correctement.
+BUG FIX : L'écran des compétences est désormais correctement rafraîchi pendant les combats
+BUG FIX : Les alliages ne sont plus des orbes.
+BUG FIX : L'équipement est désormais pris en compte lors de l'affichage des statistiques sur l'écran principal.
+BUG FIX : Correction de divers problèmes d'esthétique sur les courbes.

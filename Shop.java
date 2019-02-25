@@ -5,7 +5,7 @@ class Shop implements Serializable {
 public int level;  // niveau
 public ArrayList<Item> inventory;// inventraire
 public String name;
-public static String[] SurNames = {"l'Escroc","le Grippe-sou","le Radin","le Rapiat","l'Avare","l'Avide","le Cupide","le Rapace"};
+public static String[] SurNames = Local.SHOP_SURNAMES;
 
 public Shop(Player p)
 	{

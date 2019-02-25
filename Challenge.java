@@ -17,16 +17,16 @@ class Challenge implements Serializable {
 	type = ty;
 	param = p;
     }
-	
+
 	public String desc()
 	{
-		String res = name + "\nObjectif : ";
+		String res = name + Local.GOAL;
 		if (type == 0)
-			res += "atteindre le niveau " + (int)param;
+			res += String.format(Local.REACH_LEVEL,(int)param);
 		if (type == 1)
-			res += "gagner " + (int)param + " pièces d'or";
+			res += String.format(Local.WIN_DOLLARS,(int)param);
 		if (type == 2)
-			res += "vaincre " + boss_name;
+			res += String.format(Local.DEFEAT_BOSS,boss_name);
 		return res;
 	}
 
@@ -35,22 +35,22 @@ class Challenge implements Serializable {
 		return (type == 0 || type == 1);
 	}
 	
-	public boolean isTrue(Player p)
+	public boolean isTrue(Player p, boolean disp)
 	{
 	if  (type == 0)
 		{
 		if(p.level >= param)
-			Game.MW.addLog(String.format("Niveau %d atteint, victoire !",(int)param));
+			if(disp) Game.MW.addLog(String.format(Local.LEVEL_REACHED_VICTORY,(int)param));
 		else
-			Game.MW.addLog(String.format("Vous devez être au moins niveau %d pour gagner.",(int)param));
+			if(disp) Game.MW.addLog(String.format(Local.YOU_MUST_BE_AT_LEAST_LEVEL,(int)param));
 		return (p.level >= param);
 		}
 	if  (type == 1)
 		{
 		if(p.money >= param)
-			Game.MW.addLog(String.format("Vous possédez %d pièces d'or, victoire !",(int)p.money));
+			if(disp) Game.MW.addLog(String.format(Local.YOU_POSSESS_DOLLARS_VICTORY,(int)p.money));
 		else
-			Game.MW.addLog(String.format("Vous devez posséder au moins %d pièces d'or pour gagner.",(int)param));
+			if(disp) Game.MW.addLog(String.format(Local.YOU_MUST_POSSESS_AT_LEAST,(int)param));
 		return (p.money >= param);
 		}
 	return false;

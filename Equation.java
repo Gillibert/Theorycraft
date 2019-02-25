@@ -16,8 +16,8 @@
 		double exp, add;
 		if (fast == 0)
 		{
-			exp = 0.2*gen.nextDouble()+0.2;
-			add = (int)(gen.nextDouble()*80)+20;
+			exp = 0.2*gen.nextDouble()+0.25;
+			add = (int)(gen.nextDouble()*70)+20;
 		}
 		else if (fast==1)
 		{
@@ -26,13 +26,13 @@
 		}
 		else if (fast==2)
 		{
-			exp = 0.8*gen.nextDouble()+0.7;
-			add = (int)(gen.nextDouble()*20)+10;
+			exp = 0.4*gen.nextDouble()+0.9;
+			add = (int)(gen.nextDouble()*20)+15;
 		}
 		else
 		{
-			exp = 0.6*gen.nextDouble()+1.1;
-			add = (int)(gen.nextDouble()*20)+10;
+			exp = 0.4*gen.nextDouble()+1.1;
+			add = (int)(gen.nextDouble()*20)+15;
 		}
 		if(croissant)
 		{
@@ -72,7 +72,7 @@
 			if(fast == 0)
 			{
 				exp = 0.3*gen.nextDouble()+0.25;
-				add = (int)(gen.nextDouble()*70)+20;
+				add = (int)(gen.nextDouble()*70)+25;
 			}
 			else if(fast == 1)
 			{

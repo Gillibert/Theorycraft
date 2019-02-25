@@ -14,7 +14,17 @@ private List<String> nameInstructions = new ArrayList<String>();
 private Random rg;
 
 public NameGenerator(boolean MAT) {
-rg = new Random();
+	rg = new Random();
+	initStrings(MAT);
+}
+
+public NameGenerator(int seed) {
+	rg = new Random(seed);
+	initStrings(false);
+}
+
+private void initStrings(boolean MAT)
+{
 String demoVocals[] = { "a", "e", "i", "o", "u", "in", "ei", "ai", "ou", "j", "y", "oi", "au" };
 
 String demoStartConsonants[] = { "b", "c", "d", "f", "g", "h", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z", "ch", "bl", "br", "fl", "gl", "gr", "kl", "pr", "st", "sh", "th" };
@@ -93,14 +103,23 @@ int l = nameInstructions.length();
 for (int i = 0; i < l; i++) { char x = nameInstructions.charAt(0); switch (x) { case 'v': name += getRandomElementFrom(vocals); break; case 'c': name += getRandomElementFrom(startConsonants); break; case 'd': name += getRandomElementFrom(endConsonants); break; } nameInstructions = nameInstructions.substring(1); } return name;
 }
 
-public String getNameOf()
+public String getNameOf(String BN)
 	{
-	    String tmp = getName();
-	    char fc = tmp.charAt(0);
-	    if (fc == 'A' || fc == 'E' || fc == 'I' || fc == 'O' || fc == 'U')
-		return "d'"+tmp;
-	     else
-		return "de "+tmp;
+		String base = NameGenerator.firstCharUppercase(BN);
+		
+		if(Local.LANG == 0)
+		{
+			String tmp = getName();
+			char fc = tmp.charAt(0);
+			if (fc == 'A' || fc == 'E' || fc == 'I' || fc == 'O' || fc == 'U')
+				return base + " d'"+tmp;
+			else
+				return base + " de "+tmp;
+		}
+		else
+		{
+			return getName() + "'s " + base;
+		}
 	}
 
 public static String firstCharLowercase(String name) 

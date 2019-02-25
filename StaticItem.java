@@ -5,7 +5,7 @@ class StaticItem {
 
     public static int RESSOURCE_ELEM = 0;
     public static int RESSOURCE_PRIM = 1;
-    public static int RESSOURCE_CRAFT = 2;
+    public static int RESSOURCE_ORB = 2;
 
     // 0 Casque
     // 1 Boucles d'oreilles
@@ -21,12 +21,13 @@ class StaticItem {
     // 11 Gantelets
     // 12 Arme
     // 13 Fourreau
-    // 14 Ressources
+	// 14 Lunettes
+    // 15 Ressources
     
-    public static String[] MaterialFamily = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
-    public static String[] Rarete = {"objet normal","objet magique","objet rare","objet légendaire","ressource élémentaire","ressource primordiale","orbe"};
-    public static String[] Emplacement = {"Casque","Boucles d'oreilles","Plastron", "Cape", "Ceinture", "Jambières", "Bottes", "Chaussettes", "Amulette", "Bague", "Brassards", "Gantelets", "Arme", "Fourreau","Lunettes","Ressources"};
-    public static String[] RareNames = {"légende","héritage","relique","trophée","souvenir","réminiscence","vestige","trésor","richesse","prodige","idéal","miracle","fortune"};
+    public static String[] MaterialFamily = Local.MATERIAL_FAMILY_NAME;
+    public static String[] Rarete = Local.RARITY_NAME;
+    public static String[] Emplacement = Local.SLOT_NAME;
+    public static String[] RareNames = Local.RARE_NAMES;
 
     public static int nb_pos = Emplacement.length;
     public static int max_level = 301;
@@ -164,11 +165,11 @@ class StaticItem {
     };
 
     public static Material[] ORB = new  Material[]{
-    new Material("orbe d'augmentation","",5,         0.003,60.0,     1.0,1.0,1.30),
-    new Material("orbe de transmutation","",5,       0.003,60.0,     1.0,1.0,1.31),
-    new Material("orbe de transfert","",5,           0.003,60.0,     1.0,1.0,1.32),
-    new Material("orbe de fusion","",5,              0.003,60.0,     1.0,1.0,1.33),
-    new Material("orbe d'évolution","",5,            0.003,60.0,     1.0,1.0,1.34)
+    new Material("orbe d'augmentation","",5,         0.001,60.0,     1.0,1.0,1.30),
+    new Material("orbe de transmutation","",5,       0.001,60.0,     1.0,1.0,1.31),
+    new Material("orbe de transfert","",5,           0.001,60.0,     1.0,1.0,1.32),
+    new Material("orbe de fusion","",5,              0.001,60.0,     1.0,1.0,1.33),
+    new Material("orbe d'évolution","",5,            0.001,60.0,     1.0,1.0,1.34)
     };
 
     public static BaseItem[] BA = new  BaseItem[]{
@@ -373,7 +374,8 @@ class StaticItem {
     }
 
     public static void init(Universe universe)
-    {    
+    {
+	for(int i=0; i< MA.length; i++)
     MaterialNames = new String[MA.length];
     BaseItemNames = new String[BA.length];
     MaterialNamesList = new ArrayList<String>();
@@ -413,7 +415,7 @@ class StaticItem {
 			|| (BA[i].mat == MA[j].type))
             {
             Item it = new Item(BA[i],MA[j]);
-            WhiteItemByPosition[it.pos].list.add(it);
+			WhiteItemByPosition[it.pos].list.add(it);
             WhiteItemByLevel[it.effectiveIlvl()].list.add(it);
             }
 		}
@@ -428,7 +430,7 @@ class StaticItem {
         }
 
 
-       /*
+               /*
         for(int i=0; i< max_level; i++)
             {
             if(RessourceByLevel[i].list.size() > 0)
@@ -439,8 +441,7 @@ class StaticItem {
             }
             }
         
-        
-        
+
     for(int i=0; i< max_level; i++)
         {
         if(WhiteItemByLevel[i].list.size() > 0)

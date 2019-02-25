@@ -23,7 +23,7 @@ public void save()
 	    output.close();
 	} 
 	catch(Exception ex){
-	    System.out.println("Can't write in hiscores.data");
+	    System.out.println(Local.CANT_WRITE_IN_HISCORES);
 	}
 }
 
@@ -39,7 +39,7 @@ public static HiScore loadScore()
 	}
 	catch(Exception ex)
 	    {
-			System.out.println("Erreur lors du chargement des hiscores.");
+			System.out.println(Local.ERROR_LOADING_HISCORES);
 			res= new HiScore();
 	    }
 	return res;
@@ -50,7 +50,7 @@ public HiScore()
 	list = new  ArrayList<Score>();
 }
 
-public boolean addScore(Score news)
+public boolean addScore(Score news,boolean disp)
 {
 	boolean res = false;
 	ArrayList<Score> tmp = bestScores(news.challenge_name);
@@ -68,10 +68,42 @@ public boolean addScore(Score news)
 	if(res)
 		{
 		list.add(news);
-		Game.MW.addLog("Félicitations, vous entrez dans les hiscores !");
+		if(disp) Game.MW.addLog(Local.CONGRATULATIONS_HISCORES);
 		save();
 		}
 	return res;
+}
+
+public void cleanScores()
+{
+	System.out.println("cleanScores");
+	int clsize = ChallengeList.list.size();
+	
+	ArrayList<ArrayList<Score>> asc =  new ArrayList<ArrayList<Score>>();
+	
+	for(int i=0; i<clsize; i++)
+		asc.add(new ArrayList<Score>());
+	
+	for(Score s : list)
+		for(int i=0; i<clsize; i++)
+			if(s.challenge_name.equals(ChallengeList.list.get(i).name))
+				asc.get(i).add(s);
+	
+	list.clear();
+	for(ArrayList<Score> als : asc)
+	{
+		Collections.sort(als, new ComparateurScore());
+		Score ts = als.get(0);
+		als.clear();
+		list.add(ts);
+		for(int i=0; i<5; i++)
+		{
+			Score ts2 = new Score(ts.challenge_name,StaticItem.nameGenerator.getName(),ts.time*Math.pow(2,0.5*i+1), ts.seed);
+			list.add(ts2);
+		}
+	}
+	
+	save();
 }
 
 public ArrayList<Score> bestScores(String challenge_name)
@@ -89,7 +121,7 @@ public String bestScoresString(String challenge_name)
 	ArrayList<Score> tmp = bestScores(challenge_name);
 	String res = "";
 	for(Score s : tmp)
-		res = res + s.name + " (" + (int)s.time + " secondes, graine "+ (int)s.seed +")\n";
+		res += String.format(Local.HISCORES_LINE,s.name,(int)s.time,(int)s.seed);
 	return res;
 }
 }

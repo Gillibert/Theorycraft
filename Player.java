@@ -1,23 +1,22 @@
-import java.util.ArrayList;
+import java.util.*;
 import java.io.Serializable;
 
 
 public class Player implements Serializable {
     static private final long serialVersionUID = 100;
+	static private int dsp_target[] = {0,1,2,3,4,5,6,7,9,10,24,31};
     //***********************
 	public boolean jeu_fini = false;
-    public static String[] TagsName = 
-		{"Mort-vivant","Animal","Humain","Peau-verte","Démon","Champion"}; // nom des tags 
 	
-	public static int nb_tags = TagsName.length; // nombre de statistiques
-   
-    public boolean[] tags; // Propriétés
-
-    public String name; // Nom du joueur (ou du monstre)
+    public static String[] TagsName = Local.TAGS_NAME; // Tags names
+	public static int nb_tags = TagsName.length; // Number of tags
+    public boolean[] tags; // Player's tags
+    public String name; // Player's name
+	
 	public Challenge defi;
     public double[] stats; // statistiques
-    public double[] stats_with_bonus; // for fast access
-    public double[] item_bonus; // for fast access, used only in LevlUp2
+    public double[] stats_with_bonus; // For fast access
+    public double[] item_bonus; // For fast access, used only in LevlUp2
 
     // IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
     // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14) 
@@ -27,19 +26,11 @@ public class Player implements Serializable {
 	// EPIN(34) REP(35) NECRO(36) CRAFT_SPD(37) CRAFT_REND(38) ECO_ORB(39) 
 	// SHOP_LEVEL(40) SHOP_SIZE(41) TRAP_DET(42) TRAP_INIT(43) TRAP_RES(44)
 	// RENTE(45) EDUC(46) BONUS_XP(47) BONUS_LOWLEV(48) BONUS_HLEV(49)
+	// REDUC_PEN(50) ZONE_ACCESS (51)
 
-    public static String[] stats_name = {"Vitesse d'attaque", "Dégâts", "Réduction", "Absorption", "Esquive", "Précision",
-		"Chance de coup critique", "Dégâts des coups critiques", "Vol de vie", "Vitalité", "Constitution", "Régénération", 
-		"Résurrection", "Encombrement maximal", "Vitesse de marche", "Recherche de ressources","Recherche d'objets magiques",
-		"Recherche d'objets rares","Recherche de qualité","Recherche de quantité","Recherche de puissance","Recherche d'or",
-		"Dégâts aux morts-vivants","Dégâts aux animaux","Dégâts aux humains","Dégâts aux peaux-vertes","Dégâts aux démons",
-		"Dégâts aux champions","Estimation","Chance de fuite","Vitesse de fuite","Initiative","Immunité au coup final",
-		"Vitesse du temps","Épines","Représailles","Nécrophagie",
-		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
-		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse"}; // nom des compétences 
+    public static String[] stats_name =  Local.SKILLS_NAME; // nom des compétences 
 
-
+    public boolean disp;
     public boolean[] conditionToggle;
     public int[] conditionValues;   
 
@@ -58,12 +49,20 @@ public class Player implements Serializable {
     public int level;  // niveau
     public double money; // argent
     public int zone; // zone
-    public int xp_pt; // exp
+    public double xp_pt; // exp
     public Shop shop; // the shop
     public Monster mob; // the mob
 	public Universe universe; // the universe
     public int crit_taken;
     public TimeStats t_stats ;
+
+	static class ComparateurStats implements Comparator<Item> {
+	public int compare(Item s1, Item s2){
+	    if (s1.nb_pts() > s2.nb_pts()) return -1;
+	    if (s1.nb_pts() < s2.nb_pts()) return 1;
+	    else return 0;
+	} 
+} 
 
 	public void refresh_charge()
 	{
@@ -90,7 +89,7 @@ public class Player implements Serializable {
 		if (fric > 0.01)
 		{
 		money_gain(fric, TimeStats.GAIN_RENTE);
-		Game.MW.addLog(String.format("Vous recevez %.2f écus de rente (%.2f secondes x %.2f écus/secondes).",fric,temps_ecoule,rente_par_seconde));
+		if(disp) Game.MW.addLog(String.format(Local.LIFE_ANNUITY,fric,temps_ecoule,rente_par_seconde));
 		temps_depuis_derniere_rente = temps_total;
 		}
 	}
@@ -126,17 +125,17 @@ public class Player implements Serializable {
 		shop.inventory.remove(b);
 		get_item(b);
 		money -= prix;
-		Game.MW.addLog(String.format("Achat de %s à %s pour %.2f écus",b.name,shop.name,prix));
+		if(disp) Game.MW.addLog(String.format(Local.BUYING_OBJECTS,b.name,shop.name,prix));
 	}
 	else if(b.stackable)
 	{
 		double qty_to_buy = (money/prix)*b.qty;
 		b.set_qty(b.qty - qty_to_buy);
-		Item rit = new Item(b.material,StaticItem.RESSOURCE_CRAFT);
+		Item rit = new Item();
 		rit.copy(b);
 		rit.set_qty(qty_to_buy);
 		get_item(rit);
-		Game.MW.addLog(String.format("Achat de %s à %s pour %.2f écus",rit.name,shop.name,money));
+		if(disp) Game.MW.addLog(String.format(Local.BUYING_OBJECTS,rit.name,shop.name,money));
 		money = 0.0;
 	}
     }
@@ -146,7 +145,70 @@ public class Player implements Serializable {
 		t_stats.addRevenue(gain, type_gain);
 		money += gain;
 	}
-		
+	
+	public void sell(ArrayList<Item> slist)
+    {
+	int nbitem = slist.size();
+	if(nbitem == 0) return;
+	get_shop();
+	double cv = coeff_vente();
+	
+	double gain_base = 0.0;
+	double gain_magique = 0.0;
+	double gain_rare = 0.0;
+	double gain_mat = 0.0;
+	double gain_other = 0.0;
+	double gain_total = 0.0;
+	boolean equiped = false;
+	
+	String sellStr = "";
+	if(nbitem < 10)
+	{
+	for(Item the_object : slist)
+	{
+	if(sellStr != "") sellStr += ", ";
+	sellStr += NameGenerator.firstCharLowercase(the_object.name);
+	}
+	}
+	else
+	{
+		sellStr = String.format(Local.N_OBJECTS,nbitem);
+	}
+	
+	for(Item the_object : slist)
+	{
+	double prix = cv*the_object.prix();
+	//inventory.remove(the_object);
+	charge -= the_object.poids;
+	if(the_object.equiped) {equiped = true; the_object.equiped = false;}
+	//shop.inventory.add(the_object);
+	
+	if(the_object.rare == 0) gain_base += prix;
+	else if(the_object.rare == 1) gain_magique += prix;
+	else if(the_object.rare == 2) gain_rare += prix;
+	else if(the_object.rare == 4 || the_object.rare == 5) gain_mat += prix;
+	else gain_other += prix;
+	gain_total += prix;
+	}
+	inventory.removeAll(slist);
+	shop.inventory.addAll(slist);
+	
+	if(equiped) refresh_stats_with_bonus();
+	
+	if(gain_base > 0.0)
+		money_gain(gain_base,TimeStats.GAIN_SELL_BASE);
+	if(gain_magique > 0.0)
+		money_gain(gain_magique,TimeStats.GAIN_SELL_MAGIC);
+	if(gain_rare > 0.0)
+		money_gain(gain_rare,TimeStats.GAIN_SELL_RARE);
+	if(gain_mat > 0.0)
+		money_gain(gain_mat,TimeStats.GAIN_SELL_MAT);
+	if(gain_other > 0.0)
+		money_gain(gain_other,TimeStats.GAIN_SELL_OTHER);	
+	
+	if(disp) Game.MW.addLog(String.format(Local.SELLING_OBJECTS,sellStr,shop.name,gain_total));
+    }
+	
     public void sell(Item b)
     {
 	get_shop();
@@ -162,7 +224,7 @@ public class Player implements Serializable {
 		money_gain(prix,TimeStats.GAIN_SELL_MAT);
 	else
 		money_gain(prix,TimeStats.GAIN_SELL_OTHER);		
-	Game.MW.addLog(String.format("Vente de %s à %s pour %.2f écus",b.name,shop.name,prix));
+	if(disp) Game.MW.addLog(String.format(Local.SELLING_OBJECTS,b.name,shop.name,prix));
     }
 
     public Item get_similar(ArrayList<Item> inventory, Item i)
@@ -176,7 +238,7 @@ public class Player implements Serializable {
     public void put_craft(Item b)
     {
 	deposit_item(b,craftInventory);
-	Game.MW.addLog(String.format("Vous placez %s dans la forge mystique",b.name));
+	if(disp) Game.MW.addLog(String.format(Local.DROPPING_OBJECTS,b.name));
     }
 
     public void destroy_item(Item b)
@@ -184,7 +246,7 @@ public class Player implements Serializable {
 	inventory.remove(b);
 	charge -= b.poids;
 	if(b.equiped) refresh_stats_with_bonus();
-	Game.MW.addLog(String.format("Vous jetez %s",b.name));
+	if(disp) Game.MW.addLog(String.format(Local.THROW_AWAY_OBJECTS,b.name));
     }
 
     public void get_item(Item b)
@@ -228,7 +290,7 @@ public class Player implements Serializable {
     {
 	craftInventory.remove(b);
 	get_item(b);
-	Game.MW.addLog(String.format("Vous récupérez %s depuis la forge mystique",b.name));
+	if(disp) Game.MW.addLog(String.format(Local.PICKING_OBJECTS,b.name));
     }
 
 
@@ -258,101 +320,36 @@ public class Player implements Serializable {
 	    }
     }
 	
+	public String short_infos()
+	{
+		String res = String.format(Local.SHORT_INFOS,
+		level,temps_total,money,charge,charge_max());
+		return res;
+	}
+	
 	public String infos()
 	{
 		double dmpa = dmpa();
-		int lvl0=Math.max(level-10,1);
-		int lvl1=lvl0+5;
-		int lvl2= lvl0+10;
-		int lvl3= lvl0+20;
+		double levListShort[] = {1,3,5,10};
+		double levList[] = {universe.get_zone_level(zone), universe.get_zone_max_level(zone),level,level*0.75};
+		Arrays.sort(levList);
+		if (level < 10) levList = levListShort;
+		int lvl0=(int)levList[0];
+		int lvl1=(int)levList[1];
+		int lvl2=(int)levList[2];
+		int lvl3=(int)levList[3]; 
+		if(lvl3==lvl2) lvl3*=1.25;
 		
-		return String.format("Temps total de jeu : %.2f secondes"+
-			"\nAttaques par seconde : %.3f"+
-			"\nDégâts moyens d'une attaque basique : %.2f"+
-			"\nProbabilité de coup critique : %.3f%%"+
-			"\nMultiplicateur des coups critiques : %.3f"+
-			"\nDégâts moyens d'une attaque : %.3f"+
-			"\nDégâts moyens par seconde : %.3f"+
-			"\nMultiplicateur de dégâts :"+
-			"\n Versus morts-vivants : %.2f"+
-			"\n Versus animaux : %.2f"+
-			"\n Versus humains : %.2f"+
-			"\n Versus peaux-vertes : %.2f"+
-			"\n Versus démons : %.2f"+
-			"\n Versus champions : %.2f"+
-			"\nProbabilité de toucher un monstre :"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\nProbabilité d'esquiver contre un monstre :"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\nRéduction des dégâts : %.3f%%"+
-			"\nRésistance aux pièges : ×%.3f"+
-			"\nRéduction des dégâts des pièges : %.3f%%"+
-			"\nAbsorption des dégâts : %.3f"+
-			"\nPoints de vie par point de vitalité : %.3f"+
-			"\nPoints de vie : %.3f"+
-			"\nPoints de vie effectifs : %.3f"+
-			"\nPoints de vie par seconde : %.3f"+
-			"\nRégénération totale : %.3f secondes"+
-			"\nVol de vie : %.3f%% des dégâts"+
-			"\nTemps avant d'attaquer : %.2f secondes"+
-			"\nBonus d'initiative face à un piège : %.3f"+
-			"\nTemps d'initiative face à un piège : %.2f secondes"+
-			"\nTraque d'un adversaire : %.3f secondes"+
-			"\nRecherche d'un marchand : %.3f secondes"+
-			"\nRecherche d'une forge : %.3f secondes"+
-			"\nRésurrection : %.3f secondes"+
-			"\nEncombrement maximal : %.3f kg"+		     
-			"\nCoefficient de vente : %.3f"+
-			"\nCoefficient d'achat : %.3f" +
-			"\nProbabilité de fuite : %.2f%%"+
-			"\nTemps de fuite : %.3f secondes"+
-			"\nProbabilité qu'un objet soit magique : %.2f%%"+
-			"\nProbabilité qu'un objet soit rare : %.2f%%"+
-			"\nProbabilité qu'un objet soit de qualité : %.2f%%"+
-			"\nMultiplicateur d'or : %.3f"+
-			"\nMultiplicateur de ressources : %.3f"+
-			"\nButin moyen pour un monstre tué"+		     
-			"\n  Nombre total d'objets : %.3f"+
-			"\n  Nombre de ressources : %.3f"+
-			"\n  Nombre d'objets hors ressources : %.3f"+
-			"\n  Quantité totale de ressources : %.3f"+
-			"\n  Nombre d'objets magiques : %.3f"+
-			"\n  Nombre d'objets rares : %.4f"+
-			"\nProbabilité d'esquiver un coup final : %.3f%%"+
-			"\nMultiplicateur du temps : %.3f"+
-			"\nDégats infligés aux attaquants : %.2f"+
-			"\nDégats réfléchis sur les attaquants : %.2f%%"+
-			"\nUn monstre tué donne %.2f%% de sa vie"+			
-			"\nTemps du crafting : %.3f secondes"+
-			"\nRendement du crafting : %.3f%%"+
-			"\nUn orbe coûte %.2f%% d'orbe"+	
-			"\nNiveau moyen des marchands : %d+%.2f"+
-			"\nNombre d'objets chez les marchands : %.2f"+
-			"\nProbabilité de détecter un piège :"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\nRente par seconde : %.3f écus"+
-			"\nPoints à distibuer par niveau : %.3f"+
-			"\nBonus général d'expérience : %.2f%%"+
-			"\nBonus d'expérience sur un monstre :"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%"+
-			"\n  De niveau %d : %.3f%%",
-			temps_total,att_per_sec(),dmg_base(),100.0*crit_proba(),multi_crit(),
+		return String.format(Local.PLAYER_INFOS,
+			att_per_sec(),dmg_base(),100.0*crit_proba(),multi_crit(),
 			dmpa,att_per_sec()*dmpa,
 			ed_versus_tag(0),ed_versus_tag(1),ed_versus_tag(2),ed_versus_tag(3),ed_versus_tag(4),ed_versus_tag(5),
-			lvl1,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl1)*Monster.coeff_std[4]*0.1,PRC())*100.0,
-			lvl2,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl2)*Monster.coeff_std[4]*0.1,PRC())*100.0,
-			lvl3,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl3)*Monster.coeff_std[4]*0.1,PRC())*100.0,
-			lvl1,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl1)*Monster.coeff_std[5]*0.1)*100.0,
-			lvl2,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl2)*Monster.coeff_std[5]*0.1)*100.0,
-			lvl3,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl3)*Monster.coeff_std[5]*0.1)*100.0,
+			lvl1,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl1)*Monster.coeff_std[4]*0.5,PRC())*100.0,
+			lvl2,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl2)*Monster.coeff_std[4]*0.5,PRC())*100.0,
+			lvl3,100.0-universe.esquive_proba(universe.monster_points_for_level(lvl3)*Monster.coeff_std[4]*0.5,PRC())*100.0,
+			lvl1,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl1)*Monster.coeff_std[5]*0.5)*100.0,
+			lvl2,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl2)*Monster.coeff_std[5]*0.5)*100.0,
+			lvl3,universe.esquive_proba(ESQ(),universe.monster_points_for_level(lvl3)*Monster.coeff_std[5]*0.5)*100.0,
 			100.0-(100.0*reduc()),bonus_resistance_vs_piege(),100.0-(100.0*resistance_vs_piege()),absorption(),
 			pv_per_vita(),vie_max(),vie_max()/reduc(),
 			regen(),vie_max()/regen(),100*vol_de_vie(),
@@ -375,7 +372,9 @@ public class Player implements Serializable {
 			lvl0,100.0*modif_exp_lvl(lvl0-level)-100.0,
 			lvl1,100.0*modif_exp_lvl(lvl1-level)-100.0,
 			lvl2,100.0*modif_exp_lvl(lvl2-level)-100.0,
-			lvl3,100.0*modif_exp_lvl(lvl3-level)-100.0);
+			lvl3,100.0*modif_exp_lvl(lvl3-level)-100.0,
+			100*(1.0-penalty_reduction()),
+			max_zone_level());
 	}
 
     public double dmpa()
@@ -531,7 +530,19 @@ public class Player implements Serializable {
     public double BONUS_HLEV()
     {return stats_with_bonus[Universe.BONUS_HLEV];}
 		
+	public double REDUC_PEN()
+    {return stats_with_bonus[Universe.REDUC_PEN];}
 	
+	public double ZONE_ACCESS()
+    {return stats_with_bonus[Universe.ZONE_ACCESS];}
+	
+	public double total_skill_points()
+	{
+		double res=0;
+		for(int i=0; i<nb_stats; i++) res+=stats_with_bonus[i];
+		return res;
+	}
+
 	public double proba_rencontrer_piege() {return universe.proba_rencontrer_piege();}
     public double vie() {return vie;}
     public double vie_max() {return universe.vie_max(VITA(),CON());}
@@ -558,7 +569,7 @@ public class Player implements Serializable {
     public double quantite_drop() {return universe.quantite_drop(QTYF());}
     public double multiplicateur_or() {return universe.multiplicateur_or(GF());}
     public double puissance_ench_inf() {return universe.puissance_ench_inf(POWF());}
-    public double puissance_ench_sup() {return universe.puissance_ench_sup(POWF());}
+    public double puissance_ench_sup() {return universe.puissance_ench_sup();}
     public double ed_versus_tag(int tag) {return universe.ed_specific_monster(stats_with_bonus[22+tag]);}
     public double chance_fuite() {return universe.chance_fuite(FLEE());}
     public double temps_fuite() {return universe.temps_fuite(FLEE_SPD());}
@@ -590,8 +601,40 @@ public class Player implements Serializable {
 	public double bonus_xp() {return universe.bonus_xp(BONUS_XP());}
 	public double modif_exp_lvl(int levdiff) {return universe.modif_exp_lvl(BONUS_LOWLEV(), BONUS_HLEV(), levdiff);}
 	public double proba_trouver_piege(double hidden_lvl) {return universe.proba_trouver_piege(TRAP_DET(), hidden_lvl);}
-
-	    public void distribue(int x,double y) {stats[x]+=y;}
+	
+    public double penalty_reduction() {return universe.penalty_reduction(REDUC_PEN());}
+	public double max_zone_level() {return level*universe.zone_multiplier(ZONE_ACCESS());}
+	
+	public double penalty_for_bad_material() {return penalty_reduction()*universe.penalty_for_bad_material();}
+	
+	public void distribue(int x,double y) {stats[x]+=y;}
+	
+	public void auto_equip()
+	{
+		ArrayList<ArrayList<Item>> ai = new ArrayList<ArrayList<Item>>();
+		for (int i=0; i< StaticItem.nb_pos-1; i++)
+		{
+			ai.add(new ArrayList<Item>());
+		}
+	
+		for (Item it: inventory)
+		{
+			if(it.pos < StaticItem.nb_pos-1)
+			{
+			it.equiped = false;
+			ai.get(it.pos).add(it);
+			}
+		}
+		
+		for (int i=0; i< StaticItem.nb_pos-1; i++)
+		{
+			if(ai.get(i).size() > 0)
+			{
+				Collections.sort(ai.get(i), new ComparateurStats());
+				ai.get(i).get(0).equiped = true;
+			}
+		}
+	}
 	
     public void personal_wait(double time_w, int ACT)
     {
@@ -605,7 +648,7 @@ public class Player implements Serializable {
 	catch (Exception e)
 	    {
 	    }
-	Game.MW.refreshInFight();
+	//Game.MW.refreshInFight();
     }
 
 	public void addDefaultRules()
@@ -613,28 +656,28 @@ public class Player implements Serializable {
 		// Inventory filter rules
 		ObjectRule tmp;
 		tmp = new ObjectRule(4,2,0.0,ObjectRule.ITEM_RULE);
-		tmp.name = "Tout";
+		tmp.name = Local.ALL;
 		tmp.filter_rule = true;
 		tmp.pickup_rule = true;
 		tmp.system_rule = true;
 		rules.add(tmp);
 		tmp = new ObjectRule(17,0,1,ObjectRule.ITEM_RULE);
-		tmp.name = "Équipés";
+		tmp.name = Local.EQUIPPED;
 		tmp.filter_rule = true;
 		rules.add(tmp);
 
 		tmp = new ObjectRule(tmp, false);
-		tmp.name = "Non équipés";
+		tmp.name = Local.NOT_EQUIPPED;
 		tmp.filter_rule = true;
 		rules.add(tmp);
 
 		// Monster rules
 		tmp = new ObjectRule(0,2,5,ObjectRule.MONSTER_RULE);
 		//tmp.avoid_rule = true;
-		tmp.name = "Monstre trop fort"; rules.add(tmp);
+		tmp.name = Local.MONSTER_TOO_STRONG; rules.add(tmp);
 		tmp = new ObjectRule(0,1,1,ObjectRule.MONSTER_RULE);
 		tmp.avoid_rule = true;
-		tmp.name = "Monstre trop faible"; rules.add(tmp);
+		tmp.name = Local.MONSTER_TOO_WEAK; rules.add(tmp);
 
 		// Shopping and sell rules
 	/*	tmp = new ObjectRule(2,1,2,ObjectRule.PLAYER_RULE);
@@ -646,13 +689,10 @@ public class Player implements Serializable {
 
 		for (int i=0; i< StaticItem.nb_pos-1 ; i++)
 		{
-			if(universe.slot_est_disponible(i))
-			{
 			tmp = new ObjectRule(2,0,i,ObjectRule.ITEM_RULE);
 			tmp.name = StaticItem.Emplacement[i];
-			tmp.filter_rule = true;
+			tmp.filter_rule = universe.slot_est_disponible(i);
 			rules.add(tmp);
-			}
 		}
 		
 		for (int i=0; i< StaticItem.Rarete.length ; i++)
@@ -668,12 +708,16 @@ public class Player implements Serializable {
 		//		System.out.println(rules.get(i).desc());
 
 	}
-
+public Player()
+    {}
+	
     public Player(Universe u, boolean light)
     {
 	universe = u;
+	
 	if(!light)
 	{
+	disp=true;
 	temps_total = 0;
 	temps_depuis_derniere_rente = 0;
 	t_stats = new TimeStats();
@@ -715,14 +759,13 @@ public class Player implements Serializable {
     public String short_stats()
     {
 	String res = String.format("%s\n",name);
-	res += String.format("Niveau : %d\n",level);
-	for (int i=0; i<8; i++)
-	    res += String.format("%s : %.2f\n",stats_name[i],stats_with_bonus[i]);
-	res += String.format("%s : %.2f\n",stats_name[31],stats_with_bonus[31]);
-	res += String.format("%s : %.2f\n",stats_name[34],stats_with_bonus[34]);
-	res += String.format("%s : %.2f\n",stats_name[35],stats_with_bonus[35]);
-	if(money > 0.001)
-		res += String.format("Or : %.2f\n",money);
+	res += String.format(Local.LEVEL_N,level);
+	for(int i=0; i<dsp_target.length; i++) 
+	{
+		double bonus = stats_with_bonus[dsp_target[i]];
+		if(bonus > 0.01)
+		res += String.format("%s"+ Local.COLON + " %.2f\n",stats_name[dsp_target[i]],bonus);
+	}
 	return res;
     }
 
@@ -730,7 +773,7 @@ public class Player implements Serializable {
     public void giveStuff()
     {
 	Item it;
-		for (int i=0;i<150;i++)
+		for (int i=0;i<20;i++)
 	    {
 		it = new Item(i,this);
 		if(it.stackable) it.set_qty(5.0);
@@ -739,25 +782,27 @@ public class Player implements Serializable {
 		}
 	for(int j=0; j<StaticItem.ORB.length; j++)	
 	    {
-		it = new Item(StaticItem.ORB[j],StaticItem.RESSOURCE_CRAFT);
-		it.qty = 1000.0;
+		it = new Item(StaticItem.ORB[j],StaticItem.RESSOURCE_ORB);
+		it.qty = 2000.0;
 		it.update();
 		inventory.add(it);
 		charge += it.poids;
 	    }
 	
-	for(int j=0; j<8; j++)	
+	for(int j=0; j<20; j++)	
 		 {	
-		it = new Item(150,this);
+		it = new Item(300);
 		if (it.rare == 0)
 		{
-		it.elvl = 160;
+		it.elvl = 2000;
 		it.transform_magic(this);
+		it.material = StaticItem.MA[100];
 		it.rare = 3;
 		for(int i=0; i<Player.nb_stats; i++)
 		    {
-			it.bonus[i]=100;
+			it.bonus[i]=Item.power(this,it.elvl);
 		    }
+		it.update();
 		inventory.add(it);
 		charge += it.poids;
 		}
@@ -777,8 +822,9 @@ public class Player implements Serializable {
     public void get_mob()
     {
 	shop = null;
-	double tt = plage_random()*temps_traque();
-	Game.MW.addLog(String.format("Recherche d'un ennemi : %.3f secondes",tt));
+	double tt = universe.plage_random()*temps_traque();
+	if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_AN_ENNEMY,tt));
+	t_stats.addEvent(1.0,TimeStats.EVENT_FIND_MONSTER);
 	personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_ENNEMI);
 	int mob_level = get_mob_level();
 	mob = new Monster(mob_level,universe);
@@ -789,11 +835,12 @@ public class Player implements Serializable {
     {
 	if(shop == null)
 	    {
-		double tt = plage_random()*temps_shop();
-		Game.MW.addLog(String.format("Recherche d'un marchand : %.3f secondes",tt));
+		double tt = universe.plage_random()*temps_shop();
+		if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_A_TRADER,tt));
+		t_stats.addEvent(1.0,TimeStats.EVENT_FIND_SHOP);
 		personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_MARCHAND);
 		shop = new Shop(this);
-		Game.MW.addLog(String.format("Vous rencontrez %s (niveau %d)",shop.name,shop.level));
+		if(disp) Game.MW.addLog(String.format(Local.ENCOUNTER,shop.name,shop.level));
 		toucher_rente();
 	    }
     }
@@ -801,21 +848,17 @@ public class Player implements Serializable {
     // trouver une forge
     public void get_forge()
     {
-	double tt = plage_random()*temps_forge();
-	Game.MW.addLog(String.format("Recherche d'une forge : %.3f secondes",tt));
+	double tt = universe.plage_random()*temps_forge();
+	if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_A_MYSTIC_FORGE,tt));
+	t_stats.addEvent(1.0,TimeStats.EVENT_FIND_FORGE);
 	personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_FORGE);
     }
 
-    double plage_random()
+    public String cogne(Player p, boolean addStat)
     {
-	return 0.7 + 0.6 * Math.random(); // Compris entre 0.7 et 1.3
-    }
-
-    public String cogne(Player p)
-    {
-	double t_att = plage_random() * (1.0/att_per_sec()); // Durée de l'attaque
+	double t_att = universe.plage_random() * (1.0/att_per_sec()); // Durée de l'attaque
 	temps += t_att;
-	String res = String.format("%s frappe %s en %.3f secondes (temps total pour %s : %.3f)\n",this.name,p.name,t_att,this.name,temps);
+	String res = String.format(Local.A_HITS_B,this.name,p.name,t_att,this.name,temps);
 
 	double esquive, critique, multiplicateur1, multiplicateur2, percant;
 	double dmg, dmg_base, dmg_abs, dmg_red;
@@ -825,10 +868,11 @@ public class Player implements Serializable {
 
 	if (Math.random() < esquive)
 	    {
-		res+=String.format("   %s esquive le coup de %s (%.2f%% d'esquive)",p.name,this.name,100.0*esquive);
+		res+=String.format(Local.DODGES_THE_HIT,p.name,this.name,100.0*esquive);
 	    }
 	else
 	    {
+		if(addStat) t_stats.addEvent(1.0,TimeStats.EVENT_ATTACK_SUCCESS);
 		multiplicateur1 = 1.0;
 		multiplicateur2 = 1.0;
 
@@ -837,27 +881,27 @@ public class Player implements Serializable {
 			if (p.tags[t] && ed_versus_tag(t) > 1.001) 
 			{
 				multiplicateur1 =  multiplicateur1 * ed_versus_tag(t);
-				res+=String.format("   Multiplicateur x%.2f (%s)\n",ed_versus_tag(t),TagsName[t]);
+				res+=String.format(Local.MULTIPLIER,ed_versus_tag(t),TagsName[t]);
 			}
 		
 		critique = crit_proba();
 		if (Math.random() < critique)
 		    {
 			multiplicateur2 = multi_crit();
-			res+=String.format("   Coup critique x%.2f (%.2f%% de probabilité)\n",multiplicateur2,100.0*critique);
+			res+=String.format(Local.CRITICAL_STRIKE,multiplicateur2,100.0*critique);
 			p.crit_taken++;
 		    }
 
-		dmg_base = plage_random() * dmg_base() * multiplicateur1 * multiplicateur2;
+		dmg_base = universe.plage_random() * dmg_base() * multiplicateur1 * multiplicateur2;
 		dmg_red = p.reduc();
 		dmg_abs = p.absorption();
 		dmg = Math.max(dmg_base*dmg_red - dmg_abs,0.0); // pas de dégâts négatifs
 
-		res+=String.format("   %s inflige %.3f points de dégâts à %s (%.2f de base, %.2f%% de réduction, %.2f d'absorption)",this.name,dmg,p.name,dmg_base,100*(1.0-dmg_red),dmg_abs);
+		res+=String.format(Local.DAMAGE_INFLICTED,this.name,dmg,p.name,dmg_base,100*(1.0-dmg_red),dmg_abs);
 
 		if(dmg >= p.vie && p.vie > 0.1 && Math.random() < p.proba_immunite_final())
 		{
-			res+=String.format("\n   L'immunité au coup final sauve %s, il conserve 0.1 point de vie (probabilité : %.2f%%)", 
+			res+=String.format(Local.IMMUNITY_TO_FINAL_BLOW, 
 				p.name, p.proba_immunite_final()*100.0);
 			p.vie = 0.1;
 		}
@@ -866,24 +910,24 @@ public class Player implements Serializable {
 			p.vie -= dmg;
 		}
 		
-		dmg_base2 = p.plage_random() * p.epines();
+		dmg_base2 = p.universe.plage_random() * p.epines();
 		dmg_red2 = reduc();
 		if(dmg_base2*dmg_red2 > 0.01)
 		    {
-				res+=String.format("\n   Les épines de %s infligent %.3f points de dégâts à %s (%.2f de base, %.2f%% de réduction)",p.name,dmg_base2*dmg_red2,this.name,dmg_base2,100*(1.0-dmg_red2));
+				res+=String.format(Local.THORNS,p.name,dmg_base2*dmg_red2,this.name,dmg_base2,100*(1.0-dmg_red2));
 				this.vie -= dmg_base2*dmg_red2;
 		    }
 		double rep = p.represailles() * dmg;
 		if(rep*dmg_red2 > 0.01)
 	    	{
-				res+=String.format("\n   Les représailles de %s causent %.3f points de dégâts à %s (%.2f de base, %.2f%% de réduction)",p.name,rep*dmg_red2,this.name,rep,100*(1.0-dmg_red2));
+				res+=String.format(Local.REPRISALS,p.name,rep*dmg_red2,this.name,rep,100*(1.0-dmg_red2));
 				this.vie -= rep*dmg_red2;
 	    	}
 							
 		double vdv = Math.min(this.vie_max()-this.vie(),dmg*vol_de_vie());
 		if (vdv > 0.01)
 		    {
-		    res+="\n   "+String.format("%s récupère %.3f points de vie (vol de vie)",this.name,vdv);
+		    res+=String.format(Local.LIFE_LEECH_EFFECT,this.name,vdv);
 		    this.vie += vdv;
 		    }
 	    }
@@ -896,19 +940,20 @@ public class Player implements Serializable {
 	temps = 0;
     }
 
-    public boolean combat(boolean disp, boolean real)
+    public boolean combat(boolean real)
     {
+	if(real) t_stats.addEvent(1.0,TimeStats.EVENT_FIGHT_ATTEMPT);
 	boolean has_flee = false;
 	crit_taken = 0;
 	boolean lost;
 	Player p2 = mob;
-	if(disp) Game.MW.addLog(name + " versus " + p2.name + " (niveau "+ p2.level + ")");
+	if(disp) Game.MW.addLog(String.format(Local.A_VERSUS_B, name, p2.name,p2.level));
 
 	String tmp;
 	Player t1,t2;
 	double i1,i2;
-	i1 = plage_random()*initiative();
-	i2 = p2.plage_random()*p2.initiative();
+	i1 = universe.plage_random()*initiative();
+	i2 = p2.universe.plage_random()*p2.initiative();
 	temps += i1;
 	p2.temps += i2;
 
@@ -917,32 +962,44 @@ public class Player implements Serializable {
 
 	if (i1<i2) {t1=this; t2=p2;}
 	else {t1=p2; t2=this;}
-	if(disp) Game.MW.addLog(String.format("Initiatives : %.3f pour %s, %.3f pour %s",i1,name,i2,p2.name));
+	if(disp) Game.MW.addLog(String.format(Local.INITIATIVES,i1,name,i2,p2.name));
   
 	while (vie() >0 && p2.vie() >0)
 	    {
 		if(this == t1 && real && must_flee())
 		    {
-			double t_att = plage_random()*temps_fuite(); // Durée de la fuite
+			double t_att = universe.plage_random()*temps_fuite(); // Durée de la fuite
 			temps += t_att;
-			if(disp) Game.MW.addLog(String.format("%s tente de fuire face à %s (%.3f secondes)",name,p2.name,t_att));
+			if(real) 
+			{
+				personal_wait(t_att,TimeStats.ACTIVITY_FUITE);
+				t_stats.addEvent(1.0,TimeStats.EVENT_FLEE_ATTEMPT);
+			}
+			
+			if(disp) Game.MW.addLog(String.format(Local.TRY_TO_FLEE,name,p2.name,t_att));
 			if(Math.random() < chance_fuite())
 			    {
-				if(disp) Game.MW.addLog(String.format("   Succés de la fuite (%.2f%% de probabilité))",100*chance_fuite()));
+				if(disp) Game.MW.addLog(String.format(Local.FLEE_SUCCESS,100*chance_fuite()));
+				if(real) t_stats.addEvent(1.0,TimeStats.EVENT_FLEE_SUCCESS);
 				has_flee = true;
 				break;
 			    }
 			else
 			    {
-				if(disp) Game.MW.addLog(String.format("   Échec de la fuite (%.2f%% de probabilité))",100-100*chance_fuite()));
+				if(disp) Game.MW.addLog(String.format(Local.FLEE_FAIL,100-100*chance_fuite()));
 			    }
 		    }
 		else
 		    {
-			tmp = t1.cogne(t2);
+			tmp = t1.cogne(t2, (real && this == t1));
 			if(disp) Game.MW.addLog(tmp);
 		    }
-		if(real) personal_wait(temps-tmp_temps,TimeStats.ACTIVITY_COGNE);
+		if(real && this == t1) 
+		{
+			personal_wait(temps-tmp_temps,TimeStats.ACTIVITY_COGNE);
+			t_stats.addEvent(1.0,TimeStats.EVENT_ATTACK_ATTEMPT);
+		}
+		
 		tmp_temps = temps;
 		if(temps < p2.temps) {t1=this; t2=p2;}
 		else {t1=p2; t2=this;}
@@ -950,14 +1007,15 @@ public class Player implements Serializable {
 	if(vie() >0) // victoire ou fuite
 	    {
 		if(has_flee){
-		    if(disp) Game.MW.addLog(String.format("%s fuit face à %s (temps du combat %.3f secondes, vie restante %.3f)",name,p2.name,temps,vie()));
+		    if(disp) Game.MW.addLog(String.format(Local.END_FIGHT_FLEE,name,p2.name,temps,vie()));
 		    lost = true;
 		}
 		else{
-		    if(disp) Game.MW.addLog(String.format("%s tue %s (temps du combat %.3f secondes, vie restante %.3f)",name,p2.name,temps,vie()));
+		    if(disp) Game.MW.addLog(String.format(Local.END_FIGHT_KILL,name,p2.name,temps,vie()));
 			if(real)
 			{
-				gain_xp((int)Math.pow(100*p2.level,0.85), 0, p2.level);
+				t_stats.addEvent(1.0,TimeStats.EVENT_FIGHT_SUCCESS);
+				gain_xp(Math.pow(100*p2.level,0.85), 0, p2.level);
 				loot((Monster)p2);
 			}
 		    lost = false;
@@ -965,8 +1023,12 @@ public class Player implements Serializable {
 	    }
 	else
 	    {
-		if(disp) Game.MW.addLog(String.format("%s est tombé face à %s de niveau %d (temps du combat %.3f secondes)",name,p2.name,p2.level,temps));
-		if(real) meurt(disp);
+		if(disp) Game.MW.addLog(String.format(Local.END_FIGHT_DEATH,name,p2.name,p2.level,temps));
+		if(real) 
+		{
+			t_stats.addEvent(1.0,TimeStats.EVENT_FIGHT_DEATH);
+			meurt();
+		}
 		lost = true;
 	    }
 	temps = 0;
@@ -986,18 +1048,30 @@ public class Player implements Serializable {
     public void loot(Monster p2)
     {
 	ArrayList<Item> loot = p2.drop(this);
-	double fric = Math.random() * universe.gold_drop(p2.level) * multiplicateur_or();
+	double fric = universe.plage_random() * universe.gold_drop(p2.level) * multiplicateur_or();
+
 	if(fric < 1.0) fric = 0;
 	if (loot.isEmpty() && fric <= 0.1) 
-	    Game.MW.addLog(String.format("Pas de butin sur %s", p2.name));
+		{if(disp) Game.MW.addLog(String.format(Local.NO_LOOT, p2.name));}
 	else
 	    {
 		money_gain(fric, TimeStats.GAIN_DROP);
-		Game.MW.addLog(String.format("Vous ramassez %.2f écus sur le cadavre de %s", fric, p2.name));
+		if(disp) Game.MW.addLog(String.format(Local.GOLD_LOOT, fric, p2.name));
 		String lootStr = "";
 		String dontLootStr = "";
 		for(Item the_object : loot)
 		    {
+			if(the_object.rare == 0) 
+				t_stats.addEvent(1.0,TimeStats.EVENT_DROP_NORMAL);
+			else if(the_object.rare == 1) 
+				t_stats.addEvent(1.0,TimeStats.EVENT_DROP_MAGIC);
+			else if(the_object.rare == 2) 
+				t_stats.addEvent(1.0,TimeStats.EVENT_DROP_RARE);
+			else if(the_object.rare == 4 || the_object.rare == 5) 
+				t_stats.addEvent(the_object.qty,TimeStats.EVENT_DROP_MAT);
+			else if(the_object.rare == 6) 
+				t_stats.addEvent(the_object.qty,TimeStats.EVENT_DROP_ORB);
+			
 			if (the_object.poids < charge_max()-charge && pickupCond(the_object))
 			    {
 				if(lootStr != "") lootStr += ", ";
@@ -1011,27 +1085,34 @@ public class Player implements Serializable {
 				dontLootStr += NameGenerator.firstCharLowercase(the_object.name);
 				}
 		    }
-		if(lootStr != "")
-			Game.MW.addLog(String.format("Vous ramassez %s sur le cadavre de %s",lootStr, p2.name));
-		if(dontLootStr != "")
-			Game.MW.addLog(String.format("Vous abandonnez %s", dontLootStr));
+		if(lootStr != "" && disp)
+			Game.MW.addLog(String.format(Local.ITEMS_LOOT,lootStr, p2.name));
+		if(dontLootStr != "" && disp)
+			Game.MW.addLog(String.format(Local.OBJECTS_LEFT_BEHIND, dontLootStr));
 	    }
 		
 	double nec = necrophagie()*p2.vie_max();
 	if(nec > 0.05)
 		{
-		Game.MW.addLog(String.format("Vous dévorez le cadavre de %s et récupérez %f points de vie", p2.name,nec));
+		if(disp) Game.MW.addLog(String.format(Local.NECROPHAGY, p2.name,nec));
 		vie = Math.min(vie_max(),vie+nec);
 		}
     }
 
-    public void meurt(boolean disp)
+    public void meurt()
     {
+	double pen_reduc = penalty_reduction();
 	double res = temps_res();
-	double perte = money*universe.gold_death_penalty();
-	if(disp) Game.MW.addLog(String.format("%s perd %.1f%% de son or (%.3f)", name, 100*universe.gold_death_penalty(), perte));
-	if(disp) Game.MW.addLog(String.format("Résurrection : %.3f secondes",res));
+	double perte = money*universe.base_gold_penalty_for_death()*pen_reduc;
+	
+	if(disp) Game.MW.addLog(String.format(Local.DEATH_GOLD_LOSS, name, pen_reduc, 100*universe.base_gold_penalty_for_death(), perte));
 	money -= perte;
+	
+	double bp = universe.base_penalty_for_death();
+	if(disp) Game.MW.addLog(String.format(Local.DEATH_TIME_PENALTY, bp*pen_reduc, pen_reduc,bp));
+	personal_wait(bp*pen_reduc,TimeStats.ACTIVITY_PENALTY);
+		
+	if(disp) Game.MW.addLog(String.format(Local.RESURRECTION_TIME,res));
 	vie = vie_max();
 	personal_wait(res,TimeStats.ACTIVITY_RESURRECTION);
     }
@@ -1049,12 +1130,12 @@ public class Player implements Serializable {
 	if (hp_tg > 0.001)
 	    {
 		vie = vie_max();
-		Game.MW.addLog(String.format("Récupération de %.3f points de vie en %.3f secondes",hp_tg,res));
+		if(disp) Game.MW.addLog(String.format(Local.FULL_HEAL,hp_tg,res));
 		personal_wait(res,TimeStats.ACTIVITY_HEAL);
 	    }
     }
 
-    public int next_level()
+    public double next_level()
     {
 	return xp_level(level+1);
     }
@@ -1069,35 +1150,37 @@ public class Player implements Serializable {
 		return false;
     }
 
-    public int xp_level(int x)
+    public double xp_level(int x)
     {
 	if (x==1) return 0;
-	return 1000+((x-1)*(x-2)*1000);
+	return 1000.0+((x-1.0)*(x-2.0)*1000.0);
     }
 
 
-    public void gain_xp(int sx,int type, int gainLevel)
+    public void gain_xp(double sx,int type, int gainLevel)
     {
-	int x = (int)(sx*bonus_xp()*modif_exp_lvl(gainLevel-level));
+	double x = Math.floor(sx*bonus_xp()*modif_exp_lvl(gainLevel-level));
 	int levelback=level;
 	xp_pt+=x;
 	t_stats.addXp((double)x, type);
-	Game.MW.addLog(String.format("%s reçoit %d points d'expérience (%d × %.2f × %.2f).",
-		name,x,sx,bonus_xp(),modif_exp_lvl(gainLevel-level)));
+	if(disp) Game.MW.addLog(String.format(Local.EARN_EXPERIENCE,name,x,sx,bonus_xp(),modif_exp_lvl(gainLevel-level)));
 	while(xp_pt>=next_level())
 	    {
 		level++;
-		Game.MW.addLog(name + " passe au niveau " + level + ".");
-		refresh();
 	    }
+	
 	if(levelback != level)
-	    Game.MW.DistWindow.refresh();
+		{
+		refresh();
+	    if(disp) Game.MW.addLog(String.format(Local.LEVEL_UP,name,levelback,level));
+		if(disp) Game.MW.DistWindow.refresh();
+		}
     }
 
     public void split(Item i)
     {
 	i.set_qty(i.qty/2);
-	Item rit = new Item(i.material,StaticItem.RESSOURCE_CRAFT);
+	Item rit = new Item();
 	rit.copy(i);
 	rit.update();
 	inventory.add(rit);
@@ -1106,29 +1189,84 @@ public class Player implements Serializable {
 
 	public void craft()
 	{
-		double tt = plage_random()*temps_craft();
+		if (craftInventory.size() == 0) return;
+
+		ArrayList<Item> rlist = new ArrayList<Item>();
+		double time = Item.CraftItem(craftInventory, rlist, this);
+		craftInventory = rlist;
+		double tt = time*temps_craft();
 		personal_wait(tt,TimeStats.ACTIVITY_CRAFT);
-		if (craftInventory.size() == 1) 
-		{ 
-			Game.MW.addLog(String.format("Recyclage de : %s (%.3f secondes)",craftInventory.get(0).name,tt));
-		}
-		else
-		{
-			String rstring = "Combinaison de : ";
-			for(int i=0; i< craftInventory.size(); i++)
-			{
-				rstring += craftInventory.get(i).name;
-				if (i< craftInventory.size()-1) rstring+= ", ";
-			}
-			Game.MW.addLog(String.format("%s (%.3f secondes)",rstring,tt));
-		}
-		if (craftInventory.size() > 0) 		
-			craftInventory = Item.CraftItem(craftInventory, this);
+		t_stats.addEvent(1.0,TimeStats.EVENT_CRAFT);
 	}
 
+	public void changer_defi()
+	{
+		
+		double bp = universe.base_penalty_for_new_challenge();
+		double pen_reduc = penalty_reduction();
+		if(disp) Game.MW.addLog(String.format(Local.CHALLENGE_CHANGE, bp*pen_reduc, pen_reduc,bp));
+		personal_wait(bp*pen_reduc,TimeStats.ACTIVITY_PENALTY);
+		jeu_fini = false;
+	}
+	
+	public void victory()
+	{
+		jeu_fini = true;
+		if(disp) Game.MW.addLog(String.format(Local.TIME_PASSED,temps_total));
+		Game.HI = HiScore.loadScore();
+		Game.HI.addScore(new Score(defi.name,name,temps_total,universe.seed),disp);
+	}
+	
+	public void end_game()
+	{
+		if (jeu_fini)
+		{
+			if(disp) Game.MW.addLog(Local.YOU_HAVE_ALREADY_FINISHED_THE_GAME);
+		}
+		else if(defi.isCond() && defi.isTrue(this,disp))
+		{
+			victory();
+		}
+		else if(!defi.isCond())
+		{
+			if(disp) Game.MW.infight = true;
+			Thread thread = new Thread() {
+				public void run() {
+					mob = new Monster(defi.boss_name, defi.boss_level, defi.boss_tag, defi.boss_p_stats, universe);
+					if(disp) Game.MW.refreshButtons();
+					
+					if(!combat(true)) 
+						{
+							if(disp) Game.MW.addLog(Local.YOU_HAVE_DEFEATED_THE_FINAL_BOSS);
+							victory();
+						}
+					heal();
+					if(disp) Game.MW.infight = false;
+					if(disp) Game.MW.refreshButtons();
+				}};
+			thread.start();
+		}
+	}
+	
+	public void changer_univers()
+	{
+		Universe new_u = new Universe(universe.seed+1);
+		new_u.joueur = this;
+		new_u.number_of_travel = universe.number_of_travel+1;
+		universe = new_u;
+		zone = 0;
+		Monster.SetOptimalDistribution(universe);
+		StaticItem.init(universe);
+
+		double bp = universe.base_penalty_for_travel();
+		double pen_reduc = penalty_reduction();
+		if(disp) Game.MW.addLog(String.format(Local.UNIVERSE_CHANGE, bp*pen_reduc, pen_reduc,bp));
+		personal_wait(bp*pen_reduc,TimeStats.ACTIVITY_PENALTY);
+	}
+	
 public void reset_build()
     {
-	Game.MW.addLog("Redistribution des points de compétence");
+	Game.MW.addLog(Local.RESET_BUILD);
 	for(int i=0; i<nb_stats; i++) stats[i]=0; 
 	Game.MW.DistWindow.refresh();
     }

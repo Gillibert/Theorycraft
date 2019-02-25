@@ -402,16 +402,17 @@ public String fort(boolean m)
 // Optimal build tools
 
 
-public static double EstimateMonsterVictory(Player p)
+public static double EstimateMonsterVictory(Player p, double nbsample)
 {
 	int mob_victory = 0;
-	for(int i=0; i<10000;i++)
+	for(int i=0; i<nbsample;i++)
 		{
 		p.refresh();
 		p.mob.refresh();
-		if(p.combat(false,false)) mob_victory++;
+		p.disp = false;
+		if(p.combat(false)) mob_victory++;
 		}
-	return mob_victory/10000.0;
+	return mob_victory/nbsample;
 }
 
 // IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7) VDV(8) VITA(9) CON(10)
@@ -457,7 +458,7 @@ public static double ImproveMonster2(Player p,double best_mob_victory,double fin
 				p.mob.stats[target[idx]] += pts;
 			}
 			//double mob_victory = 0.0;
-			double mob_victory = EstimateMonsterVictory(p);
+			double mob_victory = EstimateMonsterVictory(p,1000);
 			
 			if (mob_victory > best_mob_victory) 
 			{
@@ -514,7 +515,7 @@ public static double ImproveMonster(Player p,double best_mob_victory,double fine
 			p.mob.stats_with_bonus[stat_dec]-= pts;
 			p.mob.stats_with_bonus[stat_inc]+= pts;
 			
-			double mob_victory = EstimateMonsterVictory(p);
+			double mob_victory = EstimateMonsterVictory(p,1000);
 			if (mob_victory > best_mob_victory) 
 			{
 			best_mob_victory = mob_victory;
@@ -730,7 +731,7 @@ public static void GetOptimumKiller(Player p)
 	for(int i=0; i<nb_stats; i++)
 		coeff_std[i] = mob.stats[i] / nb_pts_ref;
 	
-	//double best_mob_victory = EstimateMonsterVictory(p);
+	//double best_mob_victory = EstimateMonsterVictory(p,1000);
 	//System.out.println("\nInitial mob victory = " + 100*best_mob_victory + "%");
 	
 	/*for(int i=0; i<nb_stats; i++)

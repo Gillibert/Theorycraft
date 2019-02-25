@@ -5,8 +5,8 @@ class Item implements Serializable {
 public String name;
 public String white_name;
 public int rare; // rareté
-public int pos; // position sur le corps, compris entre 0 et 13
-				// (14 pour les ressources)
+public int pos; // position sur le corps, compris entre 0 et 14
+				// (15 pour les ressources)
 				
 public double bonus[]; // bonus
 public int ilvl; // niveau de l'objet
@@ -21,33 +21,33 @@ public double qty;
 
 public String item_description(Player p)
   {
-  String res = name;
-  res +=  String.format("\nType : %s (%s)\n",StaticItem.Rarete[rare],rare);
-  if (rare>0 && !stackable) res += "\nBase : " + NameGenerator.firstCharLowercase(white_name);
-  res += String.format("\nNiveau effectif : %d",effectiveIlvl());
+  String res = name + "\n";
+  res +=  String.format(Local.TYPE_VAL,StaticItem.Rarete[rare],rare);
+  if (rare>0 && !stackable) res += String.format(Local.BASE_VAL,NameGenerator.firstCharLowercase(white_name));
+  res += String.format(Local.EFFECTIVE_LEVEL_VAL,effectiveIlvl());
   if (!stackable) 
 	{
 	int nb_ench = nb_ench();
-	res += String.format("\nEmplacement : %s",NameGenerator.firstCharLowercase(StaticItem.Emplacement[pos]));
-	if(Math.abs(quality)>0.0001) res += String.format("\nQualité : %.2f%%",quality*100);
-	res += String.format("\nEfficacité : %.1f (%d×%.2f)",ilvl*material.coeffEfficacite,ilvl,material.coeffEfficacite);
-	res += String.format("\nEnchantement : %.1f (%d×%.2f)",elvl*material.coeffLevel,elvl,material.coeffLevel);
-	if(nb_ench > 0) res += String.format("\nNombre d'enchantements : %s",nb_ench);
-	if(nb_ench > 1) res += String.format("\nBonus compétence : %.1f points",nb_pts());
+	res += String.format(Local.SLOT_VAL,NameGenerator.firstCharLowercase(StaticItem.Emplacement[pos]));
+	if(Math.abs(quality)>0.0001) res += String.format(Local.QUALITY_VAL,quality*100);
+	res += String.format(Local.EFFICIENCY_VAL,ilvl*material.coeffEfficacite,ilvl,material.coeffEfficacite);
+	res += String.format(Local.ENCHANTMENT_VAL,elvl*material.coeffLevel,elvl,material.coeffLevel);
+	if(nb_ench > 0) res += String.format(Local.NUMBER_OF_ENCHANTMENTS_VAL,nb_ench);
+	if(nb_ench > 1) res += String.format(Local.SKILL_BONUS_VAL,nb_pts());
 	}
-  if (stackable)  res +=  String.format("\nQuantité : %.4f",qty);
-  res += String.format("\nPoids : %.3f kilogrammes",poids);
-  res += String.format("\nPrix réel : %.2f écus",prix());
-  res += String.format("\nPrix de vente : %.2f écus",prix()*p.coeff_vente());
-  res += String.format("\nPrix d'achat : %.2f écus\n",prix()*p.coeff_achat());
+  if (stackable)  res +=  String.format(Local.QUANTITY_VAL,qty);
+  res += String.format(Local.WEIGHT_VAL,poids);
+  res += String.format(Local.REAL_PRICE_VAL,prix());
+  res += String.format(Local.SELLING_PRICE_VAL,prix()*p.coeff_vente());
+  res += String.format(Local.PURCHASE_PRICE_VAL,prix()*p.coeff_achat());
 
  if(rare == 4 || rare == 5)
       {
-	  res+=String.format("\nFamille : %s",StaticItem.MaterialFamily[material.type]);
-	  res+=String.format("\nCoefficient de poids : %.2f",material.coeffPoids);
-	  res+=String.format("\nCoefficient de prix : %.2f",material.coeffPrix);
-	  res+=String.format("\nCoefficient d'efficacité : %.2f",material.coeffEfficacite);
-	  res+=String.format("\nCoefficient magique : %.2f",material.coeffLevel);
+	  res+=String.format(Local.FAMILY_VAL,StaticItem.MaterialFamily[material.type]);
+	  res+=String.format(Local.WEIGHT_COEFFICIENT_VAL,material.coeffPoids);
+	  res+=String.format(Local.PRICE_COEFFICIENT_VAL,material.coeffPrix);
+	  res+=String.format(Local.EFFICIENCY_COEFFICIENT_VAL,material.coeffEfficacite);
+	  res+=String.format(Local.ENCHANTMENT_COEFFICIENT_VAL,material.coeffLevel);
       }
 
   if(bonus != null)
@@ -55,9 +55,9 @@ public String item_description(Player p)
 	  if (bonus(i)>0)
 	      {
 			if(bonus(i) >= 100)
-		  		res += String.format("\n%s +%.0f",Player.stats_name[i],bonus(i));
+		  		res += String.format("%s +%.0f\n",Player.stats_name[i],bonus(i));
 			else
-				res += String.format("\n%s +%.2f",Player.stats_name[i],bonus(i));
+				res += String.format("%s +%.2f\n",Player.stats_name[i],bonus(i));
 	      }
   return res;
   }
@@ -72,7 +72,7 @@ public String item_description(Player p)
 	return (int)(elvl*material.coeffLevel);
     }
 
-    // Fabrique une ressource
+    // Create a ressource
     public Item(Material m, int MODE)
     {
 	// Création de base
@@ -81,17 +81,14 @@ public String item_description(Player p)
 	quality = 0;
 	pos = 15;
 	material = m;
-    ilvl = 10;
 	bonus = null;
 
 	// Création à partir du craft ou pour les ressources statiques
-	int r = 4;
-	if (MODE == StaticItem.RESSOURCE_PRIM) {r=5; ilvl=3*ilvl;}
-	if(m.type == 5) {r=6; ilvl+=20;}
-	rare = r;
-	
-	if(MODE == StaticItem.RESSOURCE_CRAFT) qty = 0.5*Math.random()+0.1;
-	else qty = 1.0;
+	if (MODE == StaticItem.RESSOURCE_ELEM) {rare = 4; ilvl=10;}
+	if (MODE == StaticItem.RESSOURCE_PRIM) {rare = 5; ilvl=30;}
+	if (MODE == StaticItem.RESSOURCE_ORB) {rare = 6; ilvl=50;}
+
+	qty = 1.0;
       
 	update();
     }
@@ -127,7 +124,7 @@ public String item_description(Player p)
 	    {
 		name = NameGenerator.firstCharUppercase(material.name);
 		if(rare == 5)
-			name = name + " alchimique";
+			name = String.format(Local.ALCHEMICAL,name);
 	    }
 	else
 	    {
@@ -135,9 +132,9 @@ public String item_description(Player p)
 		if(rare == 0)
 		    name = white_name;
 		else if (rare == 1)  
-		    name = NameGenerator.firstCharUppercase(baseItem.name) + " " + StaticItem.nameGenerator.getNameOf();
+		    name = StaticItem.nameGenerator.getNameOf(baseItem.name);
 		else if (rare == 2 || rare == 3) 
-		    name = NameGenerator.firstCharUppercase(StaticItem.rare_name()) + " " + StaticItem.nameGenerator.getNameOf();
+		    name = StaticItem.nameGenerator.getNameOf(StaticItem.rare_name());
 	    }
     }
 
@@ -193,7 +190,7 @@ static public Item get_ressouce_base(int il)
 	int obj_lev = Math.min(StaticItem.max_level-1,il);
 	if(Math.random() < il/2000.0 && il >= 50)
 	{
-		return new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_ELEM);
+		return new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_ORB);
 	}
 	else
 	{
@@ -235,6 +232,7 @@ public Item get_normal_base(int il)
 	return res;
 }
 
+ 
     // sert à remplir l'inventaire d'un marchand
     public Item(int niveau)
     {
@@ -266,34 +264,38 @@ static class ComparateurItem implements Comparator<Item> {
 	} 
 } 
 
-    public static double randomInInterval(Random rg, double i, double j)
+    public static double randomInInterval(Random rg, double i, double j, double coeff)
     {
 	double start = Math.min(i,j);
-	double end = Math.max(i,j);
+	double end = Math.max(i,j)*coeff;
 	return rg.nextDouble()*(end-start)+start;
     }
 
 
-   public static Material materialFusion(ArrayList<Material> LI)
+   public static Material materialFusion(ArrayList<Material> LI, Player p)
     {
 	Collections.sort(LI, new ComparateurMaterial());
 	Material a = LI.get(0);
 	Material b = LI.get(1);
 	Material c = LI.get(2);
 
-	int hash = (a.name + b.name + c.name).hashCode();
+	int hash = (a.name + b.name + c.name + p.universe.seed).hashCode();
 	
     Random rg = new Random(hash);
 	String an = StaticItem.matNameGenerator.getMatName(hash);
-	String n =  "Alliage "+ an;
-	String no = "d'alliage " + an;
-	int ty = 4;
-	double cpo = randomInInterval(rg,a.coeffPoids,b.coeffPoids);
-	double cpr = randomInInterval(rg,a.coeffPrix,b.coeffPrix);
-	double sol = randomInInterval(rg,a.coeffSolidite,b.coeffSolidite);
-	double eff = randomInInterval(rg,a.coeffEfficacite,b.coeffEfficacite);
-	double clvl = randomInInterval(rg,a.coeffLevel,b.coeffLevel);
-
+	String n =  String.format(Local.ALLOY,an);
+	String no = String.format(Local.OF_ALLOY,an);
+	int ty = 5;
+	double cpo, cpr, sol, eff, clvl;
+	double coeff = 1.1;
+	if(a.type == 5 || b.type == 5) coeff = 1.0;
+	
+	cpo = randomInInterval(rg,a.coeffPoids,b.coeffPoids,coeff);
+	cpr = randomInInterval(rg,a.coeffPrix,b.coeffPrix,coeff);
+	sol = randomInInterval(rg,a.coeffSolidite,b.coeffSolidite,coeff);
+	eff = randomInInterval(rg,a.coeffEfficacite,b.coeffEfficacite,coeff);
+	clvl = randomInInterval(rg,a.coeffLevel,b.coeffLevel,coeff);
+	
 	Material res = new Material(n, no, ty, cpo, cpr, sol, eff, clvl);
 	return res;
 	}
@@ -305,12 +307,109 @@ static class ComparateurItem implements Comparator<Item> {
 		update();
 	}
 
-	public static ArrayList<Item> CraftItem(ArrayList<Item> LI, Player p)
+	public static String CraftDesc(Player p)
+	{
+	double orb_unit = p.economie_orbe();
+	double rendement = p.rendement();
+	
+	String res = "";
+	res += "<b>Un objet normal ou magique, seul</b>";
+	res += String.format("<br>Recycle un objet sous forme de ressources élémentaires. Un objet de qualité peut parfois produire un orbe d'augmentation. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+	
+	res += "<br><br><b>Un objet rare ou légendaire, seul</b>";
+	res += String.format("<br>Recycle un objet sous forme d'orbes. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+	
+	res += "<br><br><b>Une ressource élémentaire ou primordiale (quantité quelconque)</b>";
+	res += String.format("<br>Produit une nouvelle ressource élémentaire de niveau inférieur à celle fournie. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+	
+	res += String.format("<br><br><b>%.2f orbe d'évolution ou orbe d'augmentation</b>",orb_unit);
+	res += String.format("<br>Donne %.2f points d'expérience au joueur.",5000*rendement);
+	
+	res += String.format("<br><br><b>%.2f orbe de transfert ou orbe de transmutation</b>",orb_unit);
+	res += "<br>Permet de redistribuer tous les points de compétence.";
+
+	res += "<br><br><b>Une quantité quelconque d'orbes de deux types</b>";
+	res += String.format("<br>Produit un nouvel orbe aléatoire. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+	
+	res += String.format("<br><br><b>Une ressource (quantité quelconque) et %.2f orbe de transmutation</b>",orb_unit);
+	res += String.format("<br>Produit une nouvelle ressource élémentaire ou primordiale suivant le type de la ressource de départ. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+
+	res += String.format("<br><br><b>Un objet normal, magique, rare ou légendaire et %.2f orbe de transmutation</b>",orb_unit);
+	res += "<br>Tire de nouvelles valeurs aléatoires pour les enchantements en fonction du niveau d'enchantement l'objet.";
+	
+	res += String.format("<br><br><b>Une ressource (quantité quelconque) et %.2f orbe d'augmentation</b>",orb_unit);
+	res += String.format("<br>Augmente la quantité de ressource. Il y a conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+	
+	res += String.format("<br><br><b>Un objet normal, magique, rare ou légendaire et %.2f orbe d'augmentation</b>",orb_unit);
+	res += String.format("<br>Augmente la qualité de l'objet de %.2f%% dans la limite des %.2f%%.",100*0.05*p.rendement(),100*0.50*p.rendement());
+	
+	res += String.format("<br><br><b>Une ressource (quantité quelconque) et %.2f orbe de transfert ou d'évolution</b>",orb_unit);
+	res += String.format("<br>Transforme la ressource en ressource primordiale. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+	
+	res += String.format("<br><br><b>Un objet normal, magique ou rare et %.2f orbe d'évolution</b>",orb_unit);
+	res += "<br>Ajoute un enchantement à l'objet, dans la limite des 5 enchantements.";
+	
+	res += String.format("<br><br><b>Un objet magique, rare ou légendaire et %.2f orbe de transfert</b>",orb_unit);
+	res += "<br>Change la cible des enchantements de l'objet sans changer leur puissance.";
+	
+	res += String.format("<br><br><b>Deux objets normaux, magiques ou rares</b>");
+	res += String.format("<br>Tire un nouvel objet aléatoire. Le niveau des enchantements est le minimum des niveaux des enchantements des objets placés. Le matériau est tiré au hasard parmi les matériaux des deux objets placés. La base de l'objet est tirée au hasard parmi les bases des deux objets placés. Enfin le type est le minimum des types des objets placés, donc il faut deux objets rares pour obtenir un objet rare. Si la famille de matériau ne colle pas à la base de l'objet, il reçoit une pénalité d'efficacité comprise entre %.2f%% et %.2f%%.",
+	100 * p.penalty_for_bad_material()*(1.0 - 0.5 * p.universe.static_plage_random()),
+	100 * p.penalty_for_bad_material()*(1.0 + 0.5 * p.universe.static_plage_random()));
+
+	res += String.format("<br><br><b>Un objet normal, magique, rare ou légendaire et %.2f ressource primordiale</b>",orb_unit);
+	res += String.format("<br>Change la nature du matériau de l'objet en fonction de la ressource fournie. Si la famille de matériau n'est pas la bonne, l'objet reçoit une pénalité d'efficacité comprise entre %.2f%% et %.2f%%.",
+	100 * p.penalty_for_bad_material()*(1.0 - 0.5 * p.universe.static_plage_random()),
+	100 * p.penalty_for_bad_material()*(1.0 + 0.5 * p.universe.static_plage_random()));
+
+	res += "<br><br><b>Trois matériaux différents</b>";
+	res += String.format("<br>Crée un alliage a partir des propriétés de deux des trois matériaux, le troisième servant de catalyseur. Un alliage peut avoir un coefficient de poids, de prix, d'efficacité ou magique jusqu'à 10%% supérieur au meilleur des deux matériaux pour le coefficient considéré. La même combinaison de matériaux donnera toujours le même alliage dans un univers donné. La quantité d'alliage est calculée pour qu'il y ait conservation du prix avec une perte de %.2f%%.",100*(1-rendement));
+
+	res += String.format("<br><br><b>Deux objets magiques, rares ou légendaires et %.2f orbe de transmutation</b>",orb_unit);
+	res += "<br>Transfert partiel des enchantements entre les deux objets : 20% des enchantements échangent leur place.";
+
+	res += String.format("<br><br><b>Deux objets magiques, rares ou légendaires et %.2f orbe de transfert</b>",orb_unit);
+	res += "<br>Transfert des enchantements entre les deux objets : 100% des enchantements échangent leur place.";
+
+	res += String.format("<br><br><b>Deux objets magiques, rares ou légendaires et %.2f orbe de fusion</b>",orb_unit);
+	res += String.format("<br>Fusion de deux objets. Un objet est détruit et %.2f%% de ses enchantements sont transférés vers l'autre.",0.5*rendement);
+
+	res += String.format("<br><br><b>Deux objets magiques, rares ou légendaires et %.2f orbe d'évolution</b>",orb_unit);
+	res += String.format("<br>Un des deux objets est choisi au hasard comme source, l'autre comme cible. L'efficacité de la cible est alignée sur %.2f%% de l'efficacité de la source.",100*rendement);
+
+	res += String.format("<br><br><b>Deux objets magiques, rares ou légendaires et %.2f orbe d'augmentation</b>",orb_unit);
+	res += String.format("<br>Un des deux objets est choisi au hasard comme source, l'autre comme cible. Le niveau d'enchantement de la cible est alignée sur %.2f%% du niveau d'enchantement de la source.",100*rendement);
+	
+	res += String.format("<br><br><b>%.2f orbes de chaque type</b>",p.universe.travel_cost()*orb_unit);
+	res += "<br>Permet au joueur de changer d'univers.";
+	
+	res += String.format("<br><br><b>N objets magiques, rares ou légendaires et N×%.2f orbes de fusion</b>",orb_unit);
+	res += String.format("<br>Fusionne tous les objets pour en créer un nouveau. Chaque enchantement a la même probabilité d'être conservé. Après fusion on a en moyenne (%.3f×E)<sup>0.584</sup> enchantements, où E est le nombre cumulé d'enchantement des objets fusionnés. Si deux enchantements de même cible sont conservés par le tirage aléatoire, c'est le plus puissant des deux qui est retenu.",rendement);
+	return res;
+	}
+
+	public static double CraftItem(ArrayList<Item> LI, ArrayList<Item> rlist, Player p)
 	{
 		Collections.sort(LI, new ComparateurItem());
-		ArrayList<Item> rlist = new ArrayList<Item>();
+		
 		double orb_unit = p.economie_orbe();
 		int lisize = LI.size();
+		double time = lisize*p.temps_craft()*p.universe.plage_random();
+		
+		if (lisize == 1) 
+		{ 
+			Game.MW.addLog(String.format("Recyclage de : %s (%.3f secondes)",LI.get(0).name,time));
+		}
+		else
+		{
+			String rstring = "Combinaison de : ";
+			for(int i=0; i< lisize; i++)
+			{
+				rstring += LI.get(i).name;
+				if (i< LI.size()-1) rstring+= ", ";
+			}
+			Game.MW.addLog(String.format("%s (%.3f secondes)",rstring,time));
+		}
 		
 		// ------------------------------------------------------------------
 		// Recyclage (1 objet)
@@ -324,13 +423,13 @@ static class ComparateurItem implements Comparator<Item> {
 				// (donne des ressources élémentaires ou un orbe d'augmentation dans le cas d'un objet de qualité)
 				if(Math.random() < a.quality)
 				{
-					tmp = new Item(StaticItem.ORB[4],StaticItem.RESSOURCE_CRAFT); // "orbe d'augmentation"
+					tmp = new Item(StaticItem.ORB[4],StaticItem.RESSOURCE_ORB); // "orbe d'augmentation"
 					tmp.aligner_qty(p, a.prix());
 					rlist.add(tmp);
 				}
 				else
 				{
-					tmp = new Item(a.material,StaticItem.RESSOURCE_CRAFT);
+					tmp = new Item(a.material,StaticItem.RESSOURCE_ELEM);
 					tmp.aligner_qty(p, a.prix());
 					rlist.add(tmp);
 				}
@@ -340,7 +439,7 @@ static class ComparateurItem implements Comparator<Item> {
 			{
 				// recyclage d'un rare ou d'un légendaire 
 				// (donne des orbes)
-				tmp = new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_CRAFT);
+				tmp = new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_ORB);
 				tmp.aligner_qty(p, a.prix());
 				rlist.add(tmp);
 				Game.MW.addLog(String.format("Vous obtenez %f %s",tmp.qty,tmp.name));
@@ -359,8 +458,7 @@ static class ComparateurItem implements Comparator<Item> {
 				// recyclage d'un orbe
 				if (a.name.equals("Orbe d'évolution") || a.name.equals("Orbe d'augmentation"))
 				{
-					int xp = (int)(5000 * p.rendement());
-					Game.MW.addLog(String.format("Vous obtenez %d points d'expérience",xp));	
+					double xp = 5000 * p.rendement();
 					p.gain_xp(xp, 2, p.level);
 				}
 				else if (a.name.equals("Orbe de transfert") || a.name.equals("Orbe de transmutation"))
@@ -399,8 +497,7 @@ static class ComparateurItem implements Comparator<Item> {
 			// nouvel orbe au hazard (conservation du prix)
 			if(a.rare == 6 && b.rare == 6)
 			{
-				mat = StaticItem.getRandomOrb();
-				res = new Item(mat,StaticItem.RESSOURCE_CRAFT);
+				res = new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_ORB);
 				res.aligner_qty(p, a.prix()+b.prix());
 				rlist.add(res);
 			}
@@ -415,8 +512,8 @@ static class ComparateurItem implements Comparator<Item> {
 				if((other.rare == 4 || other.rare == 5) && comp.name.equals("Orbe de transmutation")) 
 				{
 					mat = StaticItem.getRandomMat(); // tirer un mat non-orbe
-					res = new Item(mat,StaticItem.RESSOURCE_CRAFT);
-					res.rare = other.rare;
+					if(other.rare == 4) res = new Item(mat,StaticItem.RESSOURCE_ELEM);
+					if(other.rare == 5) res = new Item(mat,StaticItem.RESSOURCE_PRIM);
 					comp.set_qty(comp.qty-orb_unit);
 					res.aligner_qty(p, other.prix()+comp.prix_unitaire()*orb_unit);
 					rlist.add(res);
@@ -508,19 +605,19 @@ static class ComparateurItem implements Comparator<Item> {
 					res.transform_rare(p);
 
 				if ( res.material.type != res.baseItem.mat)
-					res.quality = -(0.20*Math.random()+0.40); // penality for bad material
+					res.quality = p.penalty_for_bad_material() * p.universe.plage_random();
 
 				res.update();
 				rlist.add(res);
 			}
 			// une ressource primordiale et un objet
 			// change la nature du matérieau de l'objet
-			else if(a.rare < 4 &&  b.rare == 5 && b.qty >= 1.0)
+			else if(a.rare < 4 &&  b.rare == 5 && b.qty >= orb_unit)
 			{
 				res = a;
 				res.material = b.material;
 				if ( res.material.type != res.baseItem.mat)
-					res.quality = -(0.20*Math.random()+0.20); // penality for bad material
+					res.quality = p.penalty_for_bad_material() * p.universe.plage_random();
 				res.update();
 
 				b.set_qty(b.qty-1.0);
@@ -549,11 +646,11 @@ static class ComparateurItem implements Comparator<Item> {
 				Item rit;
 				if(a.rare == 5) // les trois resources sont primordiales
 				{
-					rit = new Item(materialFusion(mats),StaticItem.RESSOURCE_PRIM);
+					rit = new Item(materialFusion(mats,p),StaticItem.RESSOURCE_PRIM);
 				}
 				else
 				{
-					rit = new Item(materialFusion(mats),StaticItem.RESSOURCE_CRAFT);
+					rit = new Item(materialFusion(mats,p),StaticItem.RESSOURCE_ELEM);
 				}
 				double prix = a.prix()+b.prix()+c.prix();
 				rit.aligner_qty(p, prix); 
@@ -566,6 +663,7 @@ static class ComparateurItem implements Comparator<Item> {
 				boolean delA=false;
 				boolean delB=false;
 				// 20% des enchantements échangent leur place
+				// (en fait, chaque enchantement a une probabilité P d'être transféré avec P=0.2)
 				if(c.name.equals("Orbe de transmutation"))
 				{
 					Game.MW.addLog("Transmutation de deux objets (20% des enchantements échangent leur place)");
@@ -665,18 +763,13 @@ static class ComparateurItem implements Comparator<Item> {
 					{
 					LI.get(idx).set_qty(LI.get(idx).qty-orb_unit*orb_cost);
 					}
-					Universe universe = new Universe(p.universe.seed+1);
-					universe.joueur = p;
-					universe.number_of_travel = p.universe.number_of_travel+1;
-					p.universe = universe;
-					p.zone = 0;
-					Monster.SetOptimalDistribution(universe);
-					StaticItem.init(universe);
+					p.changer_univers();
 				}
 			}
+			rlist.addAll(LI);
 		}
 		// Fusion de N objets avec N orbes de fusion
-		if(lisize > 3)
+		else if(lisize > 3)
 		{
 			Item last = LI.get(lisize - 1);
 			boolean allOk = true;
@@ -691,7 +784,7 @@ static class ComparateurItem implements Comparator<Item> {
 				}
 				totalNbEnch += theItem.nb_ench();
 			}
-			double orbcost = lisize*orb_unit;
+			double orbcost = (lisize-1)*orb_unit;
 			if (allOk && last.name.equals("Orbe de fusion") &&  last.qty >= orbcost)
 			{
 				double seuil = Math.pow(totalNbEnch*p.rendement(),0.584) / totalNbEnch;
@@ -715,10 +808,10 @@ static class ComparateurItem implements Comparator<Item> {
 			}
 			else
 			{
-				return LI;
+				rlist.addAll(LI);
 			}
 		}
-		return rlist;
+		return time;
 	}
 
     // Drop sur un monstre
@@ -794,7 +887,7 @@ public void transform_rare(Player p)
 		    }
 	    }
     }
-	private double nb_pts()
+	public double nb_pts()
 	{
 	double count = 0;
 	for(int i=0; i<Player.nb_stats; i++)

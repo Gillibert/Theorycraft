@@ -7,16 +7,17 @@ import java.io.ObjectOutputStream;
 import java.util.Random;
  
  public class Universe implements Serializable {
+	public NameGenerator nameGenerator;
 	public Player joueur;
 	public int seed;
 	public int number_of_travel;
 	private Equation[] equations;
 	private double[] constantes;
 	private boolean[] binVar;
-	
+	public Map map;
 	static private final long serialVersionUID = 42;
 	
-	// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
+    // IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
     // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14) 
     // RESF(15) MF(16) RF(17) QALF(18) QTYF(19) POWF(20) GF(21)
     // ED_MV(22) ED_ANI(23) ED_HUM(24) ED_PV(25) ED_DEM(26) ED_CHAMP(27)
@@ -24,6 +25,7 @@ import java.util.Random;
 	// EPIN(34) REP(35) NECRO(36) CRAFT_SPD(37) CRAFT_REND(38) ECO_ORB(39) 
 	// SHOP_LEVEL(40) SHOP_SIZE(41) TRAP_DET(42) TRAP_INIT(43) TRAP_RES(44)
 	// RENTE(45) EDUC(46) BONUS_XP(47) BONUS_LOWLEV(48) BONUS_HLEV(49)
+	// REDUC_PEN(50) ZONE_ACCESS (51)
 		
 	static int IAS = 0;
 	static int DMG = 1;
@@ -75,13 +77,15 @@ import java.util.Random;
 	static int BONUS_XP = 47;
 	static int BONUS_LOWLEV = 48;
 	static int BONUS_HLEV = 49;
-		
+	static int REDUC_PEN = 50;
+	static int ZONE_ACCESS = 51;
+	
 	public static double classic_att_per_sec(double IAS) {return Math.pow(IAS+10,0.50)-2.16227766017;}
     public static double classic_pv_per_vita(double CON) {return Math.pow(CON+10,0.40)-1.51188643151;}
     public static double classic_crit_proba(double LCK) {return (2.0+LCK)/(LCK+100.0)-0.01;}
     public static double classic_multi_crit(double CRT) {return Math.pow(CRT+5.0,0.6)-1.3265278;}
     public static double classic_dmg_base(double DMG) {return 1.2*Math.pow(DMG+0.7,0.7);}
-    public static double classic_reduc(double REDUC) {return 1.0/Math.sqrt(1.0+REDUC/4.0);}
+    public static double classic_reduc(double REDUC) {return 1.0/Math.sqrt(1.0+REDUC/8.0);}
     public static double classic_absorption(double ABS) {return Math.pow(ABS+7,0.80)/4.7432763938 -1.0;}
     public static double classic_esquive_proba(double ESQ,double PRC) {return (ESQ+20.0)/(ESQ+PRC+80.0);}
     public static double classic_vol_de_vie(double VDV) {return Math.pow(VDV,0.75)/(Math.pow(VDV,0.75)+300.0);}
@@ -109,7 +113,7 @@ import java.util.Random;
     public static double classic_epines(double EPIN) {return Math.pow(EPIN+6.0,0.75) - 3.833658625477634855132095;}
     public static double classic_represailles(double REP) {return 2.0-29.7560651784/Math.pow(90.0+REP,0.60);}
     public static double classic_necrophagie(double NECRO) {return Math.pow(NECRO+20,0.80)/20.0-0.54928027164;}
-    public static double classic_temps_craft(double CRAFT_SPD) {return 16.0 / Math.pow(CRAFT_SPD+7.0,0.70);}
+    public static double classic_temps_craft(double CRAFT_SPD) {return 16.0 / Math.pow(CRAFT_SPD+7.0,0.85);}
     public static double classic_rendement(double CRAFT_REND) {return 1.0 - 4.0/Math.pow(12.0+CRAFT_REND,0.90);}
     public static double classic_economie_orbe(double ECO_ORB) {return 9.14610103855/Math.pow(40.0+ECO_ORB,0.60);}
     public static double classic_niveau_boutique(double SHOP_LEVEL) {return 0.8*Math.pow(SHOP_LEVEL+10.0,0.50);}
@@ -124,13 +128,16 @@ import java.util.Random;
 		{return (1.0+BONUS_LOWLEV*0.02)/(-levdiff+BONUS_LOWLEV*0.02);}
 	public static double classic_modif_exp_hlev(double BONUS_HLEV, int levdiff)
 		{return (Math.pow((levdiff+1)*(BONUS_HLEV+100.0),0.3)/ 3.98107170553);}
-	public static double classic_gold_drop(double level){return Math.pow(level,1.5);}
+	public static double classic_gold_drop(double level){return Math.pow(level,1.4);}
 	public static double classic_boss_level(double level){return Math.pow(level,1.08)+1.0;}
+	public static double classic_penalty_reduction(double REDUC_PEN) {return 1.0/Math.sqrt(1.0+REDUC_PEN/10.0);}
+	public static double classic_zone_multiplier(double ZONE_ACCESS){return Math.pow(ZONE_ACCESS+180.0,0.60)/22.5508804726;}
 	
 	Universe(int sd)
 	{
 		number_of_travel = 0;
 		Random gen = new Random(sd);
+		gen.nextDouble();
 		constantes = new double[20];
 		binVar = new boolean[StaticItem.nb_pos-1];
 		seed = sd;
@@ -146,11 +153,16 @@ import java.util.Random;
 			constantes[1] = 0.05+gen.nextDouble()*0.45; // proba_rencontrer_piege;
 			constantes[2] = 0.05*(int)(4+gen.nextInt(7)); // puissance_ench_sup
 			constantes[3] = (int)(gen.nextInt(25)+10.0); // points_initiaux
-			constantes[4] = (gen.nextInt(23)+2)*0.01; // gold_death_penalty (proportion d'or perdu par mort)
+			constantes[4] = (gen.nextInt(23)+2)*0.01; // base_gold_penalty_for_death()
 			constantes[5] = 0.01*(gen.nextInt(18)+5.0); // proba_champion()
-			constantes[6] = (int)(gen.nextInt(500)+50); // cout voyage dimensionnel
-			
-			equations = new Equation[50];
+			constantes[6] = (int)(gen.nextInt(451)+50); // cout voyage dimensionnel
+			constantes[7] = 0.01*(gen.nextInt(76)+5.0); // plage_random()
+			constantes[8] = -(0.2+gen.nextDouble()*0.4); // penalty_for_bad_material()
+			constantes[9] = (int)(gen.nextInt(131)+20); // penalty_for_new_challenge()
+			constantes[10] = (int)(gen.nextInt(151)+10); // penalty_for_travel()
+			constantes[11] = 0.5+gen.nextDouble()*5.5; // penalty_for_death()
+				
+			equations = new Equation[53];
 			
 			equations[0] = new Equation(gen,1.0, true, 0); // att_per_sec
 			equations[1] = new Equation(gen,1.0, true, 0); // pv_per_vita
@@ -174,7 +186,7 @@ import java.util.Random;
 			equations[19] = new Equation(gen,0.01, 1.0, 0); // chance_rare
 			equations[20] = new Equation(gen,0.02, 1.0, 0); // chance_qualite
 			equations[21] = new Equation(gen,1.0, true, 0); // quantite_drop
-			equations[22] = new Equation(gen,0.1, constantes[2], 0); // puissance_ench_inf
+			equations[22] = new Equation(gen,0.1, constantes[2], 1); // puissance_ench_inf
 			equations[23] = new Equation(gen,1.0, true, 0); // multiplicateur_or
 			equations[24] = new Equation(gen,1.0, true, 0); // ed_specific_monster
 			equations[25] = new Equation(gen,0.1, 1.0, 1); // chance_fuite
@@ -185,36 +197,46 @@ import java.util.Random;
 			equations[30] = new Equation(gen,0.0, true, 1); // epines
 			equations[31] = new Equation(gen,0.0, 1.0+gen.nextDouble()*4.0, 0); // represailles
 			equations[32] = new Equation(gen,0.0, 1.0+gen.nextDouble()*4.0, 0); // necrophagie
-			equations[33] = new Equation(gen,1.0+gen.nextDouble()*4.0, 0.0, 1); // temps_craft
+			equations[33] = new Equation(gen,0.5+gen.nextDouble()*1.5, 0.0, 1); // temps_craft
 			equations[34] = new Equation(gen,0.4+gen.nextDouble()*0.5, 1.0, 1); // rendement
 			equations[35] = new Equation(gen,1.0, 0.0, 0); // economie_orbe
 			equations[36] = new Equation(gen,gen.nextInt(5), true, 1); // niveau_boutique	
-			equations[37] = new Equation(gen,1+gen.nextInt(5), true, 0); // taille_boutique
+			equations[37] = new Equation(gen,2+gen.nextInt(4), true, 0); // taille_boutique
 			equations[38] = new Equation(gen,0.0, true, 1); // detection_piege
 			equations[39] = new Equation(gen,1.0, true, 0); // bonus_initiative_piege
 			equations[40] = new Equation(gen,1.0, true, 0); // bonus_resistance_vs_piege
 			equations[41] = new Equation(gen,0.0, true, 1); // rente_par_seconde
-			equations[42] = new Equation(gen,3+gen.nextInt(7), true, 0); // points_par_niveau
+			equations[42] = new Equation(gen,4+gen.nextInt(7), true, 0); // points_par_niveau
 			equations[43] = new Equation(gen,1.0, true, 0); // bonus_xp
 			equations[44] = new Equation(gen,1.0, true, 0); // modif_exp_hlev
 			equations[45] = new Equation(gen,0.0, 1.0, 1); // modif_exp_lowlev
-			equations[46] = new Equation(gen,0.1, true, 2); // get_zone_level et get_zone_max_level
+			equations[46] = new Equation(gen,0.0, true, 2); // get_zone_level et get_zone_max_level
 			equations[47] = new Equation(gen,1.0, true, 2); // gold_drop
 			equations[48] = new Equation(gen,1.2, true, 3); // monster_level correction used in monster_points_for_level
 			equations[49] = new Equation(gen,1.1, true, 0); // boss_level (for champions)
+			equations[50] = new Equation(gen,1.0, true, 2); // used in traps_dmg_for_level
+			equations[51] = new Equation(gen,1.0, 0.0, 1); // penalty_reduction()
+			equations[52] = new Equation(gen,1.0, true, 0); // zone_multiplier()
 		}
 
 		if(seed == 0)
 		{
 			for(int i=0; i< StaticItem.nb_pos-1; i++) binVar[i] = true;
+			binVar[7] = false;
 			constantes[0] = 5.0; // vie de départ;
 			constantes[1] = 0.20; // proba_rencontrer_piege
 			constantes[2] = 0.25; // puissance_ench_sup
 			constantes[3] = 20; // points_initiaux
-			constantes[4] = 0.1; // gold_death_penalty (proportion d'or perdu par mort)
+			constantes[4] = 0.1; // base_gold_penalty_for_death()
 			constantes[5] = 0.1; // proba_champion()
 			constantes[6] = 100; // cout voyage dimensionnel
+			constantes[7] = 0.6; // plage_random (0.7 à 1.3)
+			constantes[8] = -0.4; // penalty_for_bad_material()
+			constantes[9] = 50; // penalty_for_new_challenge()
+			constantes[10] = 25; // penalty_for_travel()
+			constantes[11] = 2; // penalty_for_death()
 		}
+		map = new Map(gen,get_zone_level(14));
 		joueur = new Player(this,false);
 	}
 			
@@ -233,6 +255,10 @@ import java.util.Random;
     public double pv_per_vita(double x) {
 		if(seed==0) return classic_pv_per_vita(x);
 		return equations[1].eval(x);
+		}
+	
+	public double vie_depart() {
+		return constantes[0];
 		}
 		
     public double vie_max(double VITA, double CON) {
@@ -344,7 +370,7 @@ import java.util.Random;
 		return equations[22].eval(x);
 		}
 
-	public double puissance_ench_sup(double x) {
+	public double puissance_ench_sup() {
 		return constantes[2];
 		}
 		
@@ -473,13 +499,11 @@ import java.util.Random;
 		return constantes[3];
 		}
 		
-	public double gold_death_penalty(){
-		return constantes[4];
-	}
+	public double base_gold_penalty_for_death()
+	{ return constantes[4]; }
 	
-	public double proba_champion(){
-		return constantes[5];
-	}
+	public double proba_champion()
+	{ return constantes[5]; }
 	
 	public double proba_trouver_piege(double td, double hidden_lvl)
 	{
@@ -490,7 +514,7 @@ import java.util.Random;
 	public int get_zone_level(int zone)
 	{
 		if(seed==0) return 10*zone+1;
-		return (int)(equations[46].eval(zone)*10.0 + 0.5);
+		return (int)(equations[46].eval(zone)*10.0+1.0);
 	}
 	public int get_zone_max_level(int zone)
 	{
@@ -506,8 +530,8 @@ import java.util.Random;
 	
 	public double monster_points_for_level(double lvl)	
 	{
-		if(seed==0) return Math.pow(lvl,1.9)*0.15 + 5.0*lvl + 10.0;
-		return (equations[48].eval(lvl)*points_par_niveau(lvl) + points_initiaux());
+		if(seed==0) return Math.pow(lvl,1.9)*0.15 + 8.0*lvl + 10.0;
+		return (equations[48].eval(lvl)*points_par_niveau(2*lvl) + points_initiaux());
 	}
 	
 	public double boss_level(double lvl)	
@@ -516,84 +540,46 @@ import java.util.Random;
 		return lvl*equations[49].eval(lvl);
 	}
 	
-	public double travel_cost()
+	public double traps_dmg_for_level(double lvl)
 	{
-		return constantes[6];
+		if(seed==0) return 2.0+Math.pow(lvl*2.5,2.3)*0.03;
+		return (equations[50].eval(lvl)*lvl*0.5);
 	}
 	
-	public String infos(World monde)
-	{
-		String res = String.format("Univers %d"+
-			"\nNombre de voyages dimensionnels : %d"+
-			"\n\nConstantes de l'univers :"+
-			"\nVie de départ : %d"+
-			"\nPoints de compétences initiaux : %d"+
-			"\nPuissance maximale des enchantements : %.3f"+
-			"\nPénalité d'or à chaque mort : %.3f%%"+
-			"\nProbabilité de tomber sur un piège : %.3f%%"+
-			"\nProbabilité de tomber sur un champion : %.1f%%"+
-			"\nCoût d'un voyage dimensionnel : %d orbes de chaque type",
-			seed,
-			number_of_travel,
-			(int)constantes[0], // vie de départ;
-			(int)constantes[3], // points_initiaux
-			constantes[2], // puissance_ench_sup
-			100*constantes[4], // gold_death_penalty (proportion d'or perdu par mort)
-			100*constantes[1], // proba_rencontrer_piege;
-			100*constantes[5],  // proba_champion()
-			(int)constantes[6]  // cout voyage dimensionnel()
-			);
-			
-			int count = 0;
-			res += "\n\nObjets disponibles :\n";
-			for(int i=0; i< StaticItem.nb_pos-1; i++)
-			{
-				if(slot_est_disponible(i))
-				{
-					res += StaticItem.Emplacement[i] + ", ";
-					count++;
-				}
-				if(count > 6)
-				{
-					res += "\n";
-					count=0;
-				}
-			}
-			if(count==0) res = res.substring(0, res.length()-1);
-			res = res.substring(0, res.length()-2);
-			res += ".";
-			
-			res += "\n\nRépartition de base des points des monstres :\n";
-			for(int i=0; i< Player.nb_stats; i++)
-			{
-			if(Monster.coeff_std[i]>0.001)
-				res += String.format("%s : %.2f%% des points\n",Player.stats_name[i],100*Monster.coeff_std[i]);
-			}
-			
-			res += "\nInformations sur les zones :\n";
-			for(int i=0; i< 15; i++)
-			{
-			res += monde.zones[i].name + " (" + get_zone_level(i) + "-" + get_zone_max_level(i) + ")\n";
-			res += String.format("  Niveau des monstres : minimum %d (%.0f points), moyen %.2f (%.0f points), maximum %d (%.0f points)\n",get_zone_level(i),
-			monster_points_for_level(get_zone_level(i)),
-			(get_zone_level(i)+get_zone_max_level(i))/2.0,
-			monster_points_for_level((get_zone_level(i)+get_zone_max_level(i))/2.0),
-			get_zone_max_level(i),
-			monster_points_for_level(get_zone_max_level(i)));
-			res += String.format("  Niveau des champions : minimum %d (%.0f points), moyen %.2f (%.0f points), maximum %d (%.0f points)\n",
-			(int)boss_level(get_zone_level(i)),
-			monster_points_for_level((int)boss_level(get_zone_level(i)))*1.5,
-			(boss_level(get_zone_level(i))+boss_level(get_zone_max_level(i)))/2.0,
-			monster_points_for_level((boss_level(get_zone_level(i))+boss_level(get_zone_max_level(i)))/2.0)*1.5,
-			(int)boss_level(get_zone_max_level(i)),
-			monster_points_for_level((int)boss_level(get_zone_max_level(i)))*1.5);
-			}
-			
-		return res;
+	public double penalty_reduction(double x) {
+		if(seed==0) return classic_penalty_reduction(x);
+		return equations[51].eval(x);
 	}
+	
+	public double zone_multiplier(double x) {
+		if(seed==0) return classic_zone_multiplier(x);
+		return equations[52].eval(x);
+	}
+	
+	public double travel_cost()
+	{ return constantes[6]; }
+
+	double static_plage_random()
+    { return constantes[7]; }
+	
+	double plage_random()
+    { return 1.0 + (Math.random() - 0.5) * constantes[7]; }
+	
+	double penalty_for_bad_material()
+    { return constantes[8]; }
+	
+	double base_penalty_for_new_challenge()
+	{ return constantes[9]; }
+	
+	double base_penalty_for_travel()
+	{ return constantes[10]; }
+	
+	double base_penalty_for_death()
+	{ return constantes[11]; }
 	
 	public void save()
     {
+	System.out.println(Local.SAVING_GAME);
 	try{
 	    //use buffering
 	    OutputStream file = new FileOutputStream( joueur.name+".theory" );
@@ -605,7 +591,7 @@ import java.util.Random;
 	} 
 	catch(Exception ex){
 	    System.out.println(ex);
-	    System.out.println("Can't write in \"" + joueur.name +".theory\"");
+	    System.out.println(String.format(Local.CANT_WRITE,joueur.name));
 	}
     }
  }

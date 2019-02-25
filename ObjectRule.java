@@ -1,11 +1,11 @@
 import java.io.Serializable;
 import java.util.ArrayList;
 
-// meta_type 
-// type.addElement("Règle sur un objet");
-// type.addElement("Règle sur un monstre");
-// type.addElement("Règle composée");
-// type.addElement("Négation");
+// meta_type :
+// Règle sur un objet
+// Règle sur un monstre
+// Règle composée
+// Négation
 public class ObjectRule implements Serializable {
 
     public static int ITEM_RULE = 0;
@@ -48,7 +48,7 @@ public class ObjectRule implements Serializable {
 		case 2: return StaticItem.Emplacement;
 		case 15: return StaticItem.BaseItemNames;
 		case 16: return StaticItem.MaterialNames;
-		case 17: return YesOrNo;
+		case 17: return Local.RULE_NO_YES;
 	    default: 
 		return empty;
 	    }
@@ -64,74 +64,10 @@ public class ObjectRule implements Serializable {
 		return empty;
     }
 
-    public static String[] YesOrNo = {"non","oui"};
-    public static String[] RuleLogic = {"et","ou","non"};
-    public static String[] RuleOperator = {"=","<",">","≠"};
-    public static String[] RuleItemTypeName = 
-    {
-	"Type d'objet", // objet.rare
-	"Type de matériau", // objet.material.type
-	"Emplacement", // objet.pos 
-	"Qualité", // objet.quality 
-	"Poids", //objet.poids
-	"Prix réel", //objet.prix 
-	"Niveau effectif", // objet.effectiveIlvl()
-	"Efficacité",  // ilvl*material.coeffEfficacite
-	"Enchantement", // elvl*material.coeffLevel
-	"Efficacité de base", // objet.ilvl
-	"Enchantement de base",  // objet.elvl
-	"Coefficient de poids",  // material.coeffPoids
-	"Coefficient de prix",  // material.coeffPrix
-	"Coefficient d'efficacité",  // material.coeffEfficacite
-	"Coefficient magique",  // material.coeffLevel
-	"Nom de l'objet de base", // objet.baseItem.name
-	"Nom du matériau", // objet.material.name
-	"Equipé" // objet.equiped
-    };
-
-    public static String[] RuleMonsterTypeName = 
-    {
-	"Niveau", // level
-	"Type de monstre", // nom_base
-	"Famille", // type
-	"Attaques par seconde", // att_per_sec()
-	"Dégâts moyens d'une attaque basique", // dmg_base()
-	"Probabilité de coup critique (%)", // 100.0*crit_proba()
-	"Multiplicateur des coups critiques", // multi_crit(),
-	"Dégâts moyens d'une attaque", // dmpa
-	"Dégâts moyens par seconde", // att_per_sec()*dmpa
-	"Multiplicateur versus humains", // ed_versus_tag(2)
-	"Réduction des dégâts (%)", // 100.0-(100.0*reduc())
-	"Absorption des dégâts", //absorption()
-	"Points de vie actuels", // vie()
-	"Points de vie", // vie_max()
-	"Points de vie effectifs", // vie_max()/reduc()
-	"Dégats infligés aux attaquants", //epines()
-	"Dégats réfléchis sur les attaquants (%)" // 100*represailles()
-    };
-
-    public static String[] RulePlayerTypeName = 
-    {
-	"Niveau", // level
-	"Charge actuelle", // charge
-	"Charge restante", // charge_max()-charge
-	"Or transporté", // money
-	"Attaques par seconde", // att_per_sec()
-	"Dégâts moyens d'une attaque basique", // dmg_base()
-	"Probabilité de coup critique (%)", // 100.0*crit_proba()
-	"Multiplicateur des coups critiques", // multi_crit(),
-	"Dégâts moyens d'une attaque", // dmpa
-	"Dégâts moyens par seconde", // att_per_sec()*dmpa
-	"Multiplicateur versus humains", // ed_versus_tag(2)
-	"Réduction des dégâts (%)", // 100.0-(100.0*reduc())
-	"Absorption des dégâts", //absorption()
-	"Points de vie actuels", // vie()
-	"Points de vie", // vie_max()
-	"Points de vie effectifs", // vie_max()/reduc()
-	"Dégats infligés aux attaquants", //epines()
-	"Dégats réfléchis sur les attaquants (%)" // 100*represailles()
-    };
-
+	public static String[] RuleOperator = Local.RULE_OPERATOR;
+    public static String[] RuleItemTypeName = Local.RULE_ITEM_TYPE_NAME;
+    public static String[] RuleMonsterTypeName = Local.RULE_MONSTER_TYPE_NAME;
+    public static String[] RulePlayerTypeName = Local.RULE_PLAYER_TYPE_NAME;
     
 	// return the metaType of the rule (Elementaire, composée ou négation)
 	public int metaType()
@@ -250,7 +186,7 @@ public class ObjectRule implements Serializable {
     
 	public String desc()
 	{
-		String res= "invalid rule";
+		String res= Local.INVALID_RULE;
 		if (badConsistency() || param < 0) return res;
 		
 		if (meta_type == ITEM_RULE) 
@@ -277,17 +213,16 @@ public class ObjectRule implements Serializable {
 		else if( meta_type == COMPOSED_RULE || meta_type == NEGATION_RULE )
 		{
 			if ((type==0 || type==1) && (ruleA!=null && ruleB!=null))
-				res= "(" + ruleA.desc() + " " + RuleLogic[type] + " " + ruleB.desc() + ")" ;
+				res= "(" + ruleA.desc() + " " + Local.RULE_LOGIC[type] + " " + ruleB.desc() + ")" ;
 			if (type == 2 && ruleA!=null)
-				res= "non (" + ruleA.desc() + ")" ;
+				res= String.format(Local.RULE_NEGATION,ruleA.desc());
 		}
-		//res += " (buy="+ buy_rule + ", sell=" +sell_rule + ", filter=" + filter_rule + ", pickup=" + pickup_rule + ")";
 		return res;
 	}
 
 	public boolean Check(double a)
 	{
-	switch (operator) //  "=","<",">","!="
+	switch (operator) //  =, < , > , !=
 		{
     	case 0: return Math.abs(a-param) < 0.0001;
     	case 1: return a < param;
@@ -299,7 +234,7 @@ public class ObjectRule implements Serializable {
 	
 	public boolean CheckTag(boolean[] t)
 	{
-	if(operator==0) //  "="
+	if(operator==0) // operator =
 		return (t[(int)param] == true) ;
 	else if(operator==3)
 		return (t[(int)param] == false) ;

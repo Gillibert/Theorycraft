@@ -1,36 +1,50 @@
-import javax.swing.JButton;
-import javax.swing.JProgressBar;
-import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
-import javax.swing.JScrollPane;
-
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.ListSelectionModel;
 
 import java.awt.event.*;
 
-public class MainWindow extends javax.swing.JFrame {
+import javax.swing.text.DefaultCaret;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.JButton;
+import javax.swing.JProgressBar;
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+
+public class MainWindow extends javax.swing.JDialog {
+	public JMenuBar menuBar;
+	public JMenu menu;
+	
     static private final long serialVersionUID = 1338162012;
+	private ScheduledExecutorService refreshService;
     public Player Joueur;
-    public World Monde;
     public LevelUp DistWindow;
     public Courbes CurvWindow;
     public InventoryWindow InvWindow;
     public WorldMap WorldMapWindow;
-	public UniversWindow UnivWindow;
+	public InfoWindow InWindow;
     public RuleWindow RuleWin;
     private String[] lines;
     private static int max_lines=50;
     private int index_line;
 
-    private boolean infight=false;
+    public boolean infight=false;
     private boolean stopfight=false;
 
     private javax.swing.JPanel ivjJFrameContentPane;
@@ -47,7 +61,6 @@ public class MainWindow extends javax.swing.JFrame {
     private JButton craft_cmd;
     private JButton inventaire_cmd;
     private JButton prog_cmd;
-    private JButton finir;
 	private JButton univers_cmd;
     private JScrollPane scroll;
     public JTextArea log;
@@ -59,44 +72,65 @@ public class MainWindow extends javax.swing.JFrame {
     private JScrollPane tableScroll;
     private String[][] rowData;
 
-    public MainWindow(World W,Player J) {
+	public void SetPlayer(Player J)
+	{
+		Joueur = J;
+		DistWindow.SetPlayer(J);
+		CurvWindow.SetPlayer(J);
+		InvWindow.SetPlayer(J);
+		WorldMapWindow.SetPlayer(J);
+		RuleWin.SetPlayer(J);
+		InWindow.SetPlayer(J);
+		this.setTitle(String.format(Local.THEORYCRAFT_TITLE,Joueur.name,Joueur.defi.name));
+	}
+	
+    public MainWindow(Player J) {
 	super();
 	Joueur = J;
-	Monde = W;
 	lines = new String[max_lines];
 	index_line=0;
 
 	DistWindow = new LevelUp(Joueur);
 	CurvWindow = new Courbes(Joueur);
 	InvWindow = new InventoryWindow(Joueur);
-	WorldMapWindow = new WorldMap(Monde,Joueur);
+	WorldMapWindow = new WorldMap(Joueur);
 	RuleWin = new RuleWindow(Joueur);
-	UnivWindow = new UniversWindow(Joueur, Monde);
+	InWindow = new InfoWindow(Joueur);
 
 	this.setContentPane(getJFrameContentPane());
-	this.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+	this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	this.setLocation(new Point(0, 0));
 	this.setSize(new Dimension(795, 680));		
 	this.setResizable(false);
 
-	this.setTitle("Theorycraft - " + Joueur.name + " - " + Joueur.defi.name);
+	this.setTitle(String.format(Local.THEORYCRAFT_TITLE,Joueur.name,Joueur.defi.name));
 	this.refresh();
 	this.refreshTable();
+	
+	refreshService = Executors.newSingleThreadScheduledExecutor();
+    refreshService.scheduleWithFixedDelay(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          refreshSlow();
+        }
+      }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     public void refreshInFight() // Refresh hp bars only
     {
 	if(Joueur.mob != null) 
 	    {
-		hp_bar2.setString(String.format("Vie : %.2f/%.2f",Joueur.mob.vie,Joueur.mob.vie_max()));
+		hp_bar2.setString(String.format(Local.HEALTH_POINTS_LEFT,Joueur.mob.vie,Joueur.mob.vie_max()));
 		hp_bar2.setValue((int)(100.0*Joueur.mob.vie/Joueur.mob.vie_max()));
 	    }
 	else
 	    {
 		hp_bar2.setValue(0);
-		hp_bar2.setString("Vie : 0/0");
+		hp_bar2.setString(String.format(Local.HEALTH_POINTS_LEFT,0.0,0.0));
 	    }
-	hp_bar1.setString(String.format("Vie : %.2f/%.2f",Joueur.vie,Joueur.vie_max()));
+	hp_bar1.setString(String.format(Local.HEALTH_POINTS_LEFT,Joueur.vie,Joueur.vie_max()));
 	hp_bar1.setValue((int)(100.0*Joueur.vie/Joueur.vie_max()));	
     }
 
@@ -111,53 +145,148 @@ public class MainWindow extends javax.swing.JFrame {
 	conditionTable.repaint();
 	moins.setEnabled(Joueur.conditionValues[conditionTable.getSelectedRow()]>0);
 	if(Joueur.conditionToggle[conditionTable.getSelectedRow()])
-	    toggle.setText("Désactiver");
+	    toggle.setText(Local.DISABLE);
 	else
-	    toggle.setText("Activer");
+	    toggle.setText(Local.ENABLE);
     }
 
-    public void refresh() // Refresh all except the condition table
-    {
-	double progress;
-	xp_bar.setString("Niveau suivant : "+(Joueur.xp_pt-Joueur.xp_level(Joueur.level))+ "/" + (Joueur.next_level()-Joueur.xp_level(Joueur.level)));
-	progress=1.0*(Joueur.xp_pt-Joueur.xp_level(Joueur.level))/(Joueur.next_level()-Joueur.xp_level(Joueur.level));
-	xp_bar.setValue((int)((100.0*progress)));
-
-	stats.setText(Joueur.short_stats());
-	if(Joueur.mob != null) 
-	    {
-		stats3.setText(Joueur.mob.short_stats());
-		if(Joueur.mob.tags[5])
-			stats3.setForeground(Color.blue);	
-		else
-		    stats3.setForeground(Color.black);
-	    }
-
+	public void refreshButtons()
+	{
 	if(infight)
-	    combat_cmd.setText("Arrêt combat");
+	    combat_cmd.setText(Local.STOP_FIGHT);
 	else
-	    combat_cmd.setText("Combat");
+	    combat_cmd.setText(Local.FIGHT);
 
 	voyager.setEnabled(!infight);
 	craft_cmd.setEnabled(!infight);
 	inventaire_cmd.setEnabled(!infight);
 	shop_cmd.setEnabled(!infight);
-	finir.setEnabled(!infight);
-
-	//   int height = (int)log.getHeight();
-	//   scroll.getVerticalScrollBar().setValue(height);
-	refreshInFight();
-    }
+	}
 	
+    public void refresh() // Refresh all except the condition table and the buttons
+    {
+	SwingUtilities.invokeLater(new Runnable() {
+     public void run() {
+	double progress;
+	xp_bar.setString(String.format(Local.NEXT_LEVEL,
+	Joueur.xp_pt-Joueur.xp_level(Joueur.level),
+	Joueur.next_level()-Joueur.xp_level(Joueur.level)));
+	progress=1.0*(Joueur.xp_pt-Joueur.xp_level(Joueur.level))/(Joueur.next_level()-Joueur.xp_level(Joueur.level));
+	xp_bar.setValue((int)((100.0*progress)));
+
+	//mySetText(stats,Joueur.short_infos());
+	stats.setText(Joueur.short_infos());
+	if(Joueur.mob != null) 
+	    {
+		stats3.setText(Joueur.mob.short_stats());
+		//mySetText(stats3,Joueur.mob.short_stats());
+		if(Joueur.mob.tags[5])
+		{
+			stats3.setForeground(Color.blue);
+			stats3.setSelectedTextColor(Color.blue);
+		}
+		else
+		{
+		    stats3.setForeground(Color.black);
+			stats3.setSelectedTextColor(Color.black);
+		}
+	    }
+	refreshLog();
+	refreshInFight();
+      }
+    });
+	}
+	
+	private void refreshSlow()
+	{
+		if (InWindow.isVisible()) InWindow.refresh();
+		if (WorldMapWindow.isVisible()) WorldMapWindow.refresh();
+		refresh();
+	}
 
     private javax.swing.JPanel getJFrameContentPane() {
 
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
-			System.out.println("Sauvegarde");
 		    Joueur.universe.save();
+			System.exit(0);
 		}});
-	  	
+	 
+	menuBar = new JMenuBar();
+	menu = new JMenu(Local.GAME);
+	//menu.setMnemonic(KeyEvent.VK_A);
+	menuBar.add(menu);
+	
+	JMenuItem menuItem = new JMenuItem(Local.NEW_GAME);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			 Joueur.universe.save();
+			 Game.MW.setVisible(false);
+			 Game.MENU.creer();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.LOAD_A_GAME);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		     Joueur.universe.save();
+			 Game.MW.setVisible(false);
+			 Game.MENU.montre_charger();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.SAVE);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    Joueur.universe.save();
+		}
+	    });
+	menu.add(menuItem);
+	menu.addSeparator();
+	
+	menuItem = new JMenuItem(Local.EXIT);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    Joueur.universe.save();
+			System.exit(0);
+		}
+	    });
+	menu.add(menuItem);
+	
+	menu = new JMenu(Local.CHALLENGE);
+	menuBar.add(menu);
+	menuItem = new JMenuItem(Local.CHANGE_THE_CHALLENGE);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			 Challenge defiBack = Joueur.defi;
+		     Game.CW.universe = Joueur.universe;
+			 Game.CW.montre_choix_defi();
+			 Game.MW.setTitle(String.format(Local.THEORYCRAFT_TITLE,Joueur.name,Joueur.defi.name));
+			 if(defiBack != Joueur.defi) Joueur.changer_defi();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.COMPLETE_THE_CHALLENGE);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		     Joueur.end_game();
+		}
+	    });
+	menu.add(menuItem);
+	menu.addSeparator();
+	
+	menuItem = new JMenuItem(Local.HISCORES);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			Game.CW.universe = Joueur.universe;
+		    Game.CW.montre_hiscores();
+		}
+	    });
+	menu.add(menuItem);
+			
 	xp_bar = new JProgressBar();
 	xp_bar.setStringPainted(true);
 	xp_bar.setBounds(new Rectangle(5, 265, 415, 15));
@@ -173,16 +302,20 @@ public class MainWindow extends javax.swing.JFrame {
 	stats = new JTextArea();
 	stats.setBounds(new Rectangle(5, 5, 205, 235));
 	stats.setEditable(false);
-	stats.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-
+	stats.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 12));
+	stats.setSelectionColor(stats.getBackground());
+	((DefaultCaret)stats.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+	
 	stats3 = new JTextArea();
 	stats3.setBounds(new Rectangle(215, 5, 205, 235));
 	stats3.setEditable(false);
-	stats3.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-
+	stats3.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 12));
+	stats3.setSelectionColor(stats3.getBackground());
+	((DefaultCaret)stats3.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
 	plus = new JButton();
 	plus.setBounds(new Rectangle(425, 325, 60, 15));
-	plus.setText("+");
+	plus.setText(Local.PLUS);
 	plus.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {plus();
 		}
@@ -191,7 +324,7 @@ public class MainWindow extends javax.swing.JFrame {
 
 	moins = new JButton();
 	moins.setBounds(new Rectangle(490, 325, 60, 15));
-	moins.setText("-");
+	moins.setText(Local.MINUS);
 	moins.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {moins();
 		}
@@ -199,7 +332,7 @@ public class MainWindow extends javax.swing.JFrame {
 	moins.setMnemonic(KeyEvent.VK_SUBTRACT);
 
 	toggle = new JButton();
-	toggle.setBounds(new Rectangle(555, 325, 100, 15));
+	toggle.setBounds(new Rectangle(650, 325, 135, 15));
 	toggle.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {toggle();
 		}
@@ -207,7 +340,7 @@ public class MainWindow extends javax.swing.JFrame {
 
 	voyager = new JButton();
 	voyager.setBounds(new Rectangle(5, 285, 135, 15));
-	voyager.setText("Voyager");
+	voyager.setText(Local.TRAVEL);
 	voyager.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    WorldMapWindow.voyager();
@@ -217,7 +350,7 @@ public class MainWindow extends javax.swing.JFrame {
 
 	combat_cmd = new JButton();
 	combat_cmd.setBounds(new Rectangle(5, 285+20, 135, 15));
-	combat_cmd.setText("Combat");
+	combat_cmd.setText(Local.FIGHT);
 	combat_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    fight();
@@ -227,18 +360,17 @@ public class MainWindow extends javax.swing.JFrame {
 
 	inventaire_cmd = new JButton();
 	inventaire_cmd.setBounds(new Rectangle(145, 285, 135, 15));
-	inventaire_cmd.setText("Inventaire");
+	inventaire_cmd.setText(Local.INVENTORY);
 	inventaire_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    InvWindow.montre_inv();
-		    refresh();
 		}
 	    });
 	inventaire_cmd.setMnemonic('i');
 	
 	prog_cmd = new JButton();
 	prog_cmd.setBounds(new Rectangle(5, 285+40, 135, 15));
-	prog_cmd.setText("Programmation");
+	prog_cmd.setText(Local.PROGRAMMING);
 	prog_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    RuleWin.montre();
@@ -249,42 +381,40 @@ public class MainWindow extends javax.swing.JFrame {
 
 	shop_cmd = new JButton();
 	shop_cmd.setBounds(new Rectangle(145, 285+20, 135, 15));
-	shop_cmd.setText("Shopping");
+	shop_cmd.setText(Local.SHOPPING);
 	shop_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    venteAuto();
 		    achatAuto();
 		    InvWindow.montre_shop();
-		    refresh();	
 		}
 	    });
 	shop_cmd.setMnemonic('s');
 
 	craft_cmd = new JButton();
 	craft_cmd.setBounds(new Rectangle(145, 285+40, 135, 15));
-	craft_cmd.setText("Crafting");
+	craft_cmd.setText(Local.CRAFTING);
 	craft_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    Joueur.get_forge();
 		    InvWindow.montre_craft();
-		    refresh();	
 		}
 	    });
 	craft_cmd.setMnemonic('r');
 
 	distrib = new JButton();
 	distrib.setBounds(new Rectangle(285, 285, 135, 15));
-	distrib.setText("Compétences");
+	distrib.setText(Local.SKILLS);
 	distrib.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    DistWindow.dist(); refresh();
+		    DistWindow.dist(); 
 		}
 	    });
 	distrib.setMnemonic('t');
 
 	courbes = new JButton();
 	courbes.setBounds(new Rectangle(285, 285+20, 135, 15));
-	courbes.setText("Courbes");
+	courbes.setText(Local.CHARTS);
 	courbes.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    CurvWindow.montre();
@@ -294,56 +424,48 @@ public class MainWindow extends javax.swing.JFrame {
 	
 	univers_cmd = new JButton();
 	univers_cmd.setBounds(new Rectangle(285, 285+40, 135, 15));
-	univers_cmd.setText("Univers");
+	univers_cmd.setText(Local.INFORMATIONS);
 	univers_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		   UnivWindow.montre();
+		   InWindow.montre();
 		}
 	});
 	univers_cmd.setMnemonic('u');
 	
-	finir = new JButton();
-	finir.setBounds(new Rectangle(705, 325, 80, 15));
-	finir.setText("Finir jeu");
-	finir.addActionListener(new java.awt.event.ActionListener() {
-		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    end_game();
-		}
-	});
-	finir.setMnemonic('f');
-	
 	log = new JTextArea();
-	log.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+	log.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 12));
 	log.setEditable(false);
 	log.setLineWrap(true);
 	log.setWrapStyleWord(true);
 	log.setBackground(Color.gray);
-
+	log.setSelectionColor(Color.gray);
+	((DefaultCaret)log.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+	
 	scroll = new JScrollPane(log);
 	scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	scroll.setBounds(new Rectangle(5, 365-20, 785, 285+20));
+	scroll.setBounds(new Rectangle(5, 345, 785, 285));
 
 	rowData = new String[5][4];
 
-	rowData[0][0] = rowData[1][0] = rowData[2][0] = rowData[3][0] = rowData[4][0] = "Arrêter les combats";
+	rowData[0][0] = rowData[1][0] = rowData[2][0] = rowData[3][0] = rowData[4][0] = Local.STOP_TO_FIGHT;
 
-	rowData[0][1] = "Défaites =";
-	rowData[1][1] = "Ennemis vaincus =";		
-	rowData[2][1] = "Niveaux gagnés =";
-	rowData[3][1] = "Pièges léthaux =";
-	rowData[4][1] = "Pièges défaits =";
+	rowData[0][1] = Local.DEFEATS;
+	rowData[1][1] = Local.DEFEATED_ENEMIES;		
+	rowData[2][1] = Local.LEVELS_WON;
+	rowData[3][1] = Local.LETHAL_TRAPS;
+	rowData[4][1] = Local.SURVIVED_TRAPS;
 	
-	String[] columnNames = {"Action","Condition","Valeur","Activé"};
+	String[] columnNames = Local.STOP_RULES_COLUMN_NAMES;
 	AbstractTableModel mytm = new MyTableModel(rowData,columnNames);
 
 	conditionTable = new JTable(mytm);
 	//table.setEnabled(false);
 	conditionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	conditionTable.setRowSelectionInterval(0,0);
-	conditionTable.getColumnModel().getColumn(0).setPreferredWidth(205);
-	conditionTable.getColumnModel().getColumn(1).setPreferredWidth(205);
+	conditionTable.getColumnModel().getColumn(0).setPreferredWidth(180);
+	conditionTable.getColumnModel().getColumn(1).setPreferredWidth(210);
 	conditionTable.getColumnModel().getColumn(2).setPreferredWidth(60);
-	conditionTable.setFont(new Font("Times Roman", Font.BOLD, 11));
+	conditionTable.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
 
 	javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
 		public void valueChanged(javax.swing.event.ListSelectionEvent e) {refreshTable();}};
@@ -354,6 +476,7 @@ public class MainWindow extends javax.swing.JFrame {
 	tableScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	tableScroll.setBounds(new Rectangle(425, 5, 365, 315));
 
+	this.setJMenuBar(menuBar);
 	ivjJFrameContentPane = new javax.swing.JPanel();
 	ivjJFrameContentPane.setLayout(null);
 	ivjJFrameContentPane.add(xp_bar);
@@ -374,7 +497,6 @@ public class MainWindow extends javax.swing.JFrame {
 	ivjJFrameContentPane.add(moins);
 	ivjJFrameContentPane.add(toggle);
 	ivjJFrameContentPane.add(scroll);
-	ivjJFrameContentPane.add(finir);
 	ivjJFrameContentPane.add(univers_cmd);
 	return ivjJFrameContentPane;
     }
@@ -387,54 +509,18 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void moins()
     {
-    	Joueur.conditionValues[conditionTable.getSelectedRow()]--;
+    Joueur.conditionValues[conditionTable.getSelectedRow()]--;
 	refreshTable();
     }
 
     private void toggle()
     {
-    	Joueur.conditionToggle[conditionTable.getSelectedRow()] = !Joueur.conditionToggle[conditionTable.getSelectedRow()];
+    Joueur.conditionToggle[conditionTable.getSelectedRow()] = !Joueur.conditionToggle[conditionTable.getSelectedRow()];
 	refreshTable();
     }
 
-	private void end_game()
-	{
-		if (Joueur.jeu_fini)
-		{
-			Game.MW.addLog("Vous avez déjà fini le jeu !");
-		}
-		else if(Joueur.defi.isCond() && Joueur.defi.isTrue(Joueur))
-		{
-			victory();
-		}
-		else if(!Joueur.defi.isCond())
-		{
-			infight = true;
-			Thread thread = new Thread() {
-				public void run() {
-					Joueur.mob = new Monster(Joueur.defi.boss_name, Joueur.defi.boss_level, Joueur.defi.boss_tag, Joueur.defi.boss_p_stats, Joueur.universe);
-					refresh();
-					
-					if(!Joueur.combat(true,true)) 
-						{
-							Game.MW.addLog("Vous avez vaincu le boss final !");
-							victory();
-						}
-					Joueur.heal();
-					infight = false;
-					refresh();
-				}};
-			thread.start();
-		}
-	}
 	
-	private void victory()
-	{
-		Joueur.jeu_fini = true;
-		Game.MW.addLog(String.format("Temps passé : %.2f secondes !",Joueur.temps_total));
-		Game.HI = HiScore.loadScore();
-		Game.HI.addScore(new Score(Joueur.defi.name,Joueur.name,Joueur.temps_total,Joueur.universe.seed));
-	}
+	
 
     private boolean combatAuto(int defaite_count, int victory_count, int trap_count, int trap_death_count, int lvl_start)
     {
@@ -486,8 +572,7 @@ public class MainWindow extends javax.swing.JFrame {
 	for(Item the_object : Joueur.inventory)
 	    if(venteAutoCond(the_object) && !the_object.equiped)
 			tmplst.add(the_object);
-	for(Item the_object : tmplst)
-	    Joueur.sell(the_object);
+	Joueur.sell(tmplst);
     }
 
     private void achatAuto()
@@ -504,20 +589,43 @@ public class MainWindow extends javax.swing.JFrame {
 
     public void addLog(String S)
     {
-	String out="";
 	lines[index_line]=S;
+	index_line = (index_line +1) % max_lines;
+	}
 	
-	for (int i=index_line+1; i<=index_line+max_lines; i++)
+	public void refreshLog()
+	{
+	String out="";
+	for (int i=index_line; i<index_line+max_lines; i++)
 	    {
 		if(lines[i%max_lines]!=null)
 		    out=out+lines[i%max_lines]+"\n";
 	    }
 
-	index_line = (index_line +1) % max_lines;
 	log.setText(out);
+	//mySetText(log,out);
     }
 
-
+	// Obsolete, plus utilisé
+	public void mySetText(JTextArea txtArea, String str)
+	{
+		int selectionStart = 0;
+		int selectionEnd = 0;
+		boolean restoreSelection = false;
+		if (this.getFocusOwner() == txtArea)
+		{
+			selectionStart = txtArea.getSelectionStart();
+			selectionEnd = txtArea.getSelectionEnd();
+			restoreSelection = (selectionStart != selectionEnd);
+		}
+		txtArea.setText(str);
+		if(restoreSelection)
+		{
+			txtArea.requestFocus();
+			txtArea.select(selectionStart, selectionEnd);
+		}
+	}
+	
     public void fight()
     {
 	if(infight)
@@ -527,7 +635,7 @@ public class MainWindow extends javax.swing.JFrame {
 	else
 	    {
 		infight = true;
-		refresh();
+		refreshButtons();
 		Thread thread = new Thread() {
 			public void run() {
 			    int lvl_start = Joueur.level;
@@ -538,8 +646,8 @@ public class MainWindow extends javax.swing.JFrame {
 			    do {
 					if(Math.random()< Joueur.proba_rencontrer_piege())
 						{
-						Trap theTrap = Trap.getTrap(Joueur.get_mob_level());
-						if (theTrap.trapEncounter(Joueur,true)) trap_death_count++;
+						Trap theTrap = Trap.getTrap(Joueur);
+						if (theTrap.trapEncounter(Joueur)) trap_death_count++;
 						else trap_count++;
 						Joueur.heal();
 						}
@@ -548,13 +656,12 @@ public class MainWindow extends javax.swing.JFrame {
 				Joueur.get_mob();
 				if(!eviteAuto())
 				    {
-					refresh();
-					if(Joueur.combat(true,true)) defaite_count++;
+					if(Joueur.combat(true)) defaite_count++;
 					else victory_count++;
 				    }
 				else
 				{
-					addLog(Joueur.name + " évite " + Joueur.mob.name + " ("+ Joueur.mob.level + ")");
+					addLog(String.format(Local.AVOIDS_MONSTER,Joueur.name,Joueur.mob.name,Joueur.mob.level));
 				}
 				Joueur.heal();
 				if(shoppingAuto())
@@ -564,7 +671,7 @@ public class MainWindow extends javax.swing.JFrame {
 			    while(combatAuto(defaite_count,victory_count,trap_count,trap_death_count,lvl_start) && !stopfight);
 			    infight = false;
 			    stopfight = false;
-			    refresh();
+			    refreshButtons();
 			}};
 		thread.start();
 	    }

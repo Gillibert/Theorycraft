@@ -25,12 +25,11 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	this.setSize(new Dimension(565, 345));
 	this.setResizable(false);
 	this.setModal(true);
-	this.setTitle("Choix du défi");
     }
-	
+
 	public void set_seed()
 	{
-		String s = JOptionPane.showInputDialog(null, "Choisissez une graine (un entier naturel)\n 0 pour les règles classiques", "Création d'un univers", 1);
+		String s = JOptionPane.showInputDialog(null, Local.CHOOSE_A_SEED, Local.CREATE_A_UNIVERSE, 1);
 		int sd = 0;
 		try { sd = Integer.parseInt(s);}
 		catch (Exception e) {}
@@ -45,10 +44,10 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	if (challenges.getSelectedIndex() != -1)
 		{
 			Challenge chal = ChallengeList.list.get(challenges.getSelectedIndex());
-			desc.setText(chal.desc() + "\nHiscores :\n" + Game.HI.bestScoresString(chal.name));
+			desc.setText(chal.desc() + Local.HISCORES_CR + Game.HI.bestScoresString(chal.name));
 		}
 	choisir.setEnabled(challenges.getSelectedIndex() != -1);
-	set_seed.setText("Graine : " + universe.seed);
+	set_seed.setText(Local.SEED + universe.seed);
     }
 
 
@@ -56,10 +55,43 @@ public class ChallengeWindow extends javax.swing.JDialog  {
     {
 	if (challenges.getSelectedIndex() == -1)
 		challenges.setSelectedIndex(0);
+	choisir.setText(Local.CREATE);
+	set_seed.setVisible(true);
+	choisir.setVisible(true);
+	titre.setText(Local.CHOOSE_A_CHALLENGE);
+	this.setTitle(Local.CHOICE_OF_THE_CHALLENGE);
+	this.setSize(new Dimension(565, 345));
+	refresh();
+	setVisible(true);
+    }
+	
+	public void montre_choix_defi()
+    {
+	if (challenges.getSelectedIndex() == -1)
+		challenges.setSelectedIndex(0);
+	choisir.setText(Local.CHOOSE);
+	set_seed.setVisible(false);
+	choisir.setVisible(true);
+	titre.setText(Local.CHOOSE_A_CHALLENGE);
+	this.setTitle(Local.CHOICE_OF_THE_CHALLENGE);
+	this.setSize(new Dimension(565, 345));
 	refresh();
 	setVisible(true);
     }
 
+	public void montre_hiscores()
+    {
+	if (challenges.getSelectedIndex() == -1)
+		challenges.setSelectedIndex(0);
+	set_seed.setVisible(false);
+	choisir.setVisible(false);
+	titre.setText(Local.BEST_TIMES);
+	this.setTitle(Local.HISCORES);
+	this.setSize(new Dimension(565, 315));
+	refresh();
+	setVisible(true);
+    }
+	
     public void choisir()
     {
 	if (challenges.getSelectedIndex() == -1)
@@ -74,9 +106,8 @@ public class ChallengeWindow extends javax.swing.JDialog  {
     private javax.swing.JPanel getJFrameContentPane() {			
 			
 	titre = new JLabel();
-	titre.setText(" Choisissez un défi");
 	titre.setBounds(new Rectangle(5, 5, 290, 30));
-	titre.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+	titre.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 20));
 
 	defi_list = new DefaultListModel();
 	
@@ -97,12 +128,12 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 
 	desc = new JTextArea();
 	desc.setBounds(new Rectangle(285, 40, 265, 240));
-	desc.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+	desc.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 12));
 	desc.setEditable(false);
 	
 	set_seed = new JButton();
 	set_seed.setBounds(new Rectangle(5, 240+45, 275, 25));
-	set_seed.setText("Graine ...");
+	set_seed.setText(Local.SEED_DOTS);
 	set_seed.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    set_seed();
@@ -112,7 +143,6 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	
 	choisir = new JButton();
 	choisir.setBounds(new Rectangle(285, 240+45, 265, 25));
-	choisir.setText("Créer");
 	choisir.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 		    choisir(); refresh();

@@ -37,16 +37,23 @@ public class InventoryWindow extends javax.swing.JDialog  {
     private int idx_tmp3;
     private ArrayList<Item> vlist;
 
-    public InventoryWindow(Player JJ) {
+    public InventoryWindow(Player J) {
 	super();
-	Joueur = JJ;
+	Joueur = J;
 	initialize();
     }
 
+	public void SetPlayer(Player J)
+	{
+		Joueur = J;
+		idx_tmp = -2; // force le refresh complet
+		refresh(1);
+	}
+	
     public void montre_inv()
     {
 	craft_mode = false;
-	this.setTitle("Inventaire");
+	this.setTitle(Local.WINDOW_INVENTORY);
 	this.setSize(new Dimension(570+20, 420));
 	sell.setVisible(false);
 	buy.setVisible(false);
@@ -71,7 +78,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     public void montre_shop()
     {
 	craft_mode = false;
-	this.setTitle("Boutique de " + Joueur.shop.name);
+	this.setTitle(String.format(Local.WINDOW_SHOP, Joueur.shop.name));
 	this.setSize(new Dimension(785+20, 420));
 	sell.setVisible(true);
 	buy.setVisible(true);
@@ -96,7 +103,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     public void montre_craft()
     {
     craft_mode = true;
-	this.setTitle("Forge mystique");
+	this.setTitle(Local.WINDOW_FORGE);
 	this.setSize(new Dimension(785+20, 420));
 	sell.setVisible(false);
 	buy.setVisible(false);
@@ -120,7 +127,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
     public void refresh(int sli)
     {
-	prompt.setText(String.format("Or : %.2f écus, charge : %.2f kg (%.2f kg max)",Joueur.money,Joueur.charge,Joueur.charge_max()));
+	prompt.setText(String.format(Local.WINDOW_INVENTORY_PROMPT,Joueur.money,Joueur.charge,Joueur.charge_max()));
 	toggle.setEnabled(false);
 	sell.setEnabled(false);
 	buy.setEnabled(false);
@@ -182,9 +189,9 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		Item sel_it = vlist.get(liste_it.getSelectedIndex());
 		display_item(sel_it);
 		if(!sel_it.equiped)
-		    toggle.setText("Équiper");
+		    toggle.setText(Local.EQUIP);
 		else
-		    toggle.setText("Déséquiper");
+		    toggle.setText(Local.UNEQUIP);
 		toggle.setEnabled(sel_it.can_be_equiped() || sel_it.equiped);
 
 		if(craft_mode)
@@ -219,6 +226,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		    }
 		display_item(buy_it);
 		toggle.setEnabled(false);
+		destroy.setEnabled(true);
 	    }
     }
 	
@@ -259,7 +267,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	    craft_mode = false;
 	    prompt = new JLabel();
 	    prompt.setBounds(new Rectangle(10, 3, 600, 23));
-	    prompt.setFont(new Font("Dialog", Font.BOLD, 14));
+	    prompt.setFont(new Font(Local.FONT_DIALOG, Font.BOLD, 14));
 
 	    vlist = new ArrayList<Item>();
 	    filter_list = new DefaultListModel();
@@ -315,7 +323,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	
 	    toggle = new JButton();
 	    toggle.setBounds(new Rectangle(10, 365, 110, 21));
-	    toggle.setText("Équiper");
+	    toggle.setText(Local.EQUIP);
 	    toggle.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {toggle();
 		    }
@@ -324,7 +332,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	    split = new JButton();
 	    split.setBounds(new Rectangle(10+115, 365, 110, 21));
-	    split.setText("Séparer");
+	    split.setText(Local.SPLIT);
 	    split.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {separer();
 		    }
@@ -334,7 +342,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		destroy = new JButton();
 	    destroy.setBounds(new Rectangle(10+115+115, 365, 110, 21));
 		destroy.setBackground(Color.RED);
-	    destroy.setText("Jeter");
+	    destroy.setText(Local.DISCARD);
 	    destroy.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {jeter();
 		    }
@@ -343,7 +351,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	    buy = new JButton();
 	    buy.setBounds(new Rectangle(360, 365, 110, 21));
-	    buy.setText("Acheter");
+	    buy.setText(Local.BUY);
 	    buy.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {acheter();
 		    }
@@ -352,7 +360,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	    sell = new JButton();
 	    sell.setBounds(new Rectangle(360+115, 365, 110, 21));
-	    sell.setText("Vendre");
+	    sell.setText(Local.SALE);
 	    sell.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				vendre((e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
@@ -362,7 +370,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 			
 	    put = new JButton();
 	    put.setBounds(new Rectangle(360, 365, 110, 21));
-	    put.setText("Déposer");
+	    put.setText(Local.DEPOSIT);
 	    put.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				deposer((e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
@@ -372,7 +380,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	    get = new JButton();
 	    get.setBounds(new Rectangle(475, 365, 110, 21));
-	    get.setText("Ramasser");
+	    get.setText(Local.PICK_UP);
 	    get.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				prendre((e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
@@ -382,7 +390,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	    forge = new JButton();
 	    forge.setBounds(new Rectangle(475+115, 365, 110, 21));
-	    forge.setText("Combiner");
+	    forge.setText(Local.COMBINE);
 	    forge.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				combiner();
@@ -390,11 +398,11 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		});
 	    forge.setMnemonic('c');
 
-	    prompt.setFont(new Font("Times Roman", Font.BOLD, 16));
-	    liste_s.setFont(new Font("Times Roman", Font.PLAIN, 11));
-	    liste_it.setFont(new Font("Times Roman", Font.BOLD, 11));
-	    infos.setFont(new Font("Times Roman", Font.PLAIN, 11));
-	    liste_shop.setFont(new Font("Times Roman", Font.BOLD, 11));
+	    prompt.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 16));
+	    liste_s.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    liste_it.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
+	    infos.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    liste_shop.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
 
 	    ivjJFrameContentPane = new javax.swing.JPanel();
 	    ivjJFrameContentPane.setLayout(null);
@@ -450,9 +458,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     {
 	if(tout)
 	{
-		int size = vlist.size();
-		for(int i=0; i< size; i++)
-			Joueur.sell(vlist.get(i));
+		Joueur.sell(vlist);
 	}
 	else
 	{
@@ -478,7 +484,14 @@ public class InventoryWindow extends javax.swing.JDialog  {
 
 	private void jeter()
 	{
-    Joueur.destroy_item(vlist.get(liste_it.getSelectedIndex()));
+	if(liste_it.getSelectedIndex() != -1)
+	{
+		Joueur.destroy_item(vlist.get(liste_it.getSelectedIndex()));
+	}
+	else
+	{
+		Joueur.craftInventory.remove(Joueur.craftInventory.get(liste_shop.getSelectedIndex()));
+	}
 	idx_tmp = -2; // force le refresh complet
 	refresh(1);
     }
