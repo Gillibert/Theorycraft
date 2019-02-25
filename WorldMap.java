@@ -8,12 +8,14 @@ public class WorldMap extends javax.swing.JDialog {
     private Player Joueur;
 	private int px=0;
 	private int py=0;
+	private int nbz;
 	private DrawMap drawMap;
 	
 	public WorldMap(Player J) {
 	super();
 	previous_zone = -2;
 	Joueur=J;
+	nbz = (int)Joueur.universe.nombre_zones();
 	drawMap = new DrawMap(J);
 	initialize();
     }
@@ -21,6 +23,8 @@ public class WorldMap extends javax.swing.JDialog {
 	public void SetPlayer(Player J)
 	{
 		Joueur = J;
+		previous_zone = -2;
+		drawMap.SetPlayer(J);
 		refresh();
 	}
 	
@@ -35,9 +39,10 @@ public class WorldMap extends javax.swing.JDialog {
 	
 	public void refresh()
 	{
+	nbz = (int)Joueur.universe.nombre_zones();
 	SwingUtilities.invokeLater(new Runnable() {
      public void run() {
-			int z=Joueur.universe.map.get_zone(px,py);
+			int z=Joueur.universe.map.get_zone(px,py,nbz);
 		    if(z!=previous_zone)
 			{
 				drawMap.setZone(z);
@@ -81,10 +86,11 @@ public class WorldMap extends javax.swing.JDialog {
 
 	this.addMouseListener(new java.awt.event.MouseListener() {
 		public void mouseClicked(java.awt.event.MouseEvent e) {
-		    int z=Joueur.universe.map.get_zone(e.getX(),e.getY());
+		    int z=Joueur.universe.map.get_zone(e.getX(),e.getY(),nbz);
 		    if(z!=-1 && Joueur.max_zone_level() >= Joueur.universe.get_zone_level(z))
 			{
 				Joueur.voyage(z);
+				Game.MW.mustRefreshMonsters = true;
 			    setVisible(false);
 			}
 		}

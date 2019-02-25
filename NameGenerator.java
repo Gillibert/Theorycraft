@@ -123,11 +123,20 @@ public String getNameOf(String BN)
 	}
 
 public static String firstCharLowercase(String name) 
-{ return Character.toString(name.charAt(0)).toLowerCase() + name.substring(1); }
+{
+	StringBuilder newName = new StringBuilder(name);
+	newName.setCharAt(0, Character.toLowerCase(name.charAt(0)));
+	return newName.toString();
+
+}
 
 public static String firstCharUppercase(String name) 
-{ return Character.toString(name.charAt(0)).toUpperCase() + name.substring(1); }
+{
+	StringBuilder newName = new StringBuilder(name);
+	newName.setCharAt(0, Character.toUpperCase(name.charAt(0)));
+	return newName.toString();
 
+}
 private String getRandomElementFrom(List v) {
 return (String) v.get((int)(rg.nextDouble()*v.size()));}
 

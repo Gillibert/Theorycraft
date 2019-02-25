@@ -98,12 +98,12 @@ class StaticItem {
     new Material("acier", "d'acier", 2,            1.1,1.0,     2.4, 2.4, 1.2),
     new Material("palladium", "de palladium", 2,   3.0,4.0,     2.5, 2.6, 2.5),
     new Material("orichalque", "d'orichalque", 2,  2.4,5.0,     2.6, 2.7, 2.9),
-    new Material("impossiblium", "d'impossiblium",2,1.7,5.0,    2.7, 2.8, 3.1),
+    new Material("impossiblium", "d'impossiblium",2,1.7,5.0,    2.7, 2.8, 2.4),
     new Material("adamantium", "d'adamantium", 2,  1.0,4.0,     2.8, 2.9, 1.9),
-    new Material("mithrol", "de mithrol", 2,       0.6,5.0,     2.9, 3.0, 2.6),
-    new Material("mithrul", "de mithrul", 2,       0.6,5.0,     3.0, 3.1, 2.6),
-    new Material("unobtainium", "d'unobtainium",2, 0.3,6.0,     3.1, 3.2, 2.6),
-    new Material("mithral", "de mithral", 2,       0.5,6.0,     3.2, 3.3, 2.6),
+    new Material("mithrol", "de mithrol", 2,       0.6,5.0,     2.9, 3.0, 2.4),
+    new Material("mithrul", "de mithrul", 2,       0.6,5.0,     3.0, 3.1, 2.2),
+    new Material("unobtainium", "d'unobtainium",2, 0.3,6.0,     3.1, 3.2, 2.2),
+    new Material("mithral", "de mithral", 2,       0.5,6.0,     3.2, 3.3, 2.2),
     new Material("mithril", "de mithril",2,        0.5,6.0,     3.3, 3.5, 1.0),
     new Material("sombracier", "de sombracier",2,  1.3,3.0,     4.0, 3.5, 1.3), 
 
@@ -121,53 +121,53 @@ class StaticItem {
     new Material("agate","d'agates",3,             1.2,1.1,     0.7,1.7,1.9),
     new Material("alexandrite","d'alexandrites",3, 1.2,1.2,     0.9,1.8,2.0),
     new Material("améthyste","d'améthystes",3,     1.2,1.3,     0.9,1.9,2.1),
-    new Material("aventurine","d'aventurines",3,   1.2,1.4,     0.9,2.1,2.2),
-    new Material("grenat","de grenats",3,          1.2,1.5,     0.9,2.2,2.3),
-    new Material("malachite","de malachite",3,     1.2,1.6,     0.9,2.3,2.55),
-    new Material("onyx","d'onyx",3,                1.2,1.7,     1.0,2.4,2.60),
-    new Material("turquoise","de turquoises",3,    1.2,2.8,     1.0,2.5,2.70),
-    new Material("opale","d'opales",3,             1.2,3.0,     1.0,2.6,2.80),
-    new Material("saphir","de saphir",3,           1.0,3.6,     2.2,2.7,3.00),
-    new Material("émeraude","d'émeraudes",3,       1.0,3.8,     3.4,2.7,3.05),
-    new Material("rubis","de rubis",3,             1.0,4.0,     4.6,2.7,3.15),
-    new Material("perle","de perles",3,            0.8,3.4,     0.6,3.0,3.20),
+    new Material("aventurine","d'aventurines",3,   1.2,1.4,     0.9,2.0,2.2),
+    new Material("grenat","de grenats",3,          1.2,1.5,     0.9,2.0,2.3),
+    new Material("malachite","de malachite",3,     1.2,1.6,     0.9,2.0,2.55),
+    new Material("onyx","d'onyx",3,                1.2,1.7,     1.0,2.0,2.60),
+    new Material("turquoise","de turquoises",3,    1.2,2.8,     1.0,2.0,2.70),
+    new Material("opale","d'opales",3,             1.2,3.0,     1.0,2.0,2.80),
+    new Material("saphir","de saphir",3,           1.0,3.6,     2.2,2.0,3.00),
+    new Material("émeraude","d'émeraudes",3,       1.0,3.8,     3.4,2.0,3.05),
+    new Material("rubis","de rubis",3,             1.0,4.0,     4.6,2.0,3.15),
+    new Material("perle","de perles",3,            0.8,3.4,     0.6,2.0,3.20),
     new Material("diamant","de diamants",3,        1.0,5.0,     5.0,3.5,1.30),
 
-    new Material("jour","de jour",4,               0.02,4.2,    0.2,0.2,3.50),
-    new Material("nuit","de nuit",4,               0.02,4.2,    0.2,0.2,3.60),
-    new Material("éther","d'éther",4,              0.02,4.2,    0.2,0.2,3.70),
-    new Material("lumière","de lumière",4,         0.02,4.2,    0.2,0.2,3.80),
-    new Material("obscurité","d'obscurité",4,      0.02,4.2,    0.2,0.2,3.90),
-    new Material("ombre","d'ombre",4,              0.02,4.3,    0.2,0.2,4.00),
-    new Material("cahos","de cahos",4,             0.02,4.3,    0.2,0.2,4.05),
-    new Material("ordre","d'ordre",4,              0.02,4.3,    0.2,0.2,4.10),
-    new Material("néant","de néant",4,             0.02,4.4,    0.2,0.2,4.15),
-    new Material("loyauté","de loyauté",4,         0.02,4.5,    0.2,0.2,4.20),
-    new Material("générosité","de générosité",4,   0.02,4.6,    0.2,0.2,4.25),
-    new Material("violence","de violence",4,       0.02,4.7,    0.2,0.2,4.30),
-    new Material("éternité","d'éternité",4,        0.02,4.8,    0.2,0.2,4.35),
-    new Material("temps","de temps",4,             0.02,4.9,    0.2,0.2,4.40),
-    new Material("zéro","de zéro",4,               0.02,5.1,    0.2,0.2,4.45),
-    new Material("utopie","d'utopie",4,            0.02,5.1,    0.2,0.2,4.50),
-    new Material("dystopie","de dystopie",4,       0.02,5.2,    0.2,0.2,4.55),
-    new Material("entropie","d'entropie",4,        0.02,5.3,    0.2,0.2,4.60),
-    new Material("amour","d'amour",4,              0.02,5.4,    0.2,0.2,4.65),
-    new Material("haine","de haine",4,             0.02,5.5,    0.2,0.2,4.70),
-    new Material("vengeance","de vengeance",4,     0.02,5.6,    0.2,0.2,4.75),
-    new Material("désordre","de désordre",4,       0.02,5.7,    0.2,0.2,4.80),
-    new Material("excellence","d'excellence",4,    0.02,5.8,    0.2,0.2,4.85),
-    new Material("savoir","de savoir",4,           0.02,5.9,    0.2,0.2,4.90),
-    new Material("vérité","de vérité",4,           0.02,6.0,    0.2,0.2,4.95),
-    new Material("perfection","de perfection",4,   0.02,6.5,    0.2,0.2,5.00),
-    new Material("illogisme","d'illogisme",4,      0.02,6.5,    0.2,5.00,0.2)
+    new Material("jour","de jour",4,                   0.02,4.2,    0.2,0.2,3.50),
+    new Material("nuit","de nuit",4,                   0.02,4.2,    0.2,0.2,3.60),
+    new Material("éther","d'éther",4,                  0.02,4.2,    0.2,0.2,3.70),
+    new Material("lumière","de lumière",4,             0.02,4.2,    0.2,0.2,3.80),
+    new Material("obscurité","d'obscurité",4,          0.02,4.2,    0.2,0.2,3.90),
+    new Material("ombre","d'ombre",4,                  0.02,4.3,    0.2,0.2,4.00),
+    new Material("cahos","de cahos",4,                 0.02,4.3,    0.2,0.2,4.05),
+    new Material("ordre","d'ordre",4,                  0.02,4.3,    0.2,0.2,4.10),
+    new Material("néant","de néant",4,                 0.02,4.4,    0.2,0.2,4.15),
+    new Material("loyauté","de loyauté",4,             0.02,4.5,    0.2,0.2,4.20),
+    new Material("générosité","de générosité",4,       0.02,4.6,    0.2,0.2,4.25),
+    new Material("violence","de violence",4,           0.02,4.7,    0.2,0.2,4.30),
+    new Material("éternité","d'éternité",4,            0.02,4.8,    0.2,0.2,4.35),
+    new Material("froid","de froid",4,                 0.02,5.0,    0.2,1.3,4.40),
+    new Material("chaleur","de chaleur",4,             0.02,5.0,    0.2,1.3,4.45),
+    new Material("sécheresse","de sécheresse",4,       0.02,5.2,    0.2,1.3,4.50),
+    new Material("humidité","d'humidité",4,            0.02,5.2,    0.2,1.3,4.55),
+    new Material("entropie","d'entropie",4,            0.02,5.3,    0.2,0.2,4.60),
+    new Material("amour","d'amour",4,                  0.02,5.4,    0.2,0.2,4.65),
+    new Material("haine","de haine",4,                 0.02,5.5,    0.2,0.2,4.70),
+    new Material("vengeance","de vengeance",4,         0.02,5.6,    0.2,0.2,4.75),
+    new Material("désordre","de désordre",4,           0.02,5.7,    0.2,0.2,4.80),
+    new Material("excellence","d'excellence",4,        0.02,5.8,    0.2,0.2,4.85),
+    new Material("savoir","de savoir",4,               0.02,5.9,    0.2,0.2,4.90),
+    new Material("vérité","de vérité",4,               0.02,6.0,    0.2,0.2,4.95),
+    new Material("perfection","de perfection",4,       0.02,6.5,    0.4,0.5,5.00),
+    new Material("illogisme","d'illogisme",4,          0.02,6.5,    0.4,5.00,0.5)
     };
 
     public static Material[] ORB = new  Material[]{
-	new Material("orbe d'évolution","",5,            0.0002,60.0,     1.0,1.0,0.4),
-    new Material("orbe d'augmentation","",5,         0.0002,55.0,     1.0,1.0,0.5),
-    new Material("orbe de transmutation","",5,       0.0002,50.0,     1.0,1.0,0.6),
-    new Material("orbe de transfert","",5,           0.0002,45.0,     1.0,1.0,0.7),
-	new Material("orbe de fusion","",5,              0.0002,40.0,     1.0,1.0,0.8),
+	new Material("orbe d'évolution","",5,            0.0002,60.0,     1.0,1.0,0.40),
+    new Material("orbe d'augmentation","",5,         0.0002,55.0,     1.0,1.0,0.50),
+    new Material("orbe de transmutation","",5,       0.0002,50.0,     1.0,1.0,0.60),
+    new Material("orbe de transfert","",5,           0.0002,45.0,     1.0,1.0,0.70),
+	new Material("orbe de fusion","",5,              0.0002,40.0,     1.0,1.0,0.80)
     };
 
     public static BaseItem[] BA = new  BaseItem[]{
@@ -429,7 +429,7 @@ class StaticItem {
         }
 
 
-               /*
+   /*            
         for(int i=0; i< max_level; i++)
             {
             if(RessourceByLevel[i].list.size() > 0)
@@ -438,9 +438,9 @@ class StaticItem {
             for(Item it : RessourceByLevel[i].list)
                 System.out.print(it.name + " ");
             }
-            }
+            }*/
         
-
+/*
     for(int i=0; i< max_level; i++)
         {
         if(WhiteItemByLevel[i].list.size() > 0)

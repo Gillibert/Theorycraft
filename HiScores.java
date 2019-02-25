@@ -98,7 +98,7 @@ public void cleanScores()
 		list.add(ts);
 		for(int i=0; i<5; i++)
 		{
-			Score ts2 = new Score(ts.challenge_name,StaticItem.nameGenerator.getName(),ts.time*Math.pow(2,0.5*i+1), ts.seed);
+			Score ts2 = new Score(ts.challenge_name,StaticItem.nameGenerator.getName(),ts.time*Math.pow(2,0.75*i+1), ts.seed);
 			list.add(ts2);
 		}
 	}

@@ -24,6 +24,11 @@ public class DrawMap extends JPanel {
 		the_map = new ImageIcon(Joueur.universe.map.map_img).getImage();
 		}
 
+		public void SetPlayer(Player p)
+		{
+			Joueur = p;
+		}
+		
 		public void setZone(int z)
 		{
 			zone = z;
@@ -47,7 +52,7 @@ public class DrawMap extends JPanel {
 		
 		g.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER,0.15f));
 		Rectangle tmp;
-		for(int i=0; i < Joueur.universe.map.zonesR.size(); i++)
+		for(int i=0; i < Joueur.universe.nombre_zones()-1.0; i++)
 	    {
 		if (mzl < Joueur.universe.get_zone_level(i))
 		    the_color = Color.red;

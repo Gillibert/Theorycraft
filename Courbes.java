@@ -15,7 +15,7 @@ public class Courbes extends javax.swing.JDialog  {
 	private int to_dis_tmp;
 	private DefaultListModel stats_list;
 	private ArrayList<CurveObject> curves_to_draw;
-	private int zoom;
+	private int zoom = 2;
 	private int range;
 	
     public static int[] zoomLevel = {5,10,20,50,100,200,500,1000,2000,4000,10000};
@@ -32,7 +32,7 @@ public class Courbes extends javax.swing.JDialog  {
 		refresh();
 	}
 	
-	public void refreshAfterZoom()
+	private void refreshAfterZoom()
 	{
 		range = zoomLevel[zoom];
 		drawSurf.repaint();
@@ -62,10 +62,10 @@ public class Courbes extends javax.swing.JDialog  {
 	this.setVisible(true);
 	}
 
-	private void refresh()
+	public void refresh()
 	{	
 		prompt.setText((String)stats_list.get(liste_s.getSelectedIndex()));
-		zoom = 2;
+		//zoom = 2;
 		refreshAfterZoom();
 	}
 	
@@ -97,7 +97,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw3.title = Local.RESURRECTION_REGENERATION_PENALTIES;
 			curve_to_draw4.title = Local.SHOPPING_CRAFTING;
 			int asize = Joueur.t_stats.data.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -136,7 +136,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw3.title = Local.ATTACK;
 			curve_to_draw4.title = Local.FLEE;
 			int asize = Joueur.t_stats.data.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -163,7 +163,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw2.title = Local.REGENERATION;
 			curve_to_draw3.title = Local.PENALTIES;
 			int asize = Joueur.t_stats.data.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -187,7 +187,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw2.title = Local.LOOKING_FOR_MYSTIC_FORGE;
 			curve_to_draw3.title = Local.CRAFTING;
 			int asize = Joueur.t_stats.data.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -211,7 +211,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw2.title = Local.GOLD_FROM_LIFE_ANNUITY;
 			curve_to_draw3.title = Local.GOLD_FROM_SALES;
 			int asize = Joueur.t_stats.data_money.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -243,7 +243,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw5.title = Local.GOLD_FROM_SELLING_OTHER;
 			
 			int asize = Joueur.t_stats.data_money.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -272,7 +272,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw.title = Local.LOSS_FROM_DEATH;
 			curve_to_draw2.title = Local.LOSS_FROM_SHOPPING;
 			int asize = Joueur.t_stats.data_money.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -297,7 +297,7 @@ public class Courbes extends javax.swing.JDialog  {
 			curve_to_draw2.title = Local.EXPERIENCE_FROM_TRAPS;
 			curve_to_draw3.title = Local.EXPERIENCE_FROM_ORBS;
 			int asize = Joueur.t_stats.data_xp.size();
-			if (asize > 1) asize--;
+			//if (asize > 1) asize--;
 
 			double scale = sizar/asize;
 
@@ -336,31 +336,37 @@ public class Courbes extends javax.swing.JDialog  {
 			{
 			curve_to_draw.title = Local.BASE_MONSTER_LEVEL;
 			curve_to_draw2.title = Local.CHAMPIONS_LEVEL;
+			curve_to_draw3.title = Local.SUPER_CHAMPIONS_LEVEL;
 			for (int x = 0; x< sizar; x++)
 				{
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 
-				curve_to_draw.arr_x[x] = curve_to_draw2.arr_x[x] = tx;
+				curve_to_draw.arr_x[x] = curve_to_draw2.arr_x[x]  = curve_to_draw3.arr_x[x] = tx;
 				
 				curve_to_draw.arr_y[x]  = tx;
 				curve_to_draw2.arr_y[x] = Joueur.universe.niveau_champion(tx);
+				curve_to_draw3.arr_y[x] = Joueur.universe.niveau_super_champion(tx);
 				}
 				curves_to_draw.add(curve_to_draw2);
+				curves_to_draw.add(curve_to_draw3);
 		}
 		break;
 		case -4:
 			{
 			curve_to_draw.title = Local.MONSTERS_SKILLS_POINTS;
 			curve_to_draw2.title = Local.CHAMPIONS_SKILLS_POINTS;
+			curve_to_draw3.title = Local.SUPER_CHAMPIONS_SKILLS_POINTS;
 			for (int x = 0; x< sizar; x++)
 				{
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 
-				curve_to_draw.arr_x[x] = curve_to_draw2.arr_x[x] = tx;
+				curve_to_draw.arr_x[x] = curve_to_draw2.arr_x[x] = curve_to_draw3.arr_x[x] = tx;
 				curve_to_draw.arr_y[x]  = Joueur.universe.monster_points_for_level(tx);
-				curve_to_draw2.arr_y[x] = Joueur.universe.monster_points_for_level(tx)*1.5;
+				curve_to_draw2.arr_y[x] = Joueur.universe.monster_points_for_level(tx)*Joueur.universe.mul_points_competences_champions();
+				curve_to_draw3.arr_y[x] = Joueur.universe.monster_points_for_level(tx)*Joueur.universe.mul_points_competences_super_champions();
 				}
 				curves_to_draw.add(curve_to_draw2);
+				curves_to_draw.add(curve_to_draw3);
 		}
 		break;
 		case -3:
@@ -922,22 +928,14 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case 40:
 		{
-			curve_to_draw.title = Local.AVERAGE_MERCHANT_LEVEL_ADDED_TO_ZONE_LEVEL;
-			curve_to_draw2.title = Local.MINIMUM_MERCHANT_LEVEL_ADDED_TO_ZONE_LEVEL;
-			curve_to_draw3.title = Local.MAXIMUM_MERCHANT_LEVEL_ADDED_TO_ZONE_LEVEL;
+			curve_to_draw.title = Local.MERCHANT_LEVEL_MULTIPLIER;
 			for (int x = 0; x< sizar; x++)
 			{
 				tx = ((double)x/(double)(sizar-1))*max_pt;
-				double ptb = Joueur.universe.niveau_boutique(tx);
+				double ptb = Joueur.universe.multiplicateur_niveau_boutique(tx);
 				curve_to_draw.arr_x[x] = tx;
 				curve_to_draw.arr_y[x] = ptb;
-				curve_to_draw2.arr_x[x] = tx;
-				curve_to_draw2.arr_y[x] = StaticItem.tailleMin(ptb);
-				curve_to_draw3.arr_x[x] = tx;
-				curve_to_draw3.arr_y[x] = StaticItem.tailleMax(ptb);
 			}
-			curves_to_draw.add(curve_to_draw2);
-			curves_to_draw.add(curve_to_draw3);
 		}
 		break;
 		case 41:
@@ -1013,7 +1011,7 @@ public class Courbes extends javax.swing.JDialog  {
 			{
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 				curve_to_draw.arr_x[x] = tx;
-				curve_to_draw.arr_y[x] = Joueur.universe.rente_par_seconde(tx);
+				curve_to_draw.arr_y[x] = Joueur.universe.rente_par_rencontre(tx);
 			}
 		}
 		break;
@@ -1092,7 +1090,7 @@ public class Courbes extends javax.swing.JDialog  {
 		case 50:
 			{
 
-			curve_to_draw.title = Local.PENALTY_COEFFICIENT;
+			curve_to_draw.title = Local.PENALTY_MULTIPLIER;
 			
 			for (int x = 0; x< sizar; x++)
 			{
@@ -1190,6 +1188,110 @@ public class Courbes extends javax.swing.JDialog  {
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 				curve_to_draw.arr_x[x] = tx;
 				curve_to_draw.arr_y[x] = Joueur.universe.equipment_weight_multiplier(tx);
+			}
+			}
+		break;
+		case 58:
+			{
+
+			curve_to_draw.title = Local.COLD_RESISTANCE;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.resistance_froid(tx);
+			}
+			}
+		break;
+		case 59:
+			{
+
+			curve_to_draw.title = Local.HEAT_RESISTANCE;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.resistance_chaud(tx);
+			}
+			}
+		break;
+		case 60:
+			{
+
+			curve_to_draw.title = Local.PRECIPITATION_RESISTANCE;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.resistance_precipitations(tx);
+			}
+			}
+		break;
+		case 61:
+			{
+
+			curve_to_draw.title = Local.COLD_AFFINITY;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.affinite_froid(tx);
+			}
+			}
+		break;
+		case 62:
+			{
+
+			curve_to_draw.title = Local.HEAT_AFFINITY;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.affinite_chaud(tx);
+			}
+			}
+		break;
+		case 63:
+			{
+
+			curve_to_draw.title = Local.PRECIPITATION_AFFINITY;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.affinite_precipitations(tx);
+			}
+			}
+		break;
+		case 64:
+			{
+
+			curve_to_draw.title = Local.OVERLOAD_RESISTANCE;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.resistance_surcharge(tx);
+			}
+			}
+		break;
+		case 65:
+			{
+
+			curve_to_draw.title = Local.CLEARANCE_SALE_INVENTORY_MULTIPLIER;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.clearance_sale_inventory_multiplier(tx);
 			}
 			}
 		break;

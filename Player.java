@@ -10,7 +10,9 @@ public class Player implements Serializable {
     //***********************
 	public boolean jeu_fini = false;
 	public int nb_hits = 0;
-	
+    public int crit_taken = 0;	
+	public int nb_encounters = 0;	
+	 
     public static String[] TagsName = Local.TAGS_NAME; // Tags names
 	public static int nb_tags = TagsName.length; // Number of tags
     public boolean[] tags; // Player's tags
@@ -21,6 +23,9 @@ public class Player implements Serializable {
     public double[] stats_with_bonus; // For fast access
     public double[] item_bonus; // For fast access, used only in LevlUp
 
+	public double temperature_diff = 0.0;
+	public double precipitation_strength = 0.0;
+	
 	// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
     // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14) 
     // RESF(15) MF(16) RF(17) QALF(18) QTYF(19) POWF(20) GF(21)
@@ -42,9 +47,9 @@ public class Player implements Serializable {
 
     public double temps; // temps écoulé depuis le début du combat
     public double temps_total; // temps écoulé depuis le début du jeu
-    public double temps_depuis_derniere_rente; // temps écoulé depuis la dernière rente
 	
 	public double orbes_investits_en_points_divins;
+	public double orbes_investits_en_points_competence;
     public double vie; // vie
     public ArrayList<Item> inventory;// inventraire
     public ArrayList<Item> craftInventory; //inventaire de la forge mystique
@@ -58,26 +63,70 @@ public class Player implements Serializable {
     public Shop shop; // the shop
     public Monster mob; // the mob
 	public Universe universe; // the universe
-    public int crit_taken;
     public TimeStats t_stats ;
-
+	public double points_haut_faits = 0.0;
+	
 	static class ComparateurStats implements Comparator<Item> {
 	public int compare(Item s1, Item s2){
 	    if (s1.nb_pts() > s2.nb_pts()) return -1;
 	    if (s1.nb_pts() < s2.nb_pts()) return 1;
 	    else return 0;
 	} 
-} 
+}
+	
+	public double heat_penalty()
+	{
+			return  Math.min(1.0,100.0/(100+temperature_diff*heat_resistance()));
+	}
+	
+	public double cold_penalty()
+	{
+			return Math.min(1.0,100.0/(100-temperature_diff*cold_resistance()));
+	}
+	
+	public double overload_penalty()
+	{
+		double cm = charge_max();
+		if (charge < cm) return 1.0;
+		else return universe.base_overload_penalty((charge/cm-1.0)*overload_resistance());
+	}
+	
+	public double precipitation_penalty()
+	{
+		return 10.0/(10+precipitation_strength*precipitation_resistance());
+	}
+	
+	public double heat_bonus()
+	{
+			return  Math.max(1.0,(100+temperature_diff*heat_affinity())/100.0);
+	}
+	
+	public double cold_bonus()
+	{
+			return Math.max(1.0,(100-temperature_diff*cold_affinity())/100.0);
+	}
+	
+	public double precipitation_bonus()
+	{
+		return (10.0+precipitation_strength*precipitation_affinity())/10.0;
+	}
+	
+	public void refresh_weather_penalties()
+	{
+		temperature_diff = universe.get_current_temperature(zone) - universe.temperature_ideale();
+	}
 
 	public void voyage(int zn)
 	{
 		if (zn != zone)
 		{
 			zone = zn;
+			nb_encounters = 0;
 			double bp = universe.base_penalty_for_travel();
 			double pr = penalty_reduction();
 			personal_wait(bp*pr,TimeStats.ACTIVITY_PENALTY);
 			if(disp) Game.MW.addLog(String.format(Local.TRAVEL_TO,name,universe.map.zonesName.get(zone),bp*pr,pr,bp));
+			update_weather();
 		}
 	}
 	
@@ -104,20 +153,6 @@ public class Player implements Serializable {
 		return res;
 	}
 	
-	public void toucher_rente()
-	{
-		double temps_ecoule = temps_total - temps_depuis_derniere_rente;
-		double rente_par_seconde = rente_par_seconde();
-		double fric = rente_par_seconde()*temps_ecoule;
-		
-		if (fric > 0.01)
-		{
-		money_gain(fric, TimeStats.GAIN_RENTE);
-		if(disp) Game.MW.addLog(String.format(Local.LIFE_ANNUITY,name,fric,temps_ecoule,rente_par_seconde));
-		temps_depuis_derniere_rente = temps_total;
-		}
-	}
-	
     public void remove_item(Item i)
     {
 	i.equiped=false;
@@ -137,36 +172,91 @@ public class Player implements Serializable {
 
     public boolean can_buy(Item b)
     {
-	return (charge + b.poids_final(this) <= charge_max()) && 
-		(money - coeff_achat()*b.prix() >= 0 || (b.stackable && money > 1.0));
+	return (money - coeff_achat()*b.prix() >= 0 || (b.stackable && money > 0.01));
     }
-
-    public void buy(Item b)
-    {
-	double prix = coeff_achat()*b.prix();
 	
-	int  loss_type = TimeStats.LOSS_BUY_OTHER;
-	if(b.rare == 0) loss_type = TimeStats.LOSS_BUY_BASE;
-	else if(b.rare == 4 || b.rare == 5) loss_type = TimeStats.LOSS_BUY_MAT;
-	else if(b.rare == 6) loss_type = TimeStats.LOSS_BUY_ORB;
-		
-	if(prix <= money)
+	public void buy(Item it)
 	{
-		shop.inventory.remove(b);
-		get_item(b);
-		money_loss(prix, loss_type);
+		if (money<0.01) return;
+		ArrayList<Item> tmp =  new ArrayList<Item>();
+		tmp.add(it);
+		buy(tmp);
 	}
-	else if(b.stackable)
+
+    public void buy(ArrayList<Item> slist)
+    {
+	if (slist.size()==0 || money<0.01) return;
+	double coeff_ach = coeff_achat();
+
+	double perte_base = 0.0;
+	double perte_mat = 0.0;
+	double perte_orb = 0.0;
+	double perte_other = 0.0;
+	double total_prix = 0.0;
+	
+	ArrayList<Item> toAdd = new ArrayList<Item>();
+	ArrayList<Item> toRemove = new ArrayList<Item>();
+	
+	String partial;
+	for(Item the_object : slist)
 	{
-		double qty_to_buy = (money/prix)*b.qty;
-		b.set_qty(b.qty - qty_to_buy);
+	double prix = coeff_ach*the_object.prix();
+	if(total_prix+prix <= money)
+	{
+		toAdd.add(the_object);
+		toRemove.add(the_object);
+		total_prix += prix;
+	}
+	else if (the_object.stackable)
+	{
+		double qty_to_buy = ((money-total_prix)/prix)*the_object.qty;
+		the_object.set_qty(the_object.qty - qty_to_buy);
 		Item rit = new Item();
-		rit.copy(b);
+		rit.copy(the_object);
 		rit.set_qty(qty_to_buy);
-		get_item(rit);
-		if(disp) Game.MW.addLog(String.format(Local.BUYING_OBJECTS,rit.name,shop.name,money));
-		money_loss(money, loss_type);
+		total_prix = money;
+		toAdd.add(rit);
+		break;
 	}
+	}
+	for(Item the_object : toAdd)
+	{
+	double prix = coeff_ach*the_object.prix();
+	if(the_object.rare == 0) perte_base += prix;
+	else if(the_object.rare == 4 || the_object.rare == 5) perte_mat += prix;
+	else if(the_object.rare == 6) perte_orb += prix;
+	else perte_other += prix;
+	charge += the_object.poids_final(this);
+	}
+	inventory.addAll(toAdd);
+	shop.inventory.removeAll(toRemove);
+	
+	int nbitem = toAdd.size();
+	String buyStr="";
+	if(nbitem < 10)
+	{
+	for(Item the_object : toAdd)
+	{
+		if(buyStr != "") buyStr += ", ";
+		buyStr += NameGenerator.firstCharLowercase(the_object.name);
+	}
+	}
+	else
+	{
+		buyStr = String.format(Local.N_OBJECTS,nbitem);
+	}
+
+	if(perte_base > 0.0)
+		money_loss(perte_base,TimeStats.LOSS_BUY_BASE);
+	if(perte_mat > 0.0)
+		money_loss(perte_mat,TimeStats.LOSS_BUY_MAT);
+	if(perte_orb > 0.0)
+		money_loss(perte_orb,TimeStats.LOSS_BUY_ORB);
+	if(perte_other > 0.0)
+		money_loss(perte_other,TimeStats.LOSS_BUY_OTHER);
+
+	if(inventory.size() > 50) clean_list(inventory);
+	if(disp) Game.MW.addLog(String.format(Local.BUYING_OBJECTS,buyStr,shop.name,total_prix));
     }
 
 	public void money_gain(double gain, int type_gain)
@@ -179,6 +269,7 @@ public class Player implements Serializable {
 	{
 		t_stats.addRevenue(loss, type_loss);
 		money -= loss;
+		if (money < 0) money = 0.0;
 	}
 	
 	public void sell(ArrayList<Item> slist)
@@ -316,9 +407,12 @@ public class Player implements Serializable {
 	charge -= the_object.poids_final(this);
 	if(the_object.equiped) {equiped = true; the_object.equiped = false;}
 	}
+	
 	inventory.removeAll(slist);
-	clean_list(slist);
 	craftInventory.addAll(slist);
+	
+	clean_list(craftInventory);
+	
 	if(equiped) refresh_stats_with_bonus();
 	
 	if(disp) Game.MW.addLog(String.format(Local.DROPPING_OBJECTS,name,putStr));
@@ -382,14 +476,6 @@ public class Player implements Serializable {
 	if(disp) Game.MW.addLog(String.format(Local.PICKING_OBJECTS,name,b.name));
     }
 
-
-    public boolean can_get(Item b)
-    {
-	return (charge + b.poids_final(this) <= charge_max());
-    }
-
-
-
     public void refresh_stats_with_bonus()
     {
 	for(int i=0; i<nb_stats; i++) 
@@ -448,8 +534,9 @@ public class Player implements Serializable {
 			temps_res(),charge_max(),coeff_vente(),coeff_achat(),100*chance_fuite(),temps_fuite(),
 			chance_magique()*100,chance_magique()*chance_rare()*100,chance_qualite()*100,multiplicateur_or(),
 			multiplicateur_res(),quantite_drop(),
-			quantite_drop()*universe.proba_ressource(),quantite_drop()*(1-universe.proba_ressource()),
-			quantite_drop()*(1-universe.proba_ressource())*multiplicateur_res(),
+			quantite_drop()*universe.proba_ressource(), // Nombre de ressources
+			quantite_drop()*(1-universe.proba_ressource()), // Nombre d'objets hors ressources
+			quantite_drop()*universe.proba_ressource()*multiplicateur_res()*universe.quantite_ressource_base_drops(), // Quantité totale de ressources
 			quantite_drop()*(1-universe.proba_ressource())*chance_magique(), // Nombre d'objets magiques
 			quantite_drop()*(1-universe.proba_ressource())*chance_magique()*chance_rare(), // Nombre d'objets rares
 			puissance_ench_inf(),
@@ -458,11 +545,13 @@ public class Player implements Serializable {
 			facteur_temps(),epines(),
 			100*represailles(),
 			100*necrophagie(),
-			temps_craft(),100*rendement(),100*economie_orbe(),niveau_boutique_base(),niveau_boutique(),taille_boutique(),
+			temps_craft(),100*rendement(),100*economie_orbe(),
+			multiplicateur_niveau_boutique(),niveau_boutique_base()*multiplicateur_niveau_boutique(),
+			taille_boutique(),
 			lvl1,100.0*proba_trouver_piege(lvl1),
 			lvl2,100.0*proba_trouver_piege(lvl2),
 			lvl3,100.0*proba_trouver_piege(lvl3),
-			rente_par_seconde(),points_par_niveau(),
+			rente_par_rencontre(),points_par_niveau(),
 			100.0*(bonus_xp()-1),
 			lvl0,100.0*modif_exp_lvl(lvl0-level)-100.0,
 			lvl1,100.0*modif_exp_lvl(lvl1-level)-100.0,
@@ -473,32 +562,38 @@ public class Player implements Serializable {
 			universe.points_divins_multiplier(DIEU()),
 			multi_premier_coup(),
 			divine_cap_eq(),divine_cap_const(),
-			resources_weight_multiplier(),equipment_weight_multiplier());
+			resources_weight_multiplier(),equipment_weight_multiplier(),
+			cold_resistance(), heat_resistance(), precipitation_resistance(), overload_resistance(),
+			100*(1-cold_penalty()), 100*(1-heat_penalty()), 100*(1-precipitation_penalty()), 100*(1-overload_penalty()),
+			cold_affinity(), heat_affinity(), precipitation_affinity(),
+			100*(cold_bonus()-1.0), 100*(heat_bonus()-1.0), 100*(precipitation_bonus()-1.0),100*(bonus_haut_faits()-1.0),
+			clearance_sale_inventory_multiplier()
+			);
 	}
 
     public double dmpa()
     {return dmg_base() + dmg_base()*(multi_crit()-1.0)*crit_proba();}
     
     public double IAS()
-    {return stats_with_bonus[Universe.IAS];}
+    {return stats_with_bonus[Universe.IAS]*cold_bonus();}
 
     public double DMG()
     {return stats_with_bonus[Universe.DMG];}
 
     public double REDUC()
-    {return stats_with_bonus[Universe.REDUC];}
+    {return stats_with_bonus[Universe.REDUC]*heat_bonus();}
 
     public double ABS()
     {return stats_with_bonus[Universe.ABS];}
 
     public double ESQ()
-    {return stats_with_bonus[Universe.ESQ];}
+    {return stats_with_bonus[Universe.ESQ]*precipitation_bonus();}
 
     public double PRC()
-    {return stats_with_bonus[Universe.PRC];}
+    {return stats_with_bonus[Universe.PRC]*precipitation_penalty();}
 
     public double LCK()
-    {return stats_with_bonus[Universe.LCK];}
+    {return stats_with_bonus[Universe.LCK]*precipitation_penalty();}
 
     public double CRT()
     {return stats_with_bonus[Universe.CRT];}
@@ -507,25 +602,25 @@ public class Player implements Serializable {
     {return stats_with_bonus[Universe.VDV];}
 
     public double VITA()
-    {return stats_with_bonus[Universe.VITA];}
+    {return stats_with_bonus[Universe.VITA]*cold_penalty();}
 
     public double CON()
-    {return stats_with_bonus[Universe.CON];}
+    {return stats_with_bonus[Universe.CON]*cold_penalty();}
 
     public double REGEN()
     {return stats_with_bonus[Universe.REGEN];}
 
     public double RESUR()
-    {return stats_with_bonus[Universe.RESUR];}
+    {return stats_with_bonus[Universe.RESUR]*heat_bonus();}
 
     public double LOAD()
     {return stats_with_bonus[Universe.LOAD];}
 
     public double RUN()
-    {return stats_with_bonus[Universe.RUN];}
+    {return stats_with_bonus[Universe.RUN]*overload_penalty();}
 
     public double RESF()
-    {return stats_with_bonus[Universe.RESF];}
+    {return stats_with_bonus[Universe.RESF]*bonus_haut_faits();}
 
     public double MF()
     {return stats_with_bonus[Universe.MF];}
@@ -573,13 +668,13 @@ public class Player implements Serializable {
     {return stats_with_bonus[Universe.FLEE_SPD];}
 
     public double INIT()
-    {return stats_with_bonus[Universe.INIT];}
+    {return stats_with_bonus[Universe.INIT]*overload_penalty();}
 
 	public double IMUN_FINAL()
-	{return stats_with_bonus[Universe.IMUN_FINAL];}
+	{return stats_with_bonus[Universe.IMUN_FINAL]*precipitation_bonus();}
 
     public double TIME_SPD()
-    {return stats_with_bonus[Universe.TIME_SPD];}
+    {return stats_with_bonus[Universe.TIME_SPD]*cold_bonus();}
 
     public double EPIN()
     {return stats_with_bonus[Universe.EPIN];}
@@ -621,7 +716,7 @@ public class Player implements Serializable {
 	{return stats_with_bonus[Universe.EDUC];}
 	
     public double BONUS_XP()
-    {return stats_with_bonus[Universe.BONUS_XP];}
+    {return stats_with_bonus[Universe.BONUS_XP]*heat_penalty();}
 	
     public double BONUS_LOWLEV()
     {return stats_with_bonus[Universe.BONUS_LOWLEV];}
@@ -652,7 +747,31 @@ public class Player implements Serializable {
 	
 	public double LIGHTER_EQP()
 	{return stats_with_bonus[Universe.LIGHTER_EQP];}
-		
+	
+	public double COLD_RES()
+	{return stats_with_bonus[Universe.COLD_RES];}
+
+	public double HOT_RES()
+	{return stats_with_bonus[Universe.HOT_RES];}
+	
+	public double PRECI_RES()
+	{return stats_with_bonus[Universe.PRECI_RES];}
+
+	public double COLD_BONUS()
+	{return stats_with_bonus[Universe.COLD_BONUS];}
+
+	public double HOT_BONUS()
+	{return stats_with_bonus[Universe.HOT_BONUS];}
+	
+	public double PRECI_BONUS()
+	{return stats_with_bonus[Universe.PRECI_BONUS];}
+	
+	public double OVERLOAD_RES()
+	{return stats_with_bonus[Universe.OVERLOAD_RES];}
+	
+	public double SHOPPING_ADDICT()
+	{return stats_with_bonus[Universe.SHOPPING_ADDICT];}
+
 	public double total_skill_points()
 	{
 		double res=0;
@@ -672,7 +791,7 @@ public class Player implements Serializable {
     public double absorption() {return universe.absorption(ABS());}
     public double vol_de_vie() {return universe.vol_de_vie(VDV());}
     public double regen() {return universe.regen(REGEN());}
-    public double charge_max() {if(Game.DEBUG_MODE_MAX_LOAD) return 900000; else return universe.charge_max(LOAD());}
+    public double charge_max() {if(Game.DEBUG_MODE_MAX_LOAD) return 10000000; else return universe.charge_max(LOAD());}
     public double temps_traque() {return universe.temps_traque(RUN());}
     public double temps_shop() {return universe.temps_shop(RUN());}
     public double temps_forge() {return universe.temps_forge(RUN());}
@@ -699,16 +818,16 @@ public class Player implements Serializable {
     public double necrophagie() {return universe.necrophagie(NECRO());}
     public double rendement() {return universe.rendement(CRAFT_REND());}
     public double economie_orbe() {return universe.economie_orbe(ECO_ORB());}
-    public double niveau_boutique() {return universe.niveau_boutique(SHOP_LEVEL());}
+    public double multiplicateur_niveau_boutique() {return universe.multiplicateur_niveau_boutique(SHOP_LEVEL());}
     public double taille_boutique() {return universe.taille_boutique(SHOP_SIZE());}
 	public double detection_piege() {return universe.detection_piege(TRAP_DET());}
 	public double bonus_initiative_piege() {return universe.bonus_initiative_piege(TRAP_INIT());}
 	public double initiative_piege() {return universe.initiative(INIT()*universe.bonus_initiative_piege(TRAP_INIT()));}
 	public double bonus_resistance_vs_piege() {return universe.bonus_resistance_vs_piege(TRAP_RES());}
 	public double resistance_vs_piege() {return universe.reduc(REDUC()*universe.bonus_resistance_vs_piege(TRAP_RES()));}
-	public double rente_par_seconde() {return universe.rente_par_seconde(RENTE());}
+	public double rente_par_rencontre() {return universe.rente_par_rencontre(RENTE());}
 	public double points_par_niveau() {return universe.points_par_niveau(EDUC());}	
-	public double points_totaux() {return points_par_niveau()*level + universe.points_initiaux();}
+	public double points_totaux() {return points_par_niveau()*level + universe.points_initiaux() + universe.points_competence_orbes(orbes_investits_en_points_competence);}
 	public double points_a_distribuer() {return points_totaux()-points_distribues();}
 	public double points_divins_a_distribuer() {return points_divins_totaux()-points_divins_distribues();}
 	public double bonus_xp() {return universe.bonus_xp(BONUS_XP());}
@@ -723,6 +842,15 @@ public class Player implements Serializable {
 	public double divine_cap_const() {return universe.divine_cap_const(CONST_MASTER());}
 	public double resources_weight_multiplier() {return universe.resources_weight_multiplier(LIGHTER_RES());}
 	public double equipment_weight_multiplier() {return universe.equipment_weight_multiplier(LIGHTER_EQP());}
+	public double cold_resistance() {return universe.resistance_froid(COLD_RES());}
+	public double heat_resistance() {return universe.resistance_chaud(HOT_RES());}
+	public double precipitation_resistance() {return universe.resistance_precipitations(PRECI_RES());}
+	public double cold_affinity() {return universe.affinite_froid(COLD_BONUS());}
+	public double heat_affinity() {return universe.affinite_chaud(HOT_BONUS());}
+	public double precipitation_affinity() {return universe.affinite_precipitations(PRECI_BONUS());}
+	public double overload_resistance() {return universe.resistance_surcharge(OVERLOAD_RES());}
+	public double clearance_sale_inventory_multiplier() {return universe.clearance_sale_inventory_multiplier(SHOPPING_ADDICT());}
+	public double bonus_haut_faits() {return universe.bonus_haut_faits_base(points_haut_faits);}
 	
 	public double divine_cap(int i){
 		if(i < universe.nb_universe_stats) return universe.divine_cap[i] * universe.divine_cap_const(CONST_MASTER());
@@ -731,7 +859,7 @@ public class Player implements Serializable {
 	
 	public int niveau_boutique_base() 
 	{ if(zone >= 2) 
-		return (int)(universe.get_zone_level(zone)+universe.get_zone_max_level(zone))/2;
+		return (int)(universe.get_zone_max_level(zone)*universe.niveau_boutique_pour_niveau_zone());
 	  else
 		return 50*(zone+1); // Marchands peu puissants dans les arènes
 	}
@@ -768,6 +896,7 @@ public class Player implements Serializable {
     {
 	try
 	    {
+		if (Game.MW != null) Game.MW.mustRefreshCurves = true;
 		double adjusted_time = time_w/facteur_temps();
 		temps_total += adjusted_time;
 		t_stats.addActivity(adjusted_time,ACT);
@@ -847,8 +976,8 @@ public Player()
 	{
 	disp=true;
 	orbes_investits_en_points_divins = 0;
+	orbes_investits_en_points_competence = 0;
 	temps_total = 0;
-	temps_depuis_derniere_rente = 0;
 	t_stats = new TimeStats();
 	conditionToggle = new boolean[]{true,true,true,true,true};
 	conditionValues = new int[]{1,1,1,1,1};
@@ -863,6 +992,7 @@ public Player()
 	zone = 2;
 	level = 1;
   	xp_pt = 0;
+	refresh_weather_penalties();
 	
 	tags = new boolean[nb_tags];
 	for(int t=0; t<nb_tags; t++) tags[t]=false;
@@ -893,7 +1023,7 @@ public Player()
 	{
 		double bonus = stats_with_bonus[dsp_target[i]];
 		if(bonus > 0.01)
-		res += String.format("%s"+ Local.COLON + " %.2f\n",stats_name[dsp_target[i]],bonus);
+		res += String.format("%s"+ Local.COLON + " %g\n",stats_name[dsp_target[i]],bonus);
 	}
 	return res;
     }
@@ -901,26 +1031,37 @@ public Player()
 	// Utilisé si DEBUG
     public void giveStuff()
     {
-	Item it;
-		for (int i=0;i<20;i++)
+	Item it = new Item(300,this,Item.ITEM_SHOP);
+	
+	for (int i=0;i<20;i++)
 	    {
 		it = new Item(i,this,Item.ITEM_DROP);
 		if(it.stackable) it.set_qty(5.0);
 		inventory.add(it);
-		charge += it.poids_final(this);
 		}
+	
 	for(int j=0; j<StaticItem.ORB.length; j++)	
 	    {
 		it = new Item(StaticItem.ORB[j],StaticItem.RESSOURCE_ORB);
-		it.qty = 20000.0;
-		it.update();
+		it.set_qty(5000000000.0);
 		inventory.add(it);
-		charge += it.poids_final(this);
 	    }
 	
+	boolean[] posTaken = new boolean[StaticItem.nb_pos];
+	
+	for(int i=0; i< StaticItem.nb_pos-1; i++)
+		if (universe.slot_est_disponible(i)==false) 
+			posTaken[i] = true;
+	posTaken[StaticItem.nb_pos-1]=true;
+	
 	for(int j=0; j<20; j++)	
-		 {	
-		it = new Item(300,this,Item.ITEM_SHOP);
+		{
+		for(int tr=0; tr<20; tr++)
+		{
+			it = new Item(300,this,Item.ITEM_SHOP);
+			if(posTaken[it.pos]==false) break;
+		}
+		posTaken[it.pos]=true;
 		if (it.rare == 0)
 		{
 		it.elvl = 300;
@@ -929,14 +1070,110 @@ public Player()
 		it.rare = 3;
 		for(int i=0; i<Player.nb_stats; i++)
 		    {
-			it.bonus[i]=Item.power(this,it.elvl);
+			it.bonus[i]=puissance_ench_sup()*it.elvl;
 		    }
+		it.quality = universe.qualite_max();
 		it.update();
 		inventory.add(it);
-		charge += it.poids_final(this);
 		}
 		}
+		refresh_charge();
     }
+	
+	public void update_encounters()
+	{
+		double tt = universe.plage_random()*temps_traque();
+		if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_AN_ENNEMY,tt));
+		personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_ENNEMI);
+		shop = null;
+		nb_encounters++;
+		if(nb_encounters%20 == 1 ) update_weather();
+		if(nb_encounters%50 == 49 ) update_rente();
+	}
+
+	public void  update_rente()
+	{
+		double rente_par_rencontre = rente_par_rencontre();
+		double fric = rente_par_rencontre*50;
+		if (fric > 0.01)
+		{
+		money_gain(fric, TimeStats.GAIN_RENTE);
+		if(disp) Game.MW.addLog(String.format(Local.LIFE_ANNUITY,name,fric,50.0,rente_par_rencontre));
+		}
+	}
+	
+	public void update_weather()
+	{
+	String zone_name = universe.map.zonesName.get(zone);
+	
+	double precipitation = universe.get_precipitation(zone);
+	double current_precipitation = universe.get_current_precipitation(zone);
+	double current_precipitation_modifier = universe.map.current_precipitation_modifier.get(zone);
+	
+	double temperature = universe.get_temperature(zone);
+	double current_temperature = universe.get_current_temperature(zone);
+	double current_temperature_modifier = universe.map.current_temperature_modifier.get(zone);
+
+	double mdiff, tdiff, new_temperature;
+	if(Math.abs(precipitation)<0.001)
+	{
+		precipitation_strength = 0.0;
+		mdiff = 0.4*Math.random()-0.20;
+		
+		universe.map.current_temperature_modifier.set(zone,current_temperature_modifier+mdiff);
+		new_temperature = universe.get_current_temperature(zone);
+		tdiff =  new_temperature - current_temperature;
+		if(disp)
+		{
+			if(tdiff > 0) Game.MW.addLog(String.format(Local.NO_PRECIPITATIONS, zone_name, 100.0, tdiff, new_temperature));
+			else Game.MW.addLog(String.format(Local.NO_PRECIPITATIONS_NEG, zone_name, 100.0, -tdiff, new_temperature));
+		}
+	}
+	else if(Math.random()< current_precipitation)
+		{
+		String type="";
+		mdiff = 1.0*Math.random()+0.5;
+		universe.map.current_precipitation_modifier.set(zone,current_precipitation_modifier-mdiff);
+		universe.map.current_temperature_modifier.set(zone,current_temperature_modifier-mdiff);
+		new_temperature = universe.get_current_temperature(zone);
+		tdiff =  new_temperature - current_temperature;
+		
+		if(temperature <=0.0 && Math.random() < 0.5)
+			{
+			precipitation_strength = 2.0+1.0*Math.random();
+			type = Local.SNOW;
+			}
+		else if (temperature <=0.0)
+			{
+			precipitation_strength = 2.0+2.0*Math.random();
+			type = Local.HAIL;
+			}
+		else
+			{
+			precipitation_strength = 1.0+0.5*Math.random();
+			type = Local.RAIN;
+			}
+		if(disp) Game.MW.addLog(String.format(type, zone_name,precipitation_strength, 100*current_precipitation, -tdiff, new_temperature));
+		}
+	else
+		{
+			precipitation_strength = 0.0;
+			mdiff = 1.0*Math.random()+0.5;
+			
+			universe.map.current_precipitation_modifier.set(zone,current_precipitation_modifier+mdiff);
+			universe.map.current_temperature_modifier.set(zone,current_temperature_modifier+mdiff);
+			new_temperature = universe.get_current_temperature(zone);
+			tdiff =  new_temperature - current_temperature;
+		
+			if(disp) Game.MW.addLog(String.format(Local.NO_PRECIPITATIONS, zone_name, 100-100*current_precipitation, tdiff, new_temperature));
+		}
+		
+	/*System.out.println("Start: temperature_modifier="+current_temperature_modifier+" precipitation_modifier="+current_precipitation_modifier);
+	System.out.println("current_temperature="+current_temperature);
+	System.out.println("mdiff="+mdiff +" new_temperature="+new_temperature);
+	System.out.println("new_temperature_modifier="+universe.map.current_temperature_modifier.get(zone));*/
+	refresh_weather_penalties();
+	}
 	
 	public int get_mob_level()
 	{
@@ -950,12 +1187,8 @@ public Player()
 	// peut être précédée par un piège
     public void get_mob()
     {
-	shop = null;
-	double tt = universe.plage_random()*temps_traque();
-	if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_AN_ENNEMY,tt));
-	t_stats.addEvent(1.0,TimeStats.EVENT_FIND_MONSTER);
-	personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_ENNEMI);
 	int mob_level = get_mob_level();
+	t_stats.addEvent(1.0,TimeStats.EVENT_FIND_MONSTER);
 	mob = new Monster(mob_level,universe,zone);
     }
 
@@ -964,13 +1197,13 @@ public Player()
     {
 	if(shop == null)
 	    {
-		double tt = universe.plage_random()*temps_shop();
+		double ts = temps_shop();
+		double tt = universe.plage_random()*ts;
 		if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_A_TRADER,tt));
 		t_stats.addEvent(1.0,TimeStats.EVENT_FIND_SHOP);
 		personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_MARCHAND);
 		shop = new Shop(this);
 		if(disp) Game.MW.addLog(String.format(Local.ENCOUNTER,name,shop.name,shop.level));
-		toucher_rente();
 	    }
     }
 
@@ -992,7 +1225,9 @@ public Player()
 	double esquive, critique, multiplicateur1, multiplicateur2, percant;
 	double dmg, dmg_base, dmg_abs, dmg_red;
 	double dmg_base2, dmg_red2;
-
+	
+	double tmp;
+	
 	esquive = universe.esquive_proba(p.ESQ(),PRC());
 
 	if (Math.random() < esquive)
@@ -1007,14 +1242,16 @@ public Player()
 
 		String cause = "";
 		for(int t=0; t<nb_tags; t++)
-			if (p.tags[t] && ed_versus_tag(t) > 1.001) 
+		{
+			if (p.tags[t] && (tmp = ed_versus_tag(t)) > 1.001)
 			{
-				multiplicateur1 =  multiplicateur1 * ed_versus_tag(t);
-				res+=String.format(Local.MULTIPLIER,ed_versus_tag(t),TagsName[t]);
+				multiplicateur1 =  multiplicateur1 * tmp;
+				res+=String.format(Local.MULTIPLIER,tmp,TagsName[t]);
 			}
-		if(p.nb_hits == 0 && multi_premier_coup() > 1.001) {
-			multiplicateur1 =  multiplicateur1 * multi_premier_coup();
-			res+=String.format(Local.MULTIPLIER,multi_premier_coup(),Local.FIRST_STRIKE);
+		}
+		if(p.nb_hits == 0 && (tmp=multi_premier_coup()) > 1.001) {
+			multiplicateur1 =  multiplicateur1 * tmp;
+			res+=String.format(Local.MULTIPLIER,tmp,Local.FIRST_STRIKE);
 			}
 		critique = crit_proba();
 		if (Math.random() < critique)
@@ -1031,10 +1268,10 @@ public Player()
 
 		res+=String.format(Local.DAMAGE_INFLICTED,this.name,dmg,p.name,dmg_base,100*(1.0-dmg_red),dmg_abs);
 
-		if(dmg >= p.vie && p.vie > 0.1 && Math.random() < p.proba_immunite_final())
+		if(dmg >= p.vie && p.vie > 0.1 && Math.random() < (tmp = p.proba_immunite_final()))
 		{
 			res+=String.format(Local.IMMUNITY_TO_FINAL_BLOW, 
-				p.name, p.proba_immunite_final()*100.0);
+				p.name, tmp*100.0);
 			p.vie = 0.1;
 		}
 		else
@@ -1203,10 +1440,10 @@ public Player()
 				t_stats.addEvent(1.0,TimeStats.EVENT_DROP_RARE);
 			else if(the_object.rare == 4 || the_object.rare == 5) 
 				t_stats.addEvent(the_object.qty,TimeStats.EVENT_DROP_MAT);
-			else if(the_object.rare == 6) 
+			else if(the_object.rare == 6)
 				t_stats.addEvent(the_object.qty,TimeStats.EVENT_DROP_ORB);
 			
-			if (the_object.poids_final(this) < charge_max()-charge && pickupCond(the_object))
+			if (pickupCond(the_object))
 			    {
 				if(lootStr != "") lootStr += ", ";
 				lootStr += NameGenerator.firstCharLowercase(the_object.name);
@@ -1223,7 +1460,8 @@ public Player()
 			Game.MW.addLog(String.format(Local.ITEMS_LOOT,name,lootStr, p2.name));
 		if(dontLootStr != "" && disp)
 			Game.MW.addLog(String.format(Local.OBJECTS_LEFT_BEHIND, dontLootStr));
-	    }
+	    if(inventory.size() > 50) clean_list(inventory);
+		}
 		
 	double nec = necrophagie()*p2.vie_max();
 	double to_heal = Math.min(vie_max()-vie,nec);
@@ -1301,11 +1539,12 @@ public Player()
     public void gain_xp(double sx,int type, int gainLevel)
     {
 	double x = Math.floor(sx*bonus_xp()*modif_exp_lvl(gainLevel-level));
-	int levelback=level;
 	xp_pt+=x;
 	t_stats.addXp((double)x, type);
 	if(disp) Game.MW.addLog(String.format(Local.EARN_EXPERIENCE,name,x,sx,bonus_xp(),modif_exp_lvl(gainLevel-level)));
 
+	if (level == MAX_LEVEL) return;
+	int levelback=level;
 	level = level_for_xp(xp_pt);
 	
 	if(levelback != level)
@@ -1394,6 +1633,8 @@ public Player()
 		new_u.number_of_travel = universe.number_of_travel+1;
 		universe = new_u;
 		zone = 2;
+		nb_encounters = 0;
+		refresh_weather_penalties();
 		Monster.SetOptimalDistribution(universe);
 		StaticItem.init(universe);
 

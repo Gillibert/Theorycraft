@@ -48,7 +48,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	{
 		Joueur = J;
 		idx_tmp = -2; // force le refresh complet
-		refresh(1);
+		refresh(0);
 	}
 	
     public void montre_inv()
@@ -134,7 +134,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	{sli=1;}
 	if((liste_shop.getSelectedIndex() != -1) && sli==0)
 	{sli=2;}
-
+	
 	prompt.setText(String.format(Local.WINDOW_INVENTORY_PROMPT,Joueur.money,Joueur.charge,Joueur.charge_max()));
 	toggle.setEnabled(false);
 	sell.setEnabled(false);
@@ -179,7 +179,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		    	if(liste_s.getSelectedIndex()<=0 || therule.IsTrue(Joueur,the_object,null))
 				{
 			    	if(the_object.equiped)
-						obj_list.addElement("<html><i>"+the_object.name+"</i></html>");
+						obj_list.addElement("<html><font color=\"#0000ee\">"+the_object.name+"</font></html>");
 			    	else
 						obj_list.addElement(the_object.name);
 			    	vlist.add(the_object);
@@ -224,7 +224,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		    {
 			buy_it = Joueur.craftInventory.get(liste_shop.getSelectedIndex());
 			put.setEnabled(false);
-			get.setEnabled(Joueur.can_get(buy_it));
+			get.setEnabled(true);
     
 		    }
 		else 
@@ -249,19 +249,19 @@ public class InventoryWindow extends javax.swing.JDialog  {
     {
 	infos.setText(it.item_description(Joueur));
 	if(it.rare == 0 || it.rare == 4)
-	    infos.setForeground(Color.black);	
+	    infos.setForeground(Color.black);
 	else if(it.rare == 1)
 	    infos.setForeground(new Color(0, 0, 150));
 	else if(it.rare == 2)
-	    infos.setForeground(new Color(190, 140, 0));
+	    infos.setForeground(new Color(160, 80, 0));
 	else if(it.rare == 3)
 	    infos.setForeground(new Color(80, 0, 160));
 	else if(it.rare == 5)
-	    infos.setForeground(new Color(50, 100, 50));
-	else if(it.rare == 6)
 	    infos.setForeground(new Color(0, 100, 0));
-	else if(it.rare == 7)
-	    infos.setForeground(new Color(20, 100, 20));
+	else if(it.rare == 6)
+	    infos.setForeground(new Color(130, 0, 0));
+	else
+	    infos.setForeground(Color.black);
     }
 
 	private void refresh_filter_list()
@@ -466,7 +466,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	else
 	    Joueur.put_item(vlist.get(liste_it.getSelectedIndex()));
 	idx_tmp = -2; // force le refresh complet
-	refresh(1);
+	refresh(0);
     }
 
     private void vendre(boolean tout)
@@ -480,14 +480,14 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		Joueur.sell(vlist.get(liste_it.getSelectedIndex()));
 	}
 	idx_tmp = -2; // force le refresh complet
-	refresh(1);
+	refresh(0);
     }
 
     private void acheter()
     {
     Joueur.buy(Joueur.shop.inventory.get(liste_shop.getSelectedIndex()));
 	idx_tmp = -2; // force le refresh complet
-	refresh(2);
+	refresh(0);
     }
 
     private void separer()
@@ -496,12 +496,12 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	if(liste_it.getSelectedIndex() != -1)
 	{
 		Joueur.split(vlist.get(liste_it.getSelectedIndex()),Joueur.inventory);
-		refresh(1);
+		refresh(0);
 	}
 	if(Joueur.shop != null && !craft_mode && liste_shop.getSelectedIndex() != -1)
 	{
 		Joueur.split(Joueur.shop.inventory.get(liste_shop.getSelectedIndex()),Joueur.shop.inventory);
-		refresh(2);
+		refresh(0);
 	}
     }
 
@@ -516,7 +516,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		Joueur.craftInventory.remove(Joueur.craftInventory.get(liste_shop.getSelectedIndex()));
 	}
 	idx_tmp = -2; // force le refresh complet
-	refresh(1);
+	refresh(0);
     }
 
     private void deposer(boolean tout)
@@ -530,7 +530,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		Joueur.put_craft(vlist.get(liste_it.getSelectedIndex()));
 	}
 	idx_tmp = -2; // force le refresh complet
-	refresh(1);
+	refresh(0);
     }
 
     private void prendre(boolean tout)
@@ -546,13 +546,13 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		Joueur.get_craft(Joueur.craftInventory.get(liste_shop.getSelectedIndex()));
 	}
 	idx_tmp = -2; // force le refresh complet
-	refresh(2);
+	refresh(0);
     }
 
     private void combiner()
     {
 	Joueur.craft();
 	idx_tmp = -2; // force le refresh complet
-	refresh(2);
+	refresh(0);
     }
 } 

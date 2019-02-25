@@ -9,18 +9,18 @@ import java.awt.event.*;
 public class EditUniverse extends javax.swing.JDialog  {
     private Player Joueur;
     private javax.swing.JPanel ivjJFrameContentPane = null;
-	private boolean mustRefreshCharge = false;
 	private boolean mustRefreshInfos = true;
 	private boolean mustRefreshAfterZoom = true;
     private JButton moins;
     private JButton plus;
+	private JButton equi;
     private JLabel prompt;
     private JScrollPane scroll;
     private String[][] rowData;
     private JTable table;
 	private MyDraw drawSurf;
 	private JEditorPane infos;
-	private int zoom;
+	private int zoom = 4;
 	
 	
 	public static int[] zoomLevel = {5,10,20,50,100,200,500,1000,2000,5000,10000};
@@ -33,6 +33,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 
 	private ArrayList<CurveObject> compute_the_curves(int idx)
 		{
+			//System.out.println("compute_the_curves "+idx);
 			ArrayList<CurveObject> res = new ArrayList<CurveObject>();
 			double max_pt = zoomLevel[zoom];
 			
@@ -40,13 +41,13 @@ public class EditUniverse extends javax.swing.JDialog  {
 			{
 			CurveObject curve_to_draw = new CurveObject();
 			double sizar = curve_to_draw.arr_x.length;
-			curve_to_draw.title =  Local.UNIVERSE_EQUATIONS_NAME[idx-Joueur.universe.nb_universe_stats];
+			curve_to_draw.title =  Local.UNIVERSE_EQUATIONS_NAME[Joueur.universe.sortedEquations[idx-Joueur.universe.nb_universe_stats].id];
 			for (int x = 0; x < sizar; x++)
 				{
 				double tx = ((double)x/(double)(sizar-1))*max_pt;
 				
 				curve_to_draw.arr_x[x] = tx;
-				curve_to_draw.arr_y[x] = Joueur.universe.equations[idx-Joueur.universe.nb_universe_stats].eval(tx);
+				curve_to_draw.arr_y[x] = Joueur.universe.sortedEquations[idx-Joueur.universe.nb_universe_stats].eval(tx);
 				}
 			res.add(curve_to_draw);
 			}
@@ -92,7 +93,6 @@ public class EditUniverse extends javax.swing.JDialog  {
 	public void SetPlayer(Player J)
 	{
 		Joueur = J;
-		zoom = 2;
 		refresh();
 	}
 
@@ -124,10 +124,10 @@ public class EditUniverse extends javax.swing.JDialog  {
 		else
 		{
 			int i = idx-Joueur.universe.nb_universe_stats;
-			res+="<p><b>Base</b><br> E(x)=" + Joueur.universe.equations[i].dispHTML(false);
-			res+=String.format("<br>E(10)=%.3f<br>E(100)=%.3f<br>E(10000)=%.3f",Joueur.universe.equations[i].evalStatic(10),Joueur.universe.equations[i].evalStatic(100),Joueur.universe.equations[i].evalStatic(10000));
-			res+="<p><b>Ajustée</b><br> E(x)=" + Joueur.universe.equations[i].dispHTMLadj(false);
-			res+=String.format("<br>E(10)=%.3f<br>E(100)=%.3f<br>E(10000)=%.3f",Joueur.universe.equations[i].eval(10),Joueur.universe.equations[i].eval(100),Joueur.universe.equations[i].eval(10000));
+			res+="<p><b>Base</b><br> E(x)=" + Joueur.universe.sortedEquations[i].dispHTML(false);
+			res+=String.format("<br>E(10)=%.3f<br>E(100)=%.3f<br>E(10000)=%.3f",Joueur.universe.sortedEquations[i].evalStatic(10),Joueur.universe.sortedEquations[i].evalStatic(100),Joueur.universe.sortedEquations[i].evalStatic(10000));
+			res+="<p><b>Ajustée</b><br> E(x)=" + Joueur.universe.sortedEquations[i].dispHTMLadj(false);
+			res+=String.format("<br>E(10)=%.3f<br>E(100)=%.3f<br>E(10000)=%.3f",Joueur.universe.sortedEquations[i].eval(10),Joueur.universe.sortedEquations[i].eval(100),Joueur.universe.sortedEquations[i].eval(10000));
 		}
 		return res+Local.BODY_HTML_END;
 	}
@@ -154,8 +154,8 @@ public class EditUniverse extends javax.swing.JDialog  {
 	    }
 	for (int i=0; i< Joueur.universe.nb_universe_equations ; i++)
 		{
-		rowData[Joueur.universe.nb_universe_stats+i][1] = Joueur.universe.equations[i].dispHTML(true);
-		rowData[Joueur.universe.nb_universe_stats+i][2] = Joueur.universe.equations[i].dispHTMLadj(true);
+		rowData[Joueur.universe.nb_universe_stats+i][1] = Joueur.universe.sortedEquations[i].dispHTML(true);
+		rowData[Joueur.universe.nb_universe_stats+i][2] = Joueur.universe.sortedEquations[i].dispHTMLadj(true);
 		rowData[Joueur.universe.nb_universe_stats+i][3] = 
 					String.format("%.0f",Joueur.universe.points_divins[Joueur.universe.nb_universe_stats+i]);
 		rowData[Joueur.universe.nb_universe_stats+i][4] = 
@@ -168,11 +168,6 @@ public class EditUniverse extends javax.swing.JDialog  {
 	plus.setEnabled(pts < 0 || Joueur.points_divins_a_distribuer() >= 1 && pts+1.0 <= divine_cap);
 	moins.setEnabled(pts > 0 || Joueur.points_divins_a_distribuer() >= 1  && pts-1.0 >= -divine_cap);
 	mustRefreshInfos = false;
-	}
-	if(mustRefreshCharge) 
-	{
-		Joueur.refresh_charge(); 
-		mustRefreshCharge=false;
 	}
     }
 	
@@ -187,7 +182,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 		}
 		for (int i=0; i< Joueur.universe.nb_universe_equations ; i++)
 		{
-		    rowData[Joueur.universe.nb_universe_stats+i][0] = Local.UNIVERSE_EQUATIONS_NAME[i];
+		    rowData[Joueur.universe.nb_universe_stats+i][0] = Local.UNIVERSE_EQUATIONS_NAME[Joueur.universe.sortedEquations[i].id];
 		}
 
 	    AbstractTableModel mytm = new MyTableModel(rowData,Local.EDIT_UNIVERSE_COLUMN_NAMES);
@@ -261,6 +256,16 @@ public class EditUniverse extends javax.swing.JDialog  {
 		});
 	    moins.setMnemonic(KeyEvent.VK_SUBTRACT);
 
+		
+		equi = new JButton();
+	    equi.setBounds(new Rectangle(59+49, 245-20, 150, 21));
+	    equi.setText(Local.AUTO_DISTRIBUTION);
+	    equi.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {
+				 equirepartir();
+		    }
+		});
+		
 	    prompt.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 14));
 	    table.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
 
@@ -272,6 +277,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 	    ivjJFrameContentPane.add(prompt);
 	    ivjJFrameContentPane.add(plus);
 	    ivjJFrameContentPane.add(moins);
+		ivjJFrameContentPane.add(equi);
 	}
 	return ivjJFrameContentPane;
     }
@@ -290,32 +296,72 @@ public class EditUniverse extends javax.swing.JDialog  {
 	refresh();
     }
 	
+	private void updateMustRefresh(int idx)
+	{
+		Game.MW.mustRefreshCurves=true;
+		if (idx == 3 || idx == 14 || idx == 23 || idx == 24) Game.MW.mustRefreshMonsters=true;
+		if (idx == 17) Game.MW.mustRefreshWeather=true;
+		if(idx >= Joueur.universe.nb_universe_stats)
+		{
+			int tidx = Joueur.universe.sortedEquations[idx-Joueur.universe.nb_universe_stats].id;
+			if(tidx == 65|| tidx == 66) Game.MW.mustRefreshCharge=true;
+			if(tidx == 51|| tidx == 53) Game.MW.mustRefreshMonsters=true;
+		}
+	}
+	
     private void plus(double x)
     {
 	mustRefreshInfos = true;
 	int idx = table.getSelectedRow();
-	if (idx == 81 || idx == 82) mustRefreshCharge=true;
+	updateMustRefresh(idx);
 	double can_be_dist = Joueur.points_divins_a_distribuer();
 	if(Joueur.universe.points_divins[idx]<0) can_be_dist -= Joueur.universe.points_divins[idx];
-	double cap = Math.min(Joueur.divine_cap(table.getSelectedRow())-Joueur.universe.points_divins[idx],can_be_dist);
+	double cap = Math.min(Joueur.divine_cap(idx)-Joueur.universe.points_divins[idx],can_be_dist);
     double to_dist = Math.floor(Math.min(cap,x));
 	Joueur.universe.points_divins[idx] += to_dist; 
 	int eidx = idx-Joueur.universe.nb_universe_stats;
-	if (eidx >= 0) Joueur.universe.equations[eidx].update(Joueur.universe.points_divins[idx]);
+	if (eidx >= 0) Joueur.universe.sortedEquations[eidx].update(Joueur.universe.points_divins[idx]);
     }
 
     private void moins(double x)
     {
 	mustRefreshInfos = true;
 	int idx = table.getSelectedRow();
-	if (idx == 81 || idx == 82) mustRefreshCharge=true;
+	updateMustRefresh(idx);
 	double can_be_dist = Joueur.points_divins_a_distribuer();
 	if(Joueur.universe.points_divins[idx]>0) can_be_dist += Joueur.universe.points_divins[idx];
-    double cap = Math.min(Joueur.divine_cap(table.getSelectedRow())+Joueur.universe.points_divins[idx],can_be_dist);
+    double cap = Math.min(Joueur.divine_cap(idx)+Joueur.universe.points_divins[idx],can_be_dist);
 	double to_dist = Math.floor(Math.min(cap,x));
 	Joueur.universe.points_divins[idx] -= to_dist; 
 	int eidx = idx-Joueur.universe.nb_universe_stats;
-	if (eidx >= 0) Joueur.universe.equations[eidx].update(Joueur.universe.points_divins[idx]);
+	if (eidx >= 0) Joueur.universe.sortedEquations[eidx].update(Joueur.universe.points_divins[idx]);
     }
 
+	private void equirepartir()
+	{
+		mustRefreshInfos = true;
+		Game.MW.mustRefreshCurves=true;
+		Game.MW.mustRefreshMonsters=true;
+		Game.MW.mustRefreshWeather=true;
+		Game.MW.mustRefreshCharge=true;
+		
+		for (int idx=0; idx< Joueur.universe.nb_universe_stats+Joueur.universe.nb_universe_equations ; idx++)
+	    {
+			double can_be_dist = Joueur.points_divins_a_distribuer();
+			if (Joueur.universe.points_divins[idx] > 0.01)
+			{
+				double cap = Math.min(Joueur.divine_cap(idx)-Joueur.universe.points_divins[idx],can_be_dist);
+				double to_dist = Math.floor(cap);
+				Joueur.universe.points_divins[idx] += to_dist; 
+			}
+			if (Joueur.universe.points_divins[idx] < -0.01)
+			{
+				double cap = Math.min(Joueur.divine_cap(idx)+Joueur.universe.points_divins[idx],can_be_dist);
+				double to_dist = Math.floor(cap);
+				Joueur.universe.points_divins[idx] -= to_dist; 
+			}
+			int eidx = idx-Joueur.universe.nb_universe_stats;
+			if (eidx >= 0) Joueur.universe.sortedEquations[eidx].update(Joueur.universe.points_divins[idx]);
+	    }
+	}
 } 

@@ -1,4 +1,38 @@
-CHANGE LOG
+Version 1.2 15/01/2019 "Climate change"
+FEATURE : Ajout d'un système de haut-faits.
+FEATURE : Les points de haut-faits augmentent la compétence Recherche de ressources.
+FEATURE : Ajout des super-champions.
+FEATURE : Il est désormais possible de dépasser la charge maximale, moyennant une pénalité.
+FEATURE : Ajout d'informations sur les monstres.
+FEATURE : Ajout d'une formule de craft permettant de sacrifier des orbes pour obtenir des points de compétences.
+FEATURE : Ajout d'un système météorologique (température, pluie, neige, grêle).
+FEATURE : Contrôle climatique via la forge (précipitations et température).
+FEATURE : Ajout d'un bouton d'équirépartion lors de la distribution des points de compétences.
+FEATURE : Ajout d'un bouton d'auto-distribution lors de la distribution des points divins.
+FEATURE : Notation scientifique pour les grands nombres.
+FEATURE : Ajout des compétences "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations".
+FEATURE : Ajout des compétences "Affinité au froid", "Affinité à la chaleur" et "Affinité aux précipitations".
+FEATURE : Ajout des compétences "Résistance à la surcharge" et "Shopping addict".
+
+CHANGE : La rente viagère dépend désormais du nombre de rencontres (pièges ou monstres).
+CHANGE : La limite de points divins concernant les équations critiques dépend désormais de l'univers.
+CHANGE : L'ordre des équations est désormais plus logique, celles régissant les compétences étant regroupées.
+CHANGE : Le niveau des marchands peut désormais dépasser la capacité d'un entier 32 bits.
+CHANGE : Le nombre de zones peut désormais être édité avec des points divins.
+CHANGE : Le muliplicateur des points de compétences des champions et des super-champions dépendent désormais de l'univers.
+CHANGE : L'expérience rapportée par le sacrifice d'un orbe dépend désormais de l'univers.
+CHANGE : La probabilité qu'une ressource soit un orbe (en fonction du niveau du butin) dépend désormais de l'univers.
+CHANGE : Le niveau de base des marchands (en fonction du niveau maximal de la zone) dépend désormais de l'univers.
+CHANGE : La quantité de base de ressources dans les butins et chez les marchands dépendent désormais de l'univers.
+CHANGE : Ajustement des compétences dans les univers aléatoires.
+CHANGE : Ajustement des compétences dans l'univers par défaut (univers 0).
+CHANGE : Ajustement des matériaux.
+
+FIX : Correction d'un bug pouvant corrompre les sauvegardes. 
+FIX : Correction d'un bug avec le rafraichissement de l'inventaire dans certaines circonstances.
+FIX : Les achats d'objets sont désormais toujours correctement affichés dans les logs.
+FIX : On ne peut plus avoir deux ressources identiques dans la forge en jouant sur la fonction permettant de tout déposer.
+FIX : Correction d'un bug d'affichage avec l'estimation du nombre de ressources dans le butin des monstres.
 
 Version 1.1 04/10/2018 "God game"
 FEATURE : Ajout de la possibilité d'éditer l'univers avec des points divins.
@@ -12,9 +46,9 @@ FEATURE : Ajout de courbes sur les dépenses et les pertes, le butin de base en o
 FEATURE : Ajout de statistiques sur les dépenses et les pertes (achat chez les marchands, pénalités liées à la mort).
 FEATURE : Les zones ont maintenant une propriété propre déterminant localement la probabilité de rencontrer un champion ou un piège.
 FEATURE : Ajout d'un système d'arènes. Dans les arènes il n'y a presque pas de pièges et de champions et les monstres ne donnent pas de butin.
+FEATURE : Il est désormais possible de séparer des objets chez les marchands.
 FEATURE : Ajout des compétences "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes".
 FEATURE : Ajout des compétences "Allégement des ressources" et "Allégement de l'équipement".
-FEATURE : Il est désormais possible de séparer des objets chez les marchands.
 
 CHANGE :  Si on a plus de 100 points à distribuer on peut les distribuer 50 par 50, si on a plus de 1000 points à distribuer on peut les distribuer 500 par 500, et ainsi de suite sans limite (avec "MAJ").
 CHANGE : L'équation régissant l'expérience rapportée par les monstres et les pièges dépend désormais de l'univers.
@@ -72,7 +106,7 @@ FEATURE : Les équations régissant les compétences sont aléatoires et liées à l'u
 FEATURE : Les types d'objets disponibles sont aléatoires et liés à l'univers. On trouve cependant toujours des armes.
 FEATURE : La vie de départ, les points d'expérience initiaux, la probabilité de croiser un champion, la probabilité de croiser un piège, le niveau des zones, la puissance maximale des enchantements et le pourcentage d'or perdu à chaque décès sont aléatoires et liés à l'univers.
 FEATURE : L'univers par défaut, univers 0, est maintenu.
-FEATURE : Ajout de la possibilité de faire une règle "?" en plus de ">", "=" et "<".
+FEATURE : Ajout de la possibilité de faire une règle "!=" en plus de ">", "=" et "<".
 FEATURE : Ajout de statistiques sur l'expérience gagnée.
 FEATURE : Si on a plus de 100 points à distribuer, on peut les distribuer 50 par 50 (avec "MAJ").
 FEATURE : Les monstres n'ont plus un niveau prédéfini mais dynamique dépendant de la gamme des niveaux de l'univers. Ainsi, on peut avoir des monstres de niveau 2000 dans certains univers.
@@ -97,13 +131,12 @@ FEATURE : Ajout des compétences "Rente viagère" et "Éducation".
 FEATURE : Ajout des compétences "Détection des pièges", "Bonus d'initiative face aux pièges" et "Bonus de résistance aux pièges".
 
 CHANGE : Nouvelle carte (libre de droits).
+CHANGE : Ajustement des compétences.
 CHANGE : Ajustement des formules de craft.
 CHANGE : Ajustement des monstres.
 CHANGE : Ajustement des objets.
 
 FIX : Empêche le joueur d'entrer plusieurs fois dans les highscores en cliquant terminer plusieurs fois.
-
-CHANGE : Ajustement des compétences.
 
 Version 0.7 22/12/2013 "The big craft update"
 FEATURE : Ajout de la fonction « Jeter ».

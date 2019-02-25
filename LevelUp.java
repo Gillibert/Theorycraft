@@ -10,6 +10,7 @@ public class LevelUp extends javax.swing.JDialog  {
     private javax.swing.JPanel ivjJFrameContentPane = null;
 
     private JButton moins;
+	private JButton equi;
     private JButton plus;
     private JLabel prompt;
     private JButton ok;
@@ -40,9 +41,9 @@ public class LevelUp extends javax.swing.JDialog  {
 	prompt.setText(String.format(Local.DISTRIBUTION_OF_SKILL_POINTS,Joueur.points_a_distribuer()));
 	for (int i=0; i< Joueur.nb_stats ; i++)
 	    {
-		rowData[i][1] = String.format("%.1f",Joueur.stats[i]);
+		rowData[i][1] = String.format("%g",Joueur.stats[i]);
 		rowData[i][2] = String.format("%.2f",Joueur.item_bonus[i]);
-		rowData[i][3] = String.format("%.2f",Joueur.stats[i]+Joueur.item_bonus[i]);
+		rowData[i][3] = String.format("%g",Joueur.stats[i]+Joueur.item_bonus[i]);
 	    }
 	table.repaint();
 	plus.setEnabled(Joueur.points_a_distribuer() >= 1);
@@ -67,8 +68,8 @@ public class LevelUp extends javax.swing.JDialog  {
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	    table.setRowSelectionInterval(0,0);
 	    table.getColumnModel().getColumn(0).setPreferredWidth(200);
-	    table.getColumnModel().getColumn(1).setPreferredWidth(50);
-	    table.getColumnModel().getColumn(3).setPreferredWidth(50);
+	    table.getColumnModel().getColumn(1).setPreferredWidth(75);
+	    table.getColumnModel().getColumn(3).setPreferredWidth(75);
 
 	    javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
 		    public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh();}};
@@ -80,7 +81,7 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    scroll = new JScrollPane(table);
 	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	    scroll.setBounds(new Rectangle(10, 32, 370, 320));
+	    scroll.setBounds(new Rectangle(10, 32, 370+50, 320));
 
 	    infos = new JTextArea();
 	    infos.setEditable(false);
@@ -89,7 +90,7 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    scroll2 = new JScrollPane(infos);
 	    scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	    scroll2.setBounds(new Rectangle(385, 32, 300, 320));
+	    scroll2.setBounds(new Rectangle(385+50, 32, 275+70, 320));
 
 	    plus = new JButton();
 	    plus.setBounds(new Rectangle(245, 365, 44, 21));
@@ -120,6 +121,15 @@ public class LevelUp extends javax.swing.JDialog  {
 		    }
 		});
 	    moins.setMnemonic(KeyEvent.VK_SUBTRACT);
+		
+		equi = new JButton();
+	    equi.setBounds(new Rectangle(294+49, 365, 150, 21));
+	    equi.setText(Local.EQUAL_DISTRIBUTION);
+	    equi.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {
+				equirepartir();
+		    }
+		});
 
 	    ok = new JButton();
 	    ok.setBounds(new Rectangle(10, 365, 110, 21));
@@ -150,6 +160,7 @@ public class LevelUp extends javax.swing.JDialog  {
 	    ivjJFrameContentPane.add(anu);
 	    ivjJFrameContentPane.add(plus);
 	    ivjJFrameContentPane.add(moins);
+		ivjJFrameContentPane.add(equi);
 	    ivjJFrameContentPane.add(scroll2);
 
 	    this.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -161,7 +172,7 @@ public class LevelUp extends javax.swing.JDialog  {
     private void initialize() {
 
 	this.setLocation(new Point(15, 15));
-	this.setSize(new Dimension(670, 420+25));
+	this.setSize(new Dimension(670+70+50, 420));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -205,11 +216,25 @@ public class LevelUp extends javax.swing.JDialog  {
 	
     private void plus(double x)
     {
+	/*System.out.println("points_totaux="+Joueur.points_totaux());
+	System.out.println("points_a_distribuer="+Joueur.points_a_distribuer());
+	System.out.println("points_distribues="+Joueur.points_distribues());*/
+	
 	double toAdd = Math.min(Math.floor(Joueur.points_a_distribuer()),x);
 	Joueur.stats[table.getSelectedRow()] += toAdd; 
 	refresh();
     }
-
+	
+    private void equirepartir()
+	{
+		double toAdd = Math.floor(Joueur.points_a_distribuer()/Joueur.nb_stats);
+		for(int i=0; i<Joueur.nb_stats; i++)
+		{
+			Joueur.stats[i] += toAdd; 
+		}
+		refresh();
+	}
+	
     private void moins(double x)
     {
 	int idx = table.getSelectedRow();

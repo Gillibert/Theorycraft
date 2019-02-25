@@ -11,6 +11,7 @@ public class Game {
     public static boolean REAL_TIME = true;
 	public static boolean FILL_SCORE = false;
 	public static boolean LOG_IN_FILE = true;
+	public static int LOG_WINDOW_MAX_LINES = 50;
 	public static int LANG = 0;
 	public static HiScore HI;
 
@@ -29,13 +30,15 @@ public class Game {
 		
 		for(int i=0; i<100000; i++)
 		{
-		if(i%100==0) System.out.println(i);
+		//if(i%100==0) System.out.println(i);
 		Universe U = new Universe(i);
 		StaticItem.init(U);
 		Monster.SetOptimalDistribution(U);
-
+		if (i>0 && U.proba_orbe_niveau_drop(50)<0.04) continue;
+		
 		boolean must_end = false;
-		for (int cli = 0; cli < ChallengeList.list.size() && !must_end; cli++)
+		//for (int cli = 0; cli < ChallengeList.list.size() && !must_end; cli++)
+		for (int cli = 0; cli < 1 && !must_end; cli++)
 		{
 		Player joueur = new Player(U, false);
 		joueur.disp = false;
@@ -52,7 +55,7 @@ public class Game {
 			(joueur.defi.isCond() && !joueur.defi.isTrue(joueur,false))))
 			{
 			// TODO MEILLEUR CHOIX DE LA ZONE EN TENANT COMPTE DES ARENES		
-			for(int zi=joueur.zone+1; zi < joueur.universe.nombre_zones(); zi++)
+			for(int zi=joueur.zone+1; zi < joueur.universe.nombre_zones()-1.0; zi++)
 				{
 				if (joueur.max_zone_level() >= joueur.universe.get_zone_level(zi))
 				{
@@ -151,6 +154,7 @@ public class Game {
 		DEBUG_MODE_GIFT = Boolean.parseBoolean(prop.getProperty("DEBUG_MODE_GIFT"));
 		LOG_IN_FILE = Boolean.parseBoolean(prop.getProperty("LOG_IN_FILE"));
 		LANG = Integer.parseInt(prop.getProperty("LANG"));
+		LOG_WINDOW_MAX_LINES = Integer.parseInt(prop.getProperty("LOG_WINDOW_MAX_LINES"));
 	}
 	catch(Exception ex)
 	    {

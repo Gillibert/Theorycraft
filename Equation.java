@@ -1,8 +1,12 @@
- import java.util.Random;
  import java.io.Serializable;
+ import java.util.*;
  
  public class Equation implements Serializable {
 	static private final long serialVersionUID = 0xe91e2b04;
+	
+	double order;
+	int id;
+	double divine_cap=50;
 	
 	double exponent_num_max;
 	double x_add_num_max;
@@ -40,12 +44,23 @@
 	double end = 0.0;
 	int type;
 	
-	public Equation(TheoryGenerator gen, double lstart, boolean croissant, double linearSpeed, double expSpeed)
-	{
-		this(gen, lstart, croissant, linearSpeed, expSpeed, 0.25);
+	static class SortByOrder implements Comparator<Equation> 
+	{ 
+    public int compare(Equation a, Equation b) 
+    { 
+	    if (a.order < b.order) return -1;
+	    if (a.order > b.order) return 1;
+	    else return 0;
 	}
-	public Equation(TheoryGenerator gen, double lstart, boolean croissant, double linearSpeed, double expSpeed, double margin)
+	}
+	
+	public Equation(TheoryGenerator gen, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed)
 	{
+		this(gen, ord, lstart, croissant, linearSpeed, expSpeed, 0.25);
+	}
+	public Equation(TheoryGenerator gen, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed, double margin)
+	{
+		order = ord;
 		double exp_min, exp_max;
 		double add_min, add_max;
 		double mul_max, mul_min;
@@ -112,8 +127,9 @@
 		update(0);
 	}
 	
-	public Equation(TheoryGenerator gen, double lstart, double lend, double linearSpeed, double expSpeed)
+	public Equation(TheoryGenerator gen, double ord, double lstart, double lend, double linearSpeed, double expSpeed)
 	{
+		order = ord;
 		start = lstart;
 		end = lend;
 		double exp, add;
@@ -161,12 +177,12 @@
 	
 	public double evalStatic(double x)
 	{
-		return (Math.pow(x*x_mul_num+x_add_num,exponent_num) / Math.pow(x*x_mul_denom+x_add_denom,exponent_denom)) + result_add;
+		return Math.max(0.0,(Math.pow(x*x_mul_num+x_add_num,exponent_num) / Math.pow(x*x_mul_denom+x_add_denom,exponent_denom)) + result_add);
 	}
 	
 	public double eval(double x)
 	{
-		return (Math.pow(x*x_mul_num_adj+x_add_num_adj,exponent_num_adj) / Math.pow(x*x_mul_denom_adj+x_add_denom_adj,exponent_denom_adj)) + result_add_adj;
+		return Math.max(0.0,(Math.pow(x*x_mul_num_adj+x_add_num_adj,exponent_num_adj) / Math.pow(x*x_mul_denom_adj+x_add_denom_adj,exponent_denom_adj)) + result_add_adj);
 	}
 	
 	public void update(double adj)

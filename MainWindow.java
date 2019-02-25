@@ -32,6 +32,11 @@ public class MainWindow extends javax.swing.JDialog {
 	public JMenuBar menuBar;
 	public JMenu menu;
 	
+	public boolean mustRefreshCurves=true;
+	public boolean mustRefreshCharge=true;
+	public boolean mustRefreshMonsters=true;
+	public boolean mustRefreshWeather=true;
+	
     static private final long serialVersionUID = 1338162012;
 	private ScheduledExecutorService refreshService;
     public Player Joueur;
@@ -43,7 +48,7 @@ public class MainWindow extends javax.swing.JDialog {
 	public InfoWindow InWindow;
     public RuleWindow RuleWin;
     private String[] lines;
-    private static int max_lines=50;
+    private static int max_lines=Game.LOG_WINDOW_MAX_LINES;
     private int index_line;
 
     public boolean infight=false;
@@ -72,7 +77,8 @@ public class MainWindow extends javax.swing.JDialog {
     private JTable conditionTable;
     private JScrollPane tableScroll;
     private String[][] rowData;
-
+	private int refCounter = 0;
+	
 	public void SetPlayer(Player J)
 	{
 		Joueur = J;
@@ -172,6 +178,9 @@ public class MainWindow extends javax.swing.JDialog {
 	craft_cmd.setEnabled(!infight);
 	inventaire_cmd.setEnabled(!infight);
 	shop_cmd.setEnabled(!infight);
+	univers_cmd.setEnabled(!infight);
+	distrib.setEnabled(!infight);
+	prog_cmd.setEnabled(!infight);
 	}
 	
     public void refresh() // Refresh all except the condition table and the buttons
@@ -217,18 +226,43 @@ public class MainWindow extends javax.swing.JDialog {
 	
 	private void refreshSlow()
 	{
+		refCounter++;
+				
+		if(refCounter%5==0) {Achievements.refreshAchievements(Joueur,false);}
+		
+		if(mustRefreshCharge) {Joueur.refresh_charge(); mustRefreshCharge=false;}
+		if(mustRefreshWeather) {Joueur.refresh_weather_penalties(); mustRefreshWeather=false;}
+		
 		if (EditUniverseWindow.isVisible()) EditUniverseWindow.refresh();
-		if (InWindow.isVisible()) InWindow.refresh();
+		if (InWindow.isVisible() && refCounter%2==0) 
+		{
+		if(InWindow.displayType==3 && mustRefreshMonsters) 
+			{InWindow.refresh(); mustRefreshMonsters=false;}
+		if(InWindow.displayType==4 && refCounter%10==0) 
+			{InWindow.refresh();}
+		if(InWindow.displayType!=3 && InWindow.displayType!=4) 
+			{InWindow.refresh();}
+		}
+		if (CurvWindow.isVisible() && refCounter%2==0 && mustRefreshCurves==true)
+		{
+			CurvWindow.refresh(); 
+			mustRefreshCurves=false;
+		}
 		if (WorldMapWindow.isVisible()) WorldMapWindow.refresh();
-		if(Game.LOG_IN_FILE) {try{outputLog.flush();} catch(Exception ex){}}
+		if(Game.LOG_IN_FILE && refCounter%5==0) {try{outputLog.flush();} catch(Exception ex){}}
 		refresh();
 	}
 
+	private void save()
+	{
+		if(infight) {stopfight = true;}
+		 Joueur.universe.save();
+	}
     private javax.swing.JPanel getJFrameContentPane() {
 
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
-		    Joueur.universe.save();
+		    save();
 			if(Game.LOG_IN_FILE) {
 				try{outputLog.flush(); outputLog.close();}
 				catch(Exception ex){}
@@ -244,7 +278,7 @@ public class MainWindow extends javax.swing.JDialog {
 	JMenuItem menuItem = new JMenuItem(Local.NEW_GAME);
 	menuItem.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-			 Joueur.universe.save();
+			 save();
 			 Game.MW.setVisible(false);
 			 Game.MENU.creer();
 		}
@@ -254,7 +288,7 @@ public class MainWindow extends javax.swing.JDialog {
 	menuItem = new JMenuItem(Local.LOAD_A_GAME);
 	menuItem.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		     Joueur.universe.save();
+		     save();
 			 Game.MW.setVisible(false);
 			 Game.MENU.montre_charger();
 		}
@@ -264,7 +298,7 @@ public class MainWindow extends javax.swing.JDialog {
 	menuItem = new JMenuItem(Local.SAVE);
 	menuItem.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    Joueur.universe.save();
+		    save();
 		}
 	    });
 	menu.add(menuItem);
@@ -273,7 +307,7 @@ public class MainWindow extends javax.swing.JDialog {
 	menuItem = new JMenuItem(Local.EXIT);
 	menuItem.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    Joueur.universe.save();
+		    save();
 			System.exit(0);
 		}
 	    });
@@ -346,6 +380,23 @@ public class MainWindow extends javax.swing.JDialog {
 	    });
 	menu.add(menuItem);
 	
+	menuItem = new JMenuItem(Local.MONSTERS);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			InWindow.montreMonstres();
+		}
+	    });
+	menu.add(menuItem);
+	
+	menuItem = new JMenuItem(Local.ACHIEVEMENTS);
+	menuItem.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			InWindow.montreAchievements();
+		}
+	    });
+	menu.add(menuItem);
+	
+
 	xp_bar = new JProgressBar();
 	xp_bar.setStringPainted(true);
 	xp_bar.setBounds(new Rectangle(5, 265, 415, 15));
@@ -630,9 +681,7 @@ public class MainWindow extends javax.swing.JDialog {
 	for(Item the_object : Joueur.shop.inventory)
 	    if(achatAutoCond(the_object))
 			tmplst.add(the_object);
-	for(Item the_object : tmplst)
-	    if(Joueur.can_buy(the_object))
-		Joueur.buy(the_object);
+	Joueur.buy(tmplst);
     }
 
     public void addLog(String S)
@@ -698,30 +747,30 @@ public class MainWindow extends javax.swing.JDialog {
 				int trap_death_count = 0;
 			    int trap_count = 0;
 			    do {
+					Joueur.update_encounters();
 					if(Math.random()< Joueur.proba_rencontrer_piege())
 						{
 						Trap theTrap = Trap.getTrap(Joueur);
 						if (theTrap.trapEncounter(Joueur)) trap_death_count++;
 						else trap_count++;
-						Joueur.heal();
 						}
 					else
 					{
-				Joueur.get_mob();
-				if(!eviteAuto())
-				    {
-					if(Joueur.combat(true)) defaite_count++;
-					else victory_count++;
-				    }
-				else
-				{
-					addLog(String.format(Local.AVOIDS_MONSTER,Joueur.name,Joueur.mob.name,Joueur.mob.level));
-				}
-				Joueur.heal();
-				if(shoppingAuto())
-				    {venteAuto(); achatAuto();}
-			    }
-				}
+					Joueur.get_mob();
+					if(!eviteAuto())
+						{
+						if(Joueur.combat(true)) defaite_count++;
+						else victory_count++;
+						}
+					else
+						{
+						addLog(String.format(Local.AVOIDS_MONSTER,Joueur.name,Joueur.mob.name,Joueur.mob.level));
+						}
+					}
+					Joueur.heal();
+					if(shoppingAuto())
+						{venteAuto(); achatAuto();}
+					}
 			    while(combatAuto(defaite_count,victory_count,trap_count,trap_death_count,lvl_start) && !stopfight);
 			    infight = false;
 			    stopfight = false;

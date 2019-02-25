@@ -274,17 +274,66 @@ public ArrayList<Item> drop(Player p)
 {
   ArrayList<Item> res = new ArrayList<Item>();
   int count = StaticItem.getRandomInt(p.quantite_drop());
-  int drplev = Math.min(StaticItem.max_level-1,level);
   
   if (tags[5]) count = 2*count; // Champion
   for(int i=0; i<count; i++)
 	{
-	    res.add(new Item(drplev,p,Item.ITEM_DROP));
+	    res.add(new Item(level,p,Item.ITEM_DROP));
 	}
 return res;
 }
 
+// Affiche les monstres de la zone active
+public static String infoZooHTML(Player p)
+{
+	int minL = p.universe.get_zone_level(p.zone);
+	int maxL = p.universe.get_zone_max_level(p.zone);
+	double max_thorical_level = p.universe.get_zone_max_level((int)p.universe.nombre_zones()-2);
+	
+	int minNL = Math.min((int)(100*(minL/max_thorical_level)),99);
+	int maxNL = Math.min((int)(100*(maxL/max_thorical_level)),99);
 
+	String res = "";
+	int inc = 1;
+	if(maxNL-minNL>1) inc=2;
+	for (int normalized_lev=minNL; normalized_lev <= maxNL; normalized_lev+=inc)
+	    {
+		if(inc==2 && normalized_lev == maxNL-1) normalized_lev = maxNL;
+		
+		int lev = (int)(max_thorical_level * (normalized_lev/100.0));
+		
+		if(normalized_lev==minNL)
+			{lev = minL;}
+		else if (normalized_lev==maxNL)
+			{lev = maxL;}
+
+		double pts = p.universe.monster_points_for_level(lev);
+	
+		res += String.format(Local.H2_LEVEL_H2,lev);
+	    for(Monster it : ZooByLevel[normalized_lev].list)
+			{
+			res += "<b>" + it.name + "</b><br>";
+			for (int i=0; i<nb_stats; i++)
+			if(coeff_std[i] > 0.001 || it.prefered_stats[0]==i || it.prefered_stats[1]==i || it.prefered_stats[2]==i)
+			{
+				boolean col = false;
+				double stat = pts*coeff_std[i]*0.5;
+				double min_stat = pts*coeff_std[i]*0.5*(1.0 - 0.5 * p.universe.static_plage_random());
+				double max_stat = pts*coeff_std[i]*0.5*(1.0 + 0.5 * p.universe.static_plage_random());
+				
+				if (it.prefered_stats[0]==i) {col = true; stat += pts*0.22; min_stat += pts*0.22; max_stat += pts*0.22;}
+				if (it.prefered_stats[1]==i) {col = true; stat += pts*0.18; min_stat += pts*0.18; max_stat += pts*0.18;}
+				if (it.prefered_stats[2]==i) {col = true; stat += pts*0.10; min_stat += pts*0.10; max_stat += pts*0.10;}
+				if(col)
+					res += String.format("<font color=\"#ff0000\">%s %g [%g %g]</font><br>",Local.SKILLS_NAME[i], stat, min_stat, max_stat);
+				else
+					res += String.format("%s %g [%g %g]<br>",Local.SKILLS_NAME[i], stat, min_stat, max_stat);
+			}
+			res += "<br>";
+			}
+	    }
+	return res;
+}
 public static void initZoo()
     {
 	coeff_std = new double[nb_stats];
@@ -298,7 +347,7 @@ public static void initZoo()
 	for (int i=0; i<zoo.length; i++)
 	    {
 		mlv = zoo[i].prefered_level;
-		for(int j=-2; j < 3; j++)
+		for(int j=-1; j < 2; j++)
 		    if(mlv+j >= 0 && mlv+j < ZooByLevelSize)
 			ZooByLevel[mlv+j].list.add(zoo[i]);
 	    }
@@ -331,7 +380,7 @@ public Monster(int lev, Universe u, int zone)
 	stats = new double[nb_stats];
 
 	// Sélectionne les monstres de bon niveau
-	double max_thorical_level = u.get_zone_max_level(u.map.zonesR.size()-1);
+	double max_thorical_level = u.get_zone_max_level((int)u.nombre_zones()-2);
 	int normalized_lev = (int)(100*(lev/max_thorical_level));
 	if(normalized_lev>=99) normalized_lev = 99;
 	ArrayList<Monster> t_list = ZooByLevel[normalized_lev].list;
@@ -342,9 +391,9 @@ public Monster(int lev, Universe u, int zone)
 	// Crée le monstre
 	name = m.name;
 	nom_base = m.name;
-	if (m.prefered_level > lev)
+	if (m.prefered_level > normalized_lev)
 		name += " " + faible(m.masculin);
-	else if (m.prefered_level < lev)
+	else if (m.prefered_level < normalized_lev)
 		name += " " + fort(m.masculin);
 
 	level = lev;
@@ -363,13 +412,22 @@ public Monster(int lev, Universe u, int zone)
 		tags[5]=true;
 		name = StaticItem.nameGenerator.getName() + " " + adj_m[(int)(Math.random()*adj_m.length)];
 
-		level = (int)u.niveau_champion(level);
-		pts = u.monster_points_for_level(level)*1.5;
+		if(Math.random() < u.proba_super_champion()) // Super-champion
+		{
+			name = "Uber-" + name;
+			level = (int)u.niveau_super_champion(level);
+			pts = u.monster_points_for_level(level)*u.mul_points_competences_super_champions();
+		}
+		else
+		{
+			level = (int)u.niveau_champion(level);
+			pts = u.monster_points_for_level(level)*u.mul_points_competences_champions();
+		}
 		}
 	
 	// 0.5 points distribués avec coeff_std 
 	for (int i=0; i<nb_stats; i++)
-		{stats[i]= pts*coeff_std[i]*(0.7+Math.random()*0.6)*0.5;}
+		{stats[i]= pts*coeff_std[i]*u.plage_random()*0.5;}
 
 	// 0.5 points distribués avec prefered_stats 
 	stats[m.prefered_stats[0]]+=pts*0.22;
