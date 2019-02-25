@@ -36,7 +36,7 @@ public class DrawMap extends JPanel {
 		
 		public String get_zone_label(int x) {
 			if (x==-1) return Local.SELECT_A_ZONE;
-			return Joueur.universe.map.zonesName.get(x) + " (" + Joueur.universe.get_zone_level(x) + "-" + Joueur.universe.get_zone_max_level(x) + ")";
+			return String.format("%s (%.0f-%.0f)",Joueur.universe.map.zonesName.get(x),Joueur.universe.get_zone_level(x),Joueur.universe.get_zone_max_level(x));
 		}
 		
 		

@@ -6,6 +6,7 @@
 	
 	double order;
 	int id;
+	public int auto_dist_strategy; // 0=minimize, 1=maximize, 2=don't change
 	double divine_cap=50;
 	
 	double exponent_num_max;
@@ -54,12 +55,13 @@
 	}
 	}
 	
-	public Equation(TheoryGenerator gen, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed)
+	public Equation(TheoryGenerator gen, int auto_dist, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed)
 	{
-		this(gen, ord, lstart, croissant, linearSpeed, expSpeed, 0.25);
+		this(gen, auto_dist, ord, lstart, croissant, linearSpeed, expSpeed, 0.25);
 	}
-	public Equation(TheoryGenerator gen, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed, double margin)
+	public Equation(TheoryGenerator gen, int auto_dist, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed, double margin)
 	{
+		auto_dist_strategy = auto_dist;
 		order = ord;
 		double exp_min, exp_max;
 		double add_min, add_max;
@@ -127,8 +129,9 @@
 		update(0);
 	}
 	
-	public Equation(TheoryGenerator gen, double ord, double lstart, double lend, double linearSpeed, double expSpeed)
+	public Equation(TheoryGenerator gen, int auto_dist, double ord, double lstart, double lend, double linearSpeed, double expSpeed)
 	{
+		auto_dist_strategy = auto_dist;
 		order = ord;
 		start = lstart;
 		end = lend;

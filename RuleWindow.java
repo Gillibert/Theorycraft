@@ -1,3 +1,4 @@
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import javax.swing.*;
 import java.util.ArrayList;
@@ -7,7 +8,10 @@ import java.io.*;
 public class RuleWindow extends javax.swing.JDialog  {
 	private Player Joueur;
 	private javax.swing.JPanel ivjJFrameContentPane = null;
-
+	
+	private JButton addRtl;
+	private JButton delRtl;
+	
 	private JLabel prompt;
 	private JLabel warning;
 	private JList liste_r;
@@ -24,6 +28,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 	private JCheckBox is_avoid_rule;
 	private JCheckBox is_flee_rule;
 	private JCheckBox is_shopping_rule;
+	private JCheckBox is_forge_rule;
+	private JCheckBox is_dist_rule;
 	private JFileChooser fc;
 
 	private DefaultComboBoxModel type;
@@ -40,7 +46,6 @@ public class RuleWindow extends javax.swing.JDialog  {
 	private JComboBox rtype;
 	private JComboBox logic;
 	private JComboBox rl1;
-	private JComboBox rl2;
 
 	private JComboBox symbol;
 	private JComboBox opt1;
@@ -48,6 +53,12 @@ public class RuleWindow extends javax.swing.JDialog  {
 	private JTextField opt2txt;
 	private JTextField rule_name;
 
+	private JScrollPane scroll2;
+	private DefaultListModel rule_list2;
+	private JList liste2;
+
+    private JTable table;
+	
 	private ObjectRule current_rule;
 	private ObjectRule to_update;
 
@@ -68,14 +79,11 @@ public class RuleWindow extends javax.swing.JDialog  {
 	
    public void montre()
     {
-	if(current_rule == null)
-	{
-		refreshRulesList();
-		int defaultRule = rule_list.indexOf(Local.ALL);
-		if (defaultRule == -1) defaultRule = 0;
-		liste_r.setSelectedIndex(defaultRule);
-		refreshRule();
-	}	
+	refreshRulesList();
+	int defaultRule = rule_list.indexOf(Local.ALL);
+	if (defaultRule == -1) defaultRule = 0;
+	liste_r.setSelectedIndex(defaultRule);
+	refreshRule();
 	this.setVisible(true);
     }
 
@@ -159,17 +167,48 @@ public class RuleWindow extends javax.swing.JDialog  {
 		int metaType = current_rule.metaType();
 		rtype.setSelectedIndex(metaType);
 
-		if(metaType == 0 || metaType == 1 || metaType == 2)
+		if(metaType == ObjectRule.ITEM_RULE || metaType == ObjectRule.MONSTER_RULE || metaType == ObjectRule.PLAYER_RULE)
 		{
 			symbol.setSelectedIndex((int)(current_rule.operator));
 			symbol.setVisible(true);
 			refreshOpt1();
 			refreshOpt2();
 			rl1.setVisible(false);
-			rl2.setVisible(false);
 			logic.setVisible(false);
+			scroll2.setVisible(false);
+			addRtl.setVisible(false);
+			delRtl.setVisible(false);
 		}
-		if(metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.NEGATION_RULE)
+		
+		if(metaType == ObjectRule.NEGATION_RULE)
+		{
+			addRtl.setVisible(false);
+			delRtl.setVisible(false);
+		}
+		
+		boolean ir = (metaType == ObjectRule.ITEM_RULE);
+		boolean mop = (metaType == ObjectRule.MONSTER_RULE || metaType == ObjectRule.PLAYER_RULE);
+		boolean comp = (metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.NEGATION_RULE);
+		
+		is_avoid_rule.setVisible(mop || comp);
+		is_flee_rule.setVisible(mop || comp);
+		is_shopping_rule.setVisible(mop || comp);
+		is_forge_rule.setVisible(mop || comp);
+		is_dist_rule.setVisible(mop || comp);
+		is_sell_rule.setVisible(ir || comp);
+	    is_buy_rule.setVisible(ir || comp);
+        is_inventory_rule.setVisible(ir || comp);
+        is_pickup_rule.setVisible(ir || comp);
+		
+		if(metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.CRAFT_RULE)
+		{
+		rule_list2.clear();
+		if(current_rule.ruleList != null)
+			for (int i=0; i< current_rule.ruleList.size() ; i++)
+				{rule_list2.addElement(current_rule.ruleList.get(i).name);}
+		}
+		
+		if(metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.NEGATION_RULE || metaType == ObjectRule.CRAFT_RULE)
 		{
 			opt2txt.setVisible(false);
 			opt1.setVisible(false);
@@ -180,19 +219,18 @@ public class RuleWindow extends javax.swing.JDialog  {
 			int rl1_idx = Joueur.rules.indexOf(current_rule.ruleA);
 			rl1.setSelectedIndex(rl1_idx);
 		}
-		if(metaType == ObjectRule.COMPOSED_RULE)
+		if(metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.CRAFT_RULE)
 		{
-			int rl2_idx = Joueur.rules.indexOf(current_rule.ruleB);	
-			rl2.setSelectedIndex(rl2_idx);
+			scroll2.setVisible(true);
+			addRtl.setVisible(true);
+			delRtl.setVisible(true);
 			
-			logic.setSelectedIndex((int)(current_rule.type));
-				
-			rl2.setVisible(true);
-			logic.setVisible(true);
+			logic.setSelectedIndex(Math.min(current_rule.type,logic_combo.getSize()-1));
+			logic.setVisible(metaType == ObjectRule.COMPOSED_RULE);
 		}
 		if(metaType == ObjectRule.NEGATION_RULE)
 		{
-			rl2.setVisible(false);
+			scroll2.setVisible(false);
 			logic.setVisible(false);
 		}
 	
@@ -200,7 +238,6 @@ public class RuleWindow extends javax.swing.JDialog  {
 	logic.setEnabled(!current_rule.system_rule);
 	symbol.setEnabled(!current_rule.system_rule);
 	rl1.setEnabled(!current_rule.system_rule);
-	rl2.setEnabled(!current_rule.system_rule);
 	opt1.setEnabled(!current_rule.system_rule);
 	opt2.setEnabled(!current_rule.system_rule);
 	opt2txt.setEnabled(!current_rule.system_rule);
@@ -296,6 +333,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 		current_rule.flee_rule = is_flee_rule.isSelected();
 		current_rule.avoid_rule = is_avoid_rule.isSelected();
 		current_rule.shopping_rule = is_shopping_rule.isSelected();
+		current_rule.forge_rule = is_forge_rule.isSelected();
+		current_rule.dist_rule = is_dist_rule.isSelected();
 	}
 	
 	public void displayCheck()
@@ -307,6 +346,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 		is_flee_rule.setSelected(current_rule.flee_rule);
 		is_avoid_rule.setSelected(current_rule.avoid_rule);
 		is_shopping_rule.setSelected(current_rule.shopping_rule);
+		is_forge_rule.setSelected(current_rule.forge_rule);
+		is_dist_rule.setSelected(current_rule.dist_rule);
 		}
 	
 	private void update_current_rule() 
@@ -335,23 +376,38 @@ public class RuleWindow extends javax.swing.JDialog  {
 					{current_rule.param = 0;}	
 					}			
 			}
-		if(metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.NEGATION_RULE)
+		if(metaType == ObjectRule.CRAFT_RULE || metaType == ObjectRule.COMPOSED_RULE || metaType == ObjectRule.NEGATION_RULE)
 			{
 				int idx1 = rl1.getSelectedIndex();
 				if(idx1 >= 0 && idx1 < Joueur.rules.size())
 					current_rule.ruleA = Joueur.rules.get(idx1);
 			}
 		if(metaType == ObjectRule.COMPOSED_RULE)
-				{
-					current_rule.type = Math.max(0,logic.getSelectedIndex());
-					int idx2 = rl2.getSelectedIndex();
-					if(idx2 >= 0 && idx2 < Joueur.rules.size())
-						current_rule.ruleB = Joueur.rules.get(idx2);
-				}
+			{
+				current_rule.type = Math.max(0,logic.getSelectedIndex());
+			}
 		if(metaType == ObjectRule.NEGATION_RULE)
 			{
 				current_rule.type = Math.max(0,logic.getSelectedIndex());
 			}
+		displayRule();
+	}
+	
+	private void removeRuleFromList()
+	{
+		int idx = liste2.getSelectedIndex();
+		if (current_rule.ruleList == null || idx < 0) return;
+		current_rule.ruleList.remove(idx);
+		displayRule();
+		liste2.setSelectedIndex(Math.min(idx,current_rule.ruleList.size()-1));
+	}
+	
+	private void addRuleToList()
+	{
+		if (current_rule.ruleList == null) current_rule.ruleList = new ArrayList<ObjectRule>();
+		int idx1 = rl1.getSelectedIndex();
+		if(idx1 >= 0 && idx1 < Joueur.rules.size())
+			current_rule.ruleList.add(Joueur.rules.get(idx1));
 		displayRule();
 	}
 	
@@ -366,7 +422,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 	    prompt.setFont(new Font(Local.FONT_DIALOG, Font.BOLD, 14));
 		
 	    rule_list = new DefaultListModel();
-
+	    rule_list2 = new DefaultListModel();
+		
 	    option1_list = new DefaultComboBoxModel();
 	    option2_list = new DefaultComboBoxModel();	
 	    symbol_list = new DefaultComboBoxModel();
@@ -384,7 +441,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 		type.addElement(Local.RULE_ON_THE_PLAYER);
 		type.addElement(Local.COMPOUND_RULE);
 		type.addElement(Local.NEGATION);
-
+		type.addElement(Local.CRAFT_RULE);
+		
 	    logic_combo.addElement(Local.AND);
 	    logic_combo.addElement(Local.OR);
 
@@ -398,40 +456,55 @@ public class RuleWindow extends javax.swing.JDialog  {
 	    rl1.setBounds(new Rectangle(150, 28+30+30, 230, 25));
 
 	    logic = new JComboBox(logic_combo);
-	    logic.setBounds(new Rectangle(385, 28+30+30, 70, 25));
-
-	    rl2 = new JComboBox(rule_combo2);
-	    rl2.setBounds(new Rectangle(460, 88, 150, 25));
-	
+	    logic.setBounds(new Rectangle(385, 28+30, 70, 25));
+		
+		addRtl = new  JButton(Local.ADD);
+	    addRtl.setBounds(new Rectangle(385, 28+30+30, 110, 25));
+		addRtl.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {addRuleToList();}
+		});
+		
+		delRtl = new  JButton(Local.REMOVE);
+	    delRtl.setBounds(new Rectangle(385+110+5, 28+30+30, 110, 25));
+		delRtl.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {removeRuleFromList();}
+		});
+		
 		is_sell_rule = new JCheckBox(Local.SELL_RULE);
-		is_sell_rule.setBounds(new Rectangle(150, 118, 190, 25));
+		is_sell_rule.setBounds(new Rectangle(150, 270, 190, 25));
 			
 		is_buy_rule = new JCheckBox(Local.PURCHASE_RULE);
-		is_buy_rule.setBounds(new Rectangle(150, 148, 190, 25));
+		is_buy_rule.setBounds(new Rectangle(150, 270+24, 190, 25));
 		
 		is_pickup_rule = new JCheckBox(Local.PICKUP_RULE);
-		is_pickup_rule.setBounds(new Rectangle(150, 178, 190, 25));
+		is_pickup_rule.setBounds(new Rectangle(150, 270+2*24, 190, 25));
 		
 		is_inventory_rule = new JCheckBox(Local.INVENTORY_FILTER);
-		is_inventory_rule.setBounds(new Rectangle(150, 208, 190, 25));
+		is_inventory_rule.setBounds(new Rectangle(150, 270+3*24, 190, 25));
 		
 		is_flee_rule = new JCheckBox(Local.FLEE_RULE);
-		is_flee_rule.setBounds(new Rectangle(150+190+10, 118, 220, 25));
+		is_flee_rule.setBounds(new Rectangle(150+190+10, 270, 220, 25));
 
 		is_avoid_rule = new JCheckBox(Local.NON_INVOLVEMENT_RULE);
-		is_avoid_rule.setBounds(new Rectangle(150+190+10, 148, 220, 25));
+		is_avoid_rule.setBounds(new Rectangle(150+190+10, 270+24, 220, 25));
 
 		is_shopping_rule = new JCheckBox(Local.MERCHANT_SEARCH);
-		is_shopping_rule.setBounds(new Rectangle(150+190+10, 148+30, 220, 25));
+		is_shopping_rule.setBounds(new Rectangle(150+190+10, 270+2*24, 220, 25));
+		
+		is_forge_rule = new JCheckBox(Local.FORGE_SEARCH);
+		is_forge_rule.setBounds(new Rectangle(150+190+10, 270+3*24, 220, 25));
+		
+		is_dist_rule = new JCheckBox(Local.AUTO_DISTRIBUTION);
+		is_dist_rule.setBounds(new Rectangle(150+190+10, 270+4*24, 120, 25));
 		
 	    opt1 = new JComboBox(option1_list);
-	    opt1.setBounds(new Rectangle(150, 28+30+30, 230, 25));
+	    opt1.setBounds(new Rectangle(150, 88, 230, 25));
 
 	    opt2txt = new JTextField("");
 	    opt2txt.setBounds(new Rectangle(460, 88, 150, 25));
 	
 	    symbol = new JComboBox(symbol_list);
-	    symbol.setBounds(new Rectangle(385, 28+30+30, 70, 25));
+	    symbol.setBounds(new Rectangle(385, 88, 70, 25));
 
 	    opt2 = new JComboBox(option2_list);
 	    opt2.setBounds(new Rectangle(460, 88, 150, 25));
@@ -458,7 +531,6 @@ public class RuleWindow extends javax.swing.JDialog  {
 		opt2txt.addCaretListener(txt2_listener);
 		opt2.addItemListener(sl_listener);
 		rl1.addItemListener(sl_listener);
-		rl2.addItemListener(sl_listener);
 		logic.addItemListener(sl_listener);
 		symbol.addItemListener(sl_listener);
 		is_buy_rule.addChangeListener(check_listener);
@@ -468,6 +540,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 		is_avoid_rule.addChangeListener(check_listener);
 		is_flee_rule.addChangeListener(check_listener);
 		is_shopping_rule.addChangeListener(check_listener);
+		is_forge_rule.addChangeListener(check_listener);
+		is_dist_rule.addChangeListener(check_listener);
 		
 	    javax.swing.event.ListSelectionListener list_ref = new javax.swing.event.ListSelectionListener() {
 		    public void valueChanged(javax.swing.event.ListSelectionEvent e) {if(!listener_off && !e.getValueIsAdjusting()) refreshRule();}};
@@ -480,15 +554,29 @@ public class RuleWindow extends javax.swing.JDialog  {
 	    scroll = new JScrollPane(liste_r);
 	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	    scroll.setBounds(new Rectangle(5, 28, 140, 310-24));
+		
+	    scroll2 = new JScrollPane(table);
+	    scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	    scroll2.setBounds(new Rectangle(150, 88+30, 465, 150));
+		
+		
+		liste2 = new JList(rule_list2);
+	    liste2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+	    //liste2.addListSelectionListener(list_ref);
+
+		scroll2 = new JScrollPane(liste2);
+	    scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	    scroll2.setBounds(new Rectangle(150, 88+30, 465, 150));
+		
 
 	    warning = new JLabel();
 	    warning.setText("");
 	    warning.setFont(new Font(Local.FONT_DIALOG, Font.BOLD, 14));
 		warning.setForeground(Color.red);
-	    warning.setBounds(new Rectangle(150, 365-30, 200, 21));
+	    warning.setBounds(new Rectangle(230+150+5, 28, 200, 21));
 	
 	    edit = new JButton();
-	    edit.setBounds(new Rectangle(480, 365+24, 110, 21));
+	    edit.setBounds(new Rectangle(500, 365+24, 110, 21));
 	    edit.setText(Local.SAVE);
 	    edit.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {editRule();
@@ -535,8 +623,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 
 	    prompt.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 16));
 	    liste_r.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    liste2.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
 	    rl1.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
-	    rl2.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
 		logic.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
 	    opt1.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
 		opt2txt.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
@@ -555,8 +643,9 @@ public class RuleWindow extends javax.swing.JDialog  {
 		ivjJFrameContentPane.add(export);
 		ivjJFrameContentPane.add(importer);
 	    ivjJFrameContentPane.add(rl1);
-	    ivjJFrameContentPane.add(rl2);
 	    ivjJFrameContentPane.add(logic);
+	    ivjJFrameContentPane.add(addRtl);
+	    ivjJFrameContentPane.add(delRtl);		
 	    ivjJFrameContentPane.add(rtype);
 	    ivjJFrameContentPane.add(warning);
 		ivjJFrameContentPane.add(opt2txt);
@@ -564,7 +653,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 		ivjJFrameContentPane.add(opt1);
 		ivjJFrameContentPane.add(opt2);
 		ivjJFrameContentPane.add(symbol);
-
+	    ivjJFrameContentPane.add(scroll2);
+		
 		ivjJFrameContentPane.add(is_sell_rule);
 		ivjJFrameContentPane.add(is_buy_rule);
 		ivjJFrameContentPane.add(is_inventory_rule);	
@@ -572,6 +662,8 @@ public class RuleWindow extends javax.swing.JDialog  {
 		ivjJFrameContentPane.add(is_avoid_rule);	
 		ivjJFrameContentPane.add(is_flee_rule);
 		ivjJFrameContentPane.add(is_shopping_rule);	
+		ivjJFrameContentPane.add(is_forge_rule);
+		ivjJFrameContentPane.add(is_dist_rule);	
 	}
 	return ivjJFrameContentPane;
     }
@@ -648,7 +740,7 @@ public class RuleWindow extends javax.swing.JDialog  {
 	
 	fc = new JFileChooser();
 	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	fc.setCurrentDirectory(new File("./rules"));
+	fc.setCurrentDirectory(new File("./heroes"));
 	
 	getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 		KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");

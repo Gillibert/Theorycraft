@@ -13,7 +13,8 @@ public class ObjectRule implements Serializable {
     public static int PLAYER_RULE = 2;
     public static int COMPOSED_RULE = 3;
     public static int NEGATION_RULE = 4;
-    
+    public static int CRAFT_RULE = 5;  
+	 
     static private final long serialVersionUID = 500;
 
     public double param;
@@ -32,10 +33,12 @@ public class ObjectRule implements Serializable {
 	public boolean flee_rule;
 	public boolean avoid_rule;
 	public boolean shopping_rule;
+	public boolean forge_rule;
+	public boolean dist_rule;
 	
 	public boolean system_rule;
     public ObjectRule ruleA;
-    public ObjectRule ruleB;
+	public ArrayList<ObjectRule> ruleList;
 
     public static String[] possibility(int metatype, int t)
     {
@@ -43,12 +46,14 @@ public class ObjectRule implements Serializable {
 	if(metatype==ITEM_RULE)
 		switch (t)
 	    {
-		case 0: return StaticItem.Rarete;
-		case 1: return StaticItem.MaterialFamily;
-		case 2: return StaticItem.Emplacement;
+		case 0: return Local.RARITY_NAME;
+		case 1: return Local.MATERIAL_FAMILY_NAME;
+		case 2: return Local.SLOT_NAME;
 		case 15: return StaticItem.BaseItemNames;
 		case 16: return StaticItem.MaterialNames;
-		case 17: return Local.RULE_NO_YES;
+		case 17: return StaticItem.OrbsNames;
+		case 18: return Local.RULE_NO_YES;
+		case 19: return Local.RULE_NO_YES;
 	    default: 
 		return empty;
 	    }
@@ -77,13 +82,17 @@ public class ObjectRule implements Serializable {
 
     public boolean recursiveBadConsistency(ArrayList<ObjectRule> A)
     {
-		if (meta_type == ITEM_RULE || meta_type == MONSTER_RULE || meta_type == PLAYER_RULE) return false;
+		if (meta_type == ITEM_RULE || meta_type == MONSTER_RULE || meta_type == PLAYER_RULE || meta_type == CRAFT_RULE) return false;
 		if (A.contains(this)) return true;
 		A.add(this);
 		if (meta_type == COMPOSED_RULE)
 		{
-			if(ruleA==null || ruleB==null) return true;
-			return ruleA.recursiveBadConsistency(A) || ruleB.recursiveBadConsistency(A);
+			if (ruleList== null || ruleList.size()==0) return false;
+			for(ObjectRule trule : ruleList)
+			{
+			if (trule.recursiveBadConsistency(A)) return true;
+			}
+			return false;
 		}
 		if (meta_type == NEGATION_RULE)
 		{
@@ -105,12 +114,11 @@ public class ObjectRule implements Serializable {
     {}
 
 	// Composition
-    public ObjectRule(ObjectRule A, ObjectRule B, int t)
+    public ObjectRule(ArrayList<ObjectRule> rules, int t)
     {
 	meta_type = COMPOSED_RULE;
 	type = t;
-	ruleA = A;
-	ruleB = B;
+	ruleList = new ArrayList<ObjectRule>(rules);
 	set_flags(false);
     }
 
@@ -118,7 +126,6 @@ public class ObjectRule implements Serializable {
   	public ObjectRule(ObjectRule A, boolean b)
     {
 	meta_type = NEGATION_RULE;
-	type = 2;
 	ruleA = A;
 	set_flags(false);
     }
@@ -133,28 +140,16 @@ public class ObjectRule implements Serializable {
 		flee_rule = b;
 		avoid_rule =  b;
 		shopping_rule = b;
+		forge_rule = b;
+		dist_rule = b;
 	}
 
 	// Copy
     public ObjectRule(ObjectRule r)
 	{
-		meta_type = r.meta_type;
-		type = r.type;
-		operator = r.operator;
-		param = r.param;
-		buy_rule = r.buy_rule;
-		sell_rule = r.sell_rule;
-		filter_rule = r.filter_rule;
-		pickup_rule = r.pickup_rule;
-		system_rule = r.system_rule;
-		flee_rule = r.flee_rule;
-		avoid_rule = r.avoid_rule;
-		shopping_rule = r.shopping_rule;
-		ruleA = r.ruleA;
-		ruleB = r.ruleB;
-		name = r.name;
+		update(r);
 	}
-
+	
 	// Simple object rule (item or monster or player)
 	public ObjectRule(int t, int op, double par, int RT)
 	{
@@ -179,8 +174,10 @@ public class ObjectRule implements Serializable {
 		flee_rule = r.flee_rule;
 		avoid_rule = r.avoid_rule;
 		shopping_rule = r.shopping_rule;
+		forge_rule = r.forge_rule;
+		dist_rule = r.dist_rule;
 		ruleA = r.ruleA;
-		ruleB = r.ruleB;
+		if(r.ruleList != null) ruleList = new ArrayList<ObjectRule>(r.ruleList);
 		name = r.name;
 	}
     
@@ -212,8 +209,12 @@ public class ObjectRule implements Serializable {
 		}
 		else if( meta_type == COMPOSED_RULE || meta_type == NEGATION_RULE )
 		{
-			if ((type==0 || type==1) && (ruleA!=null && ruleB!=null))
-				res= "(" + ruleA.desc() + " " + Local.RULE_LOGIC[type] + " " + ruleB.desc() + ")" ;
+			if (type==0 || type==1)
+			{
+			res= "(";
+			for(ObjectRule trule : ruleList) res+= trule.desc() + " " + Local.RULE_LOGIC[type];
+		    res += ")";
+			}
 			if (type == 2 && ruleA!=null)
 				res= String.format(Local.RULE_NEGATION,ruleA.desc());
 		}
@@ -265,7 +266,9 @@ public class ObjectRule implements Serializable {
 		case 14: return Check(i.material.coeffPuissance);
 		case 15: return !(i.baseItem==null) && Check(StaticItem.BaseItemNamesList.indexOf(i.baseItem.name));
 		case 16: return Check(StaticItem.MaterialNamesList.indexOf(i.material.name));
-		case 17: return Check((i.equiped) ? 1 : 0); // convert to int
+		case 17: return (i.rare==6) && Check(StaticItem.OrbsNamesList.indexOf(i.material.name));
+		case 18: return Check((i.equiped) ? 1 : 0); // convert to int
+		case 19: return Check((i.discount) ? 1 : 0); // convert to int
 		}
 	}
 	else if (meta_type == MONSTER_RULE)
@@ -315,13 +318,21 @@ public class ObjectRule implements Serializable {
 		case 15: return Check(p.vie_max()/p.reduc());
 		case 16: return Check(p.epines());
 		case 17: return Check(100*p.represailles());
+		case 18: return Check(p.points_totaux());
+		case 19: return Check(p.points_a_distribuer());
 	    }
 	}
 	else if (meta_type == COMPOSED_RULE)
 		switch (type) // et, ou
 		{
-	  	case 0: return ruleA.IsTrue(p,i,m) && ruleB.IsTrue(p,i,m);
-	  	case 1: return ruleA.IsTrue(p,i,m) || ruleB.IsTrue(p,i,m);
+	  	case 0: // and
+			for(ObjectRule trule : ruleList)
+				{if (!trule.IsTrue(p,i,m)) return false;}
+			return true;
+	  	case 1: // or
+			for(ObjectRule trule : ruleList)
+				{if (trule.IsTrue(p,i,m)) return true;}
+			return false;
 		}
 	else if (meta_type == NEGATION_RULE)
 		return !ruleA.IsTrue(p,i,m);

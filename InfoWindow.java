@@ -92,7 +92,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 		String res = Local.HTML_BODY;
 		res += String.format(Local.UNIVERSE_INFORMATION_LIST,
 			Joueur.universe.seed,
-			Joueur.universe.number_of_travel,
+			Joueur.universe.numberOfTravels,
 			Joueur.MAX_LEVEL);
 		res += Local.UNIVERSE_CONST;
 		for(int i=0; i< Local.UNIVERSE_STATS_NAME.length; i++)
@@ -110,12 +110,10 @@ public class InfoWindow extends javax.swing.JDialog  {
 		}
 		res += "</ul>";
 			res += Local.H3_AVAILABLE_OBJECTS_H3;
-			for(int i=0; i< StaticItem.nb_pos-1; i++)
+
+			for(int i=0; i< Joueur.universe.nuberSlotsAvailable; i++)
 			{
-				if(Joueur.universe.slot_est_disponible(i))
-				{
-					res += StaticItem.Emplacement[i] + ", ";
-				}
+					res += Local.SLOT_NAME[Joueur.universe.ItemUnlockOrder.get(i)] + ", ";
 			}
 			res = res.substring(0, res.length()-2);
 			res += ".";
@@ -125,7 +123,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 			{
 				if(!Joueur.universe.slot_est_disponible(i))
 				{
-					res += StaticItem.Emplacement[i] + ", ";
+					res += Local.SLOT_NAME[i] + ", ";
 				}
 			}
 			res = res.substring(0, res.length()-2);
@@ -138,7 +136,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 				res += String.format(Local.LI_SKILL_POINTS,Player.stats_name[i],100*Monster.coeff_std[i]);
 			}
 			res += Local.LI_END;
-			
+				
 			res += Local.H3_ZONE_INFORMATION_H3;
 			res += Local.NUMBER_OF_ZONES + (int)Joueur.universe.nombre_zones();
 			res += Local.DL;
@@ -161,26 +159,26 @@ public class InfoWindow extends javax.swing.JDialog  {
 			double zmax = Joueur.universe.get_zone_max_level(i);
 			
 			res += String.format(Local.MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM,
-			(int)zmin,
-			(int)zmax,
-			Joueur.universe.monster_points_for_level((int)zmin),
-			Joueur.universe.monster_points_for_level((int)zmax),
+			zmin,
+			zmax,
+			Joueur.universe.monster_points_for_level(zmin),
+			Joueur.universe.monster_points_for_level(zmax),
 			(zmin+zmax)/2.0,
 			Joueur.universe.monster_points_for_level((zmin+zmax)/2.0));
 			
 			res += String.format(Local.CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM,
-			(int)Joueur.universe.niveau_champion(zmin),
-			(int)Joueur.universe.niveau_champion(zmax),
-			Joueur.universe.monster_points_for_level((int)Joueur.universe.niveau_champion(zmin))*mpc,
-			Joueur.universe.monster_points_for_level((int)Joueur.universe.niveau_champion(zmax))*mpc,
+			Joueur.universe.niveau_champion(zmin),
+			Joueur.universe.niveau_champion(zmax),
+			Joueur.universe.monster_points_for_level(Joueur.universe.niveau_champion(zmin))*mpc,
+			Joueur.universe.monster_points_for_level(Joueur.universe.niveau_champion(zmax))*mpc,
 			(Joueur.universe.niveau_champion(zmin)+Joueur.universe.niveau_champion(zmax))/2.0,
 			Joueur.universe.monster_points_for_level((Joueur.universe.niveau_champion(zmin)+Joueur.universe.niveau_champion(zmax))/2.0)*mpc);
 			
 			res += String.format(Local.SUPER_CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM,
-			(int)Joueur.universe.niveau_super_champion(zmin),
-			(int)Joueur.universe.niveau_super_champion(zmax),
-			Joueur.universe.monster_points_for_level((int)Joueur.universe.niveau_super_champion(zmin))*mpsc,
-			Joueur.universe.monster_points_for_level((int)Joueur.universe.niveau_super_champion(zmax))*mpsc,
+			Joueur.universe.niveau_super_champion(zmin),
+			Joueur.universe.niveau_super_champion(zmax),
+			Joueur.universe.monster_points_for_level(Joueur.universe.niveau_super_champion(zmin))*mpsc,
+			Joueur.universe.monster_points_for_level(Joueur.universe.niveau_super_champion(zmax))*mpsc,
 			(Joueur.universe.niveau_super_champion(zmin)+Joueur.universe.niveau_super_champion(zmax))/2.0,
 			Joueur.universe.monster_points_for_level((Joueur.universe.niveau_super_champion(zmin)+Joueur.universe.niveau_super_champion(zmax))/2.0)*mpsc);
 			

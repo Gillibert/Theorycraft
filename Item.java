@@ -12,8 +12,8 @@ public int pos; // position sur le corps, compris entre 0 et 14
 				// (15 pour les ressources)
 				
 public double bonus[]; // bonus
-public int ilvl; // niveau de l'objet
-public int elvl; // niveau des enchantements
+public double ilvl; // niveau de l'objet
+public double elvl; // niveau des enchantements
 public double base_power = 0.0; // puissance de l'objet de base
 public double quality; //qualité de l'objet
 public double poids;
@@ -22,6 +22,7 @@ public BaseItem baseItem;
 public Material material;
 public boolean stackable;
 public double qty;
+public boolean discount = false;
 
 public double poids_final(Player p)
 {
@@ -32,28 +33,40 @@ public double poids_final(Player p)
 public String item_description(Player p)
   {
   String res = name + "\n";
-  res +=  String.format(Local.TYPE_VAL,StaticItem.Rarete[rare],rare);
+  res +=  String.format(Local.TYPE_VAL,Local.RARITY_NAME[rare],rare);
   if (rare>0 && !stackable) res += String.format(Local.BASE_VAL,NameGenerator.firstCharLowercase(white_name));
   res += String.format(Local.EFFECTIVE_LEVEL_VAL,effectiveIlvl());
   if (!stackable) 
 	{
 	int nb_ench = nb_ench();
-	res += String.format(Local.SLOT_VAL,NameGenerator.firstCharLowercase(StaticItem.Emplacement[pos]));
+	res += String.format(Local.SLOT_VAL,NameGenerator.firstCharLowercase(Local.SLOT_NAME[pos]));
 	if(Math.abs(quality)>0.0001) res += String.format(Local.QUALITY_VAL,quality*100);
-	res += String.format(Local.EFFICIENCY_VAL,ilvl*material.coeffEfficacite*base_power,ilvl,material.coeffEfficacite,base_power);
-	res += String.format(Local.ENCHANTMENT_VAL,elvl*material.coeffPuissance,elvl,material.coeffPuissance);
 	if(nb_ench > 0) res += String.format(Local.NUMBER_OF_ENCHANTMENTS_VAL,nb_ench);
 	if(nb_ench > 1) res += String.format(Local.SKILL_BONUS_VAL,nb_pts());
 	}
   if (stackable)  res +=  String.format(Local.QUANTITY_VAL,qty);
   res += String.format(Local.WEIGHT_VAL,poids,poids_final(p));
   res += String.format(Local.REAL_PRICE_VAL,prix());
-  res += String.format(Local.SELLING_PRICE_VAL,prix()*p.coeff_vente());
-  res += String.format(Local.PURCHASE_PRICE_VAL,prix()*p.coeff_achat());
-
+  if(discount) 
+  {
+	res += String.format(Local.PURCHASE_PRICE_VAL_DISCOUNT,p.prix_achat(this),p.discount_multiplier());
+	res += String.format(Local.SELLING_PRICE_VAL_DISCOUNT,p.prix_vente(this),p.discount_multiplier());
+  }
+  else
+  {
+	res += String.format(Local.PURCHASE_PRICE_VAL,prix()*p.coeff_achat());
+	res += String.format(Local.SELLING_PRICE_VAL,prix()*p.coeff_vente());
+  }
+  
+  if (!stackable) 
+	{
+	res += String.format(Local.EFFICIENCY_VAL,ilvl*material.coeffEfficacite*base_power,ilvl,material.coeffEfficacite,base_power);
+	res += String.format(Local.ENCHANTMENT_VAL,elvl*material.coeffPuissance,elvl,material.coeffPuissance);
+	}
+	
  if(rare == 4 || rare == 5)
       {
-	  res+=String.format(Local.FAMILY_VAL,StaticItem.MaterialFamily[material.type]);
+	  res+=String.format(Local.FAMILY_VAL, Local.MATERIAL_FAMILY_NAME[material.type]);
 	  res+=String.format(Local.WEIGHT_COEFFICIENT_VAL,material.coeffPoids);
 	  res+=String.format(Local.PRICE_COEFFICIENT_VAL,material.coeffPrix);
 	  res+=String.format(Local.EFFICIENCY_COEFFICIENT_VAL,material.coeffEfficacite);
@@ -61,7 +74,9 @@ public String item_description(Player p)
       }
 
   if(bonus != null)
-      for (int i=0; i<Player.nb_stats; i++)
+  {
+      res+="\n";
+	  for (int i=0; i<Player.nb_stats; i++)
 	  if (bonus(i)>0)
 	      {
 			if(bonus(i) >= 100)
@@ -69,17 +84,23 @@ public String item_description(Player p)
 			else
 				res += String.format("%s +%g\n",Player.stats_name[i],bonus(i));
 	      }
+  }
   return res;
   }
 
-    public int effectiveIlvl() // used for the price and for the drops
+    public double effectiveIlvl() // used for the price and for the drops
     {
-	return Math.max(1,(int)(ilvl*0.80*(material.coeffEfficacite+material.coeffPuissance)));
+	if(rare == 0)
+		return Math.max(1.0,ilvl*material.coeffEfficacite);
+	else if (rare == 4 || rare == 5 || rare == 6)
+		return Math.max(1.0,(int)(ilvl*0.80*(material.coeffEfficacite+material.coeffPuissance)));
+	else
+		return Math.max(ilvl*material.coeffEfficacite,elvl*material.coeffPuissance)*rare;
     }
 
-    public int effectiveElvl() // used for the price 
+    public double effectiveElvl() // used for the price 
     {
-	return (int)(elvl*material.coeffPuissance);
+	return elvl*material.coeffPuissance;
     }
 
     // Create a ressource
@@ -229,23 +250,31 @@ public double bonus(int i)
     }
 
 
-public Item get_normal_base(double niveau)
+public Item get_normal_base(double niveau, Player p)
 {
-	int il = (int)Math.min((double)StaticItem.max_level-1,niveau);
-    ItemSet its = StaticItem.WhiteItemByLevel[il];
-    int i = il;
-    while(its.list.size() == 0)
+	int nb = (int)(Math.min(p.universe.nuberSlotsAvailable,(niveau+20.0)/10.0));
+	int pos = p.universe.ItemUnlockOrder.get((int)(Math.random()*nb));
+	
+	int id = (int)(Math.random()*StaticItem.WhiteItemByPosition[pos].list.size());
+	Item res = StaticItem.WhiteItemByPosition[pos].list.get(id);
+	
+	int nb2, mt;
+	
+	if(Math.random() < 0.5 && niveau<20) 
 	{
-	    i--;
-	    its = StaticItem.WhiteItemByLevel[i];
+		mt = 0;
+		nb2 = StaticItem.MaterialByType.get(mt).size();
 	}
-    Item res = its.list.get((int)(Math.random()*its.list.size()));
+	else
+	{
+		mt = res.baseItem.mat;
+		nb2 = (int)(Math.min(StaticItem.MaterialByType.get(mt).size(),(niveau+20.0)/10.0));
+	}
+	res.material = StaticItem.MaterialByType.get(mt).get((int)(Math.random()*nb2));
+	
+	res.ilvl = niveau/res.material.coeffEfficacite;
 	return res;
 }
-
- 
-
-
 
 static class ComparateurMaterial implements Comparator<Material> {
 	public int compare(Material s1, Material s2){
@@ -515,18 +544,8 @@ static class ComparateurItem implements Comparator<Item> {
 		{
 			Item a = LI.get(0);
 			Item b = LI.get(1);
-
+			
 			Item res=null;
-			int rarity = Math.min(a.rare,b.rare);
-			int elv = Math.min(a.elvl,b.elvl);
-
-			Material mat;
-			if(Math.random()<0.5) mat = a.material;
-			else mat = b.material;
-
-			BaseItem ba; 
-			if(Math.random()<0.5) ba = a.baseItem;
-			else ba = b.baseItem;
 
 			// deux orbes
 			// nouvel orbe au hazard (conservation du prix)
@@ -534,6 +553,7 @@ static class ComparateurItem implements Comparator<Item> {
 			{
 				res = new Item(StaticItem.getRandomOrb(),StaticItem.RESSOURCE_ORB);
 				res.aligner_qty(p, a.prix()+b.prix());
+				res.discount = (a.discount || b.discount);
 				rlist.add(res);
 			}
 			// orbe d'augmentation (quantité quelconque) + objet
@@ -560,11 +580,12 @@ static class ComparateurItem implements Comparator<Item> {
 				// ressource aléatoire (conservation du prix)
 				if((other.rare == 4 || other.rare == 5) && comp.name.equals("Orbe de transmutation")) 
 				{
-					mat = StaticItem.getRandomMat(); // tirer un mat non-orbe
+					Material mat = StaticItem.getRandomMat(); // tirer un mat non-orbe
 					if(other.rare == 4) res = new Item(mat,StaticItem.RESSOURCE_ELEM);
 					if(other.rare == 5) res = new Item(mat,StaticItem.RESSOURCE_PRIM);
 					comp.set_qty(comp.qty-orb_unit);
 					res.aligner_qty(p, other.prix()+comp.prix_unitaire()*orb_unit);
+					res.discount = other.discount;
 					rlist.add(res);
 					if(comp.qty>0.001) rlist.add(comp);			  
 				}
@@ -588,6 +609,7 @@ static class ComparateurItem implements Comparator<Item> {
 					res = other;
 					res.aligner_qty(p, other.prix()+comp.prix_unitaire()*orb_unit);
 					comp.set_qty(comp.qty-orb_unit);
+					res.discount = other.discount;
 					rlist.add(res);
 					if(comp.qty>0.001) rlist.add(comp);			  
 				}
@@ -599,6 +621,7 @@ static class ComparateurItem implements Comparator<Item> {
 					res =new Item(other.material,StaticItem.RESSOURCE_PRIM);
 					comp.set_qty(comp.qty-orb_unit);
 					res.aligner_qty(p, other.prix()+comp.prix_unitaire()*orb_unit);
+					res.discount = other.discount;
 					rlist.add(res);
 					if(comp.qty>0.001) rlist.add(comp);	  
 				}
@@ -662,14 +685,27 @@ static class ComparateurItem implements Comparator<Item> {
 			// un objet aléatoire
 			else if(a.rare < 3 && b.rare < 3)
 			{
+				int rarity = Math.min(a.rare,b.rare);
+
+				Material mat;
+				if(Math.random()<0.5) mat = a.material;
+				else mat = b.material;
+
+				double ilvl;
+				BaseItem ba; 
+				if(Math.random()<0.5) {ba = a.baseItem;  ilvl = a.ilvl;}
+				else {ba = b.baseItem;  ilvl = b.ilvl;}
+			
 				res = new Item(ba, mat, p.universe);
-				res.elvl = elv;
+				res.elvl = Math.min(a.elvl,b.elvl);
+				res.ilvl = ilvl;
+				
 				if (rarity == 1)
 					res.transform_magic(p);
 				else if (rarity == 2)
 					res.transform_rare(p);
 
-				if ( res.material.type != res.baseItem.mat)
+				if (res.material.type != res.baseItem.mat)
 					res.quality = p.penalty_for_bad_material() * p.universe.plage_random();
 			
 				res.update();
@@ -719,6 +755,7 @@ static class ComparateurItem implements Comparator<Item> {
 				}
 				double prix = a.prix()+b.prix()+c.prix();
 				rit.aligner_qty(p, prix); 
+				rit.discount = (a.discount || b.discount || c.discount);
 				rlist.add(rit);
 			}
 			
@@ -777,12 +814,12 @@ static class ComparateurItem implements Comparator<Item> {
 					Game.MW.addLog("Évolution de deux objets (aligne le niveau d'efficacité des objets)");
 					if(Math.random() < 0.5)
 					{
-						b.ilvl = (int)(p.rendement()*a.ilvl);
+						b.ilvl = p.rendement()*a.ilvl;
 						b.base_power = a.base_power;
 					}
 					else
 					{
-						a.ilvl = (int)(p.rendement()*b.ilvl);
+						a.ilvl = p.rendement()*b.ilvl;
 						a.base_power = b.base_power;
 					}
 				}
@@ -791,9 +828,9 @@ static class ComparateurItem implements Comparator<Item> {
 				{
 					Game.MW.addLog("Augmentation de deux objets (aligne le niveau d'enchantement des objets)");
 					if(Math.random() < 0.5)
-						b.elvl = (int)(p.rendement()*a.elvl);
+						b.elvl = p.rendement()*a.elvl;
 					else 
-						a.elvl = (int)(p.rendement()*b.elvl);
+						a.elvl = p.rendement()*b.elvl;
 				}
 				
 				if(!delA)
@@ -888,22 +925,22 @@ static class ComparateurItem implements Comparator<Item> {
   
     public Item(double niveau, Player p, int iType)
     {
-	double drop_lvl = Math.max(1,niveau*0.7+Math.random()*niveau*0.3);
-	
 	// sert à remplir l'inventaire d'un marchand
     if(iType==ITEM_SHOP)
     {
 	if(Math.random()  < p.universe.proba_ressource()) // ressource
 	    {
-		this.copy(get_ressouce_base(drop_lvl,p));
+		this.copy(get_ressouce_base(niveau,p));
 		qty = p.universe.plage_random();
 		update_poids();
 	    }
 	else
 	    {
-		this.copy(get_normal_base(drop_lvl));
+		this.copy(get_normal_base(niveau, p));
 		base_power = p.universe.efficacite_base();
+		update();
 	    }
+	discount = (Math.random()  < p.universe.proba_promo());
     }
 	
 	// Drop sur un monstre
@@ -911,22 +948,22 @@ static class ComparateurItem implements Comparator<Item> {
 	{
 	if(Math.random() < p.universe.proba_ressource()) // ressource
 	    {
-		this.copy(get_ressouce_base(drop_lvl,p));
+		this.copy(get_ressouce_base(niveau,p));
 		qty = p.universe.quantite_ressource_base_drops()*p.multiplicateur_res()*p.universe.plage_random();
 		update_poids();
 	    }
 	else // objet de base ou magique ou rare
 	    {
-		this.copy(get_normal_base(drop_lvl));
+		this.copy(get_normal_base(p.universe.niveau_efficacite(niveau),p));
 		base_power = p.universe.efficacite_base();
 		if (Math.random() < p.chance_magique())
 		    {
-			elvl = (int)Math.min((double)StaticItem.max_level-1,niveau);
+			elvl = p.universe.niveau_enchantement(niveau);
 			if (Math.random() <= p.chance_rare())
 			    transform_rare(p);	      
 			else
 			    transform_magic(p);
-		    }
+			}
 		if (Math.random()< p.chance_qualite())
 		    quality = Math.random()*p.universe.qualite_max();
 		update();
@@ -1075,6 +1112,7 @@ public Item(Item i)
 	equiped = i.equiped;
 	baseItem = i.baseItem;
 	material = i.material;
+	discount = i.discount;
 	if(i.bonus != null)
 	    {
 	    	bonus = new double[Player.nb_stats];
@@ -1086,7 +1124,7 @@ public Item(Item i)
     }
 
     // Puissance d'un enchantement en fonction du niveau de l'item
-    public static double power(Player p,int niveau)
+    public static double power(Player p,double niveau)
     {
 	double min = p.puissance_ench_inf();
 	double max = p.puissance_ench_sup();

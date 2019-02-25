@@ -2,10 +2,12 @@ import java.io.*;
 import java.util.*; 
  
  public class Universe implements Serializable {
+	private TheoryGenerator gen;
 	public NameGenerator nameGenerator;
 	public Player joueur;
 	public int seed;
-	public int number_of_travel;
+	public int numberOfTravels;
+	public int nuberSlotsAvailable;
 	public Equation[] equations;
 	public Equation[] sortedEquations;
 	
@@ -18,6 +20,7 @@ import java.util.*;
 	public static int nb_universe_stats = Local.UNIVERSE_STATS_NAME.length;  // nombre de paramètres modifiables de l'univers
 	public static int nb_universe_equations = Local.UNIVERSE_EQUATIONS_NAME.length;
 			
+	public ArrayList<Integer> ItemUnlockOrder;
 	private boolean[] binVar;
 	public Map map;
 	static private final long serialVersionUID = 42;
@@ -35,7 +38,8 @@ import java.util.*;
 	// REDUC_PEN(50) ZONE_ACCESS (51) DIEU(52) FIRST_STRIKE(53)
 	// EQ_MASTER(54) CONST_MASTER(55) LIGHTER_RES(56) LIGHTER_EQP(57)
 	// COLD_RES(58) HOT_RES(59) PRECI_RES(60) 
-	// COLD_BONUS(61) HOT_BONUS(62) PRECI_BONUS(63)
+	// COLD_BONUS(61) HOT_BONUS(62) PRECI_BONUS(63) OVERLOAD_RES(64) 
+	// UNDERLOAD_BONUS(65) ACHI_BONUS(66) SHOPPING_ADDICT(67) DISCOUNT_SPEC(68)
 
 	
 	public static int IAS = 0;
@@ -103,12 +107,15 @@ import java.util.*;
 	public static int HOT_BONUS = 62;
 	public static int PRECI_BONUS = 63;	
 	public static int OVERLOAD_RES = 64;
-	public static int SHOPPING_ADDICT = 65;
+	public static int UNDERLOAD_BONUS = 65;
+	public static int ACHI_BONUS = 66;
+	public static int SHOPPING_ADDICT = 67;
+	public static int DISCOUNT_SPEC = 68;
 	
 	Universe(int sd)
 	{
-		number_of_travel = 0;
-		TheoryGenerator gen = new TheoryGenerator(sd);
+		numberOfTravels = 0;
+		gen = new TheoryGenerator(sd);
 		
 		points_divins = new double[nb_universe_stats+nb_universe_equations];
 		for(int i=0; i<nb_universe_stats+nb_universe_equations; i++) 
@@ -121,10 +128,10 @@ import java.util.*;
 		binVar = new boolean[StaticItem.nb_pos-1];
 		seed = sd;
 		
-		constantes_min[0] = 1.0; // vie de départ;
-		constantes_min[1] = 0.0; // proba_rencontrer_piege;
-		constantes_min[2] = 0.0; // puissance_ench_sup
-		constantes_min[3] = 5.0; // points_initiaux
+		constantes_min[0] = 1.0; // vie de départ()
+		constantes_min[1] = 5.0; // points_initiaux()
+		constantes_min[2] = 0.0; // proba_rencontrer_piege()
+		constantes_min[3] = 0.0; // proba_promo()
 		constantes_min[4] = 0.0; // proba_clearance_sale()
 		constantes_min[5] = 0.0; // proba_champion()
 		constantes_min[6] = 0.0; // proba_super_champion()
@@ -147,14 +154,15 @@ import java.util.*;
 		constantes_min[23] = 2.0; // mul_points_competences_champions()
 		constantes_min[24] = 20.0; // mul_points_competences_super_champions()
 		constantes_min[25] = 0.0; // efficacite_base()
+		constantes_min[26] = 0.0; // puissance_ench_sup
 		
-		constantes_max[0] = 100; // vie de départ;
-		constantes_max[1] = 1.0; // proba_rencontrer_piege;
-		constantes_max[2] = 0.6; // puissance_ench_sup
-		constantes_max[3] = 200; // points_initiaux
+		constantes_max[0] = 100; // vie de départ()
+		constantes_max[1] = 200; // points_initiaux()
+		constantes_max[2] = 1.0; // proba_rencontrer_piege()
+		constantes_max[3] = 1.0; // proba_promo()
 		constantes_max[4] = 1.0; // proba_clearance_sale()
 		constantes_max[5] = 1.0; // proba_champion()
-		constantes_max[6] = 0.75; // proba_super_champion()
+		constantes_max[6] = 1.0; // proba_super_champion()
 		constantes_max[7] = 1.0; // proba_ressource()
 		constantes_max[8] = 0.6; // penalty_for_bad_material()
 		constantes_max[9] = 200; // penalty_for_new_challenge()
@@ -174,11 +182,12 @@ import java.util.*;
 		constantes_max[23] = 5.0; // mul_points_competences_champions()
 		constantes_max[24] = 50.0; // mul_points_competences_super_champions()
 		constantes_max[25] = 5.0; // efficacite_base()
+		constantes_max[26] = 0.6; // puissance_ench_sup
 		
-		constantes[0] = (int)(gen.nextInt(8)+6); // vie de départ;
-		constantes[1] = 0.05+gen.nextDouble()*0.40; // proba_rencontrer_piege;
-		constantes[2] = 0.20+gen.nextDouble()*0.30;; // puissance_ench_sup
-		constantes[3] = (int)(gen.nextInt(25)+8.0); // points_initiaux
+		constantes[0] = (int)(gen.nextInt(8)+6); // vie de départ()
+		constantes[1] = (int)(gen.nextInt(25)+8.0); // points_initiaux()
+		constantes[2] = 0.05+gen.nextDouble()*0.40; // proba_rencontrer_piege()
+		constantes[3] = 0.05+gen.nextDouble()*0.20; // proba_promo()
 		constantes[4] = 0.01*(gen.nextInt(6)+2.0); // proba_clearance_sale()
 		constantes[5] = 0.01*(gen.nextInt(10)+5.0); // proba_champion()
 		constantes[6] = 0.001*(gen.nextInt(10)+2.0); // proba_super_champion()
@@ -201,106 +210,100 @@ import java.util.*;
 		constantes[23] = 2.0+gen.nextDouble()*2.0; // mul_points_competences_champions()
 		constantes[24] = 20.0+gen.nextDouble()*20.0; // mul_points_competences_super_champions()
 		constantes[25] = 0.2+gen.nextDouble()*0.8; // efficacite_base()
-		
-		if(seed != 0)
-		{
-			for(int i=0; i< StaticItem.nb_pos-1; i++) {
-				if (gen.nextDouble() > 0.33) binVar[i] = true;
-				else binVar[i] = false;
-			}
-			binVar[12] = true; // les armes existent toujours
-		}
-		if(seed == 0)
-		{
-			for(int i=0; i< StaticItem.nb_pos-1; i++) binVar[i] = true;
-			binVar[7] = false;
-		}
+		constantes[26] = 0.20+gen.nextDouble()*0.30;; // puissance_ench_sup
 		
 		equations = new Equation[nb_universe_equations];
 			
-		equations[0] = new Equation(gen, 10, 1.0, true, 1.5, 0.8); // att_per_sec
-		equations[1] = new Equation(gen, 11, 1.0, true, 1.0, 0.5); // pv_per_vita 
-		equations[2] = new Equation(gen, 12, 0.02, 1.0, 100.0, 0.6); // crit_proba
-		equations[3] = new Equation(gen, 13, 1.25, true, 2.5, 0.65); // multi_crit
-		equations[4] = new Equation(gen, 14, 0.5, true, 10.0, 0.9); // dmg_base
-		equations[5] = new Equation(gen, 15, 1.0, false, 1.2,0.7); // reduc
-		equations[6] = new Equation(gen, 16, 0.0, true, 10.0, 0.65); // absorption
-		equations[7] = new Equation(gen, 17, 10.0, true, 20.0, 1.0); // used in esquive_proba
-		equations[8] = new Equation(gen, 18, 0.0, 1.0, 100.0, 0.35); // vol_de_vie
-		equations[9] = new Equation(gen, 19, 2.5, true, 8.0, 0.9); // regen
-		equations[10] = new Equation(gen, 20, 10+gen.nextInt(10), true, 200.0, 0.5); // charge maximale
-		equations[11] = new Equation(gen, 21, 0.5+gen.nextDouble()*1.5, 0.0, 30.0, 0.5); // temps_traque
-		equations[12] = new Equation(gen, 22, 0.5+gen.nextDouble()*2.0, 0.0, 35.0, 0.5); // temps_shop
-		equations[13] = new Equation(gen, 23, 0.5+gen.nextDouble()*2.5, 0.0, 35.0, 0.5); // temps_forge
-		equations[14] = new Equation(gen, 24, 4+gen.nextInt(12), 0.0, 60.0, 0.65); // temps_res			
-		equations[15] = new Equation(gen, 25, 1.5, 1.0, 30.0, 0.6); // coeff_achat
-		equations[16] = new Equation(gen, 26, 0.75, 1.0, 30.0, 0.6); // coeff_vente
-		equations[17] = new Equation(gen, 27, 1.0, true, 3.0, 0.35); // multiplicateur_res
-		equations[18] = new Equation(gen, 28, 0.02, 1.0, 60.0, 0.5); // chance_magique
-		equations[19] = new Equation(gen, 29, 0.01, 1.0, 80.0, 0.5); // chance_rare
-		equations[20] = new Equation(gen, 30, 0.02, 1.0, 70.0, 0.5); // chance_qualite
-		equations[21] = new Equation(gen, 31, 2.0, 50.0, 300, 0.3); // quantite_drop
-		equations[22] = new Equation(gen, 32, 0.1, 1.0, 30.0, 0.75); // puissance_ench_inf
-		equations[23] = new Equation(gen, 33, 1.0, true, 4.0, 0.5); // multiplicateur_or
-		equations[24] = new Equation(gen, 34, 1.0, true, 1.2, 0.55); // ed_mort_vivant
-		equations[25] = new Equation(gen, 35, 1.0, true, 1.2, 0.55); // ed_animal
-		equations[26] = new Equation(gen, 36, 1.0, true, 1.4, 0.6); // ed_humain
-		equations[27] = new Equation(gen, 37, 1.0, true, 1.2, 0.55); // ed_peau_verte
-		equations[28] = new Equation(gen, 38, 1.0, true, 1.0, 0.55); // ed_demon
-		equations[29] = new Equation(gen, 39, 1.0, true, 1.0, 0.45); // ed_champion
-		equations[30] = new Equation(gen, 40, 0.1, 1.0, 50.0, 0.8); // chance_fuite
-		equations[31] = new Equation(gen, 41, 1.0, false, 3.0, 0.8); // temps_fuite
-		equations[32] = new Equation(gen, 42, 0.5+gen.nextDouble()*2.0, 0.0,  75.0, 0.7); // initiative
-		equations[33] = new Equation(gen, 43, 0.0, 1.0,  50.0, 0.75); // proba_immunite_final
-		equations[34] = new Equation(gen, 44, 1.0, true, 2.0, 0.5); // facteur_temps
-		equations[35] = new Equation(gen, 45, 0.0, true, 10.0, 0.7); // epines
-		equations[36] = new Equation(gen, 46, 0.0, 1.0+gen.nextDouble()*4.0, 180.0, 0.4); // represailles
-		equations[37] = new Equation(gen, 47, 0.0, 1.0+gen.nextDouble()*4.0, 170.0, 0.4); // necrophagie
-		equations[38] = new Equation(gen, 48, 0.5+gen.nextDouble()*1.5, 0.0, 30, 1.0); // temps_craft
-		equations[39] = new Equation(gen, 49, 0.4+gen.nextDouble()*0.5, 1.0,  75.0, 0.7); // rendement
-		equations[40] = new Equation(gen, 50, 1.0, false, 1.0, 0.4); // economie_orbe
-		equations[41] = new Equation(gen, 51, 1.0, true, 5.0, 0.3); // niveau_boutique	
-		equations[42] = new Equation(gen, 52, 3+gen.nextInt(3), 50.0, 400.0, 0.5); // taille_boutique
-		equations[43] = new Equation(gen, 53, 0.0, true, 4.0, 1.4); // detection_piege
-		equations[44] = new Equation(gen, 54, 1.0, true, 1.2,0.35); // bonus_initiative_piege
-		equations[45] = new Equation(gen, 55, 1.0, true, 0.8,0.3); // bonus_resistance_vs_piege
-		equations[46] = new Equation(gen, 56, 0.0, true, 300.0, 0.9, 0.1); // rente_par_rencontre
-		equations[47] = new Equation(gen, 57, 4+gen.nextInt(3), true, 4.0,0.3); // points_par_niveau
-		equations[48] = new Equation(gen, 58, 1.0, true, 1.8,0.35); // bonus_xp
-		equations[49] = new Equation(gen, 59, 1.0, true, 0.03,0.3); // modif_exp_hlev
-		equations[50] = new Equation(gen, 60, 0.0, 1.0, 50, 0.5); // modif_exp_lowlev
-		equations[51] = new Equation(gen, 0.61, 0.0, true, 350.0, 1.2); // get_zone_level et get_zone_max_level
-		equations[52] = new Equation(gen, 0.62, 1.0, true, 12.0, 1.1); // gold_drop
-		equations[53] = new Equation(gen, 0.63, 10.0, true, 75.0, 1.45,0.1); //monster_points_for_level
-		equations[54] = new Equation(gen, 0.64, 2.0, true, 20.0, 1.45,0.1); // niveau_champion
-		equations[55] = new Equation(gen, 0.65, 1.0, true, 12.0, 2.6); // traps_dmg_for_level
-		equations[56] = new Equation(gen, 66.0, 1.0, false, 0.5, 0.6); // penalty_reduction
-		equations[57] = new Equation(gen, 67, 1.0, true, 4.0, 0.3); // zone_multiplier
-		equations[58] = new Equation(gen, 68, 1.0, true, 0.8, 0.35); // points_divins_multiplier
-		equations[59] = new Equation(gen, 0.69, 0.0, true, 30.0, 0.4); // points_divins_pour_x_orbe
-		equations[60] = new Equation(gen, 70, 1.0, true, 1.5, 0.5); // multi_premier_coup
-		equations[61] = new Equation(gen, 0.71, 0.0, true, 2500, 0.9,0.1); // xp_for_level
-		equations[62] = new Equation(gen, 72, 1.0, true, 1.5, 0.28); // divine_cap_eq
-		equations[63] = new Equation(gen, 73, 1.0, true, 1.8, 0.28); // divine_cap_const
-		equations[64] = new Equation(gen, 0.74, 4.5, true, 80, 0.4); // points_divins_pour_niveau
-		equations[65] = new Equation(gen, 75, 1.0, false, 2.0, 0.6); // resources_weight_multiplier
-		equations[66] = new Equation(gen, 76, 1.0, false, 0.8, 0.3); // equipment_weight_multiplier
-		equations[67] = new Equation(gen, 0.77, -0.075, 1.0,  400.0, 1.0); // proba_orbe_niveau_drop
-		equations[68] = new Equation(gen, 0.75, 0.0, true, 75.0, 0.5); // points_competence_orbes
-		equations[69] = new Equation(gen, 79, 1.0, false, 0.7, 0.6); // resistance_froid
-		equations[70] = new Equation(gen, 80, 1.0, false, 0.6, 0.6); // resistance_chaud
-		equations[71] = new Equation(gen, 81, 1.0, false, 0.8, 0.55); // resistance_precipitations
-		equations[72] = new Equation(gen, 82, 1.0, true, 0.5, 0.35); // affinite_froid
-		equations[73] = new Equation(gen, 83, 1.0, true, 0.55, 0.35); // affinite_chaud
-		equations[74] = new Equation(gen, 84, 1.0, true, 1.0, 0.4); // affinite_precipitations
-		equations[75] = new Equation(gen, 0.85, 1.0, true, 1.5, 0.3); // get_current_temperature
-		equations[76] = new Equation(gen, 0.86, 1.0, true, 5.0, 1.0); // get_current_precipitation
-		equations[77] = new Equation(gen, 0.87, 1.0, false, 50.0, 1.0); // base_overload_penalty
-		equations[78] = new Equation(gen, 88, 1.0, false, 1.0, 0.7); // resistance_surcharge
-		equations[79] = new Equation(gen, 0.89, 1.0, true, 4.0, 0.55); // multiplicateur_res_marchands
-		equations[80] = new Equation(gen, 0.645, 2.0, true, 20.0, 2.10,0.1); // niveau_super_champion
-		equations[81] = new Equation(gen, 91, 1.5, true, 1.0, 0.45); //clearance_sale_inventory_multiplier
-		equations[82] = new Equation(gen, 0.92, 1.0, true, 1.0, 0.9); //bonus_haut_faits_base
+		equations[0] = new Equation(gen, 1, 10, 1.0, true, 1.5, 0.8); // att_per_sec
+		equations[1] = new Equation(gen, 1, 11, 1.0, true, 1.0, 0.5); // pv_per_vita 
+		equations[2] = new Equation(gen, 1, 12, 0.02, 1.0, 100.0, 0.6); // crit_proba
+		equations[3] = new Equation(gen, 1, 13, 1.25, true, 2.5, 0.65); // multi_crit
+		equations[4] = new Equation(gen, 1, 14, 0.5, true, 10.0, 0.9); // dmg_base
+		equations[5] = new Equation(gen, 1, 15, 1.0, false, 1.2,0.7); // reduc
+		equations[6] = new Equation(gen, 1, 16, 0.0, true, 10.0, 0.65); // absorption
+		equations[7] = new Equation(gen, 1, 17, 10.0, true, 20.0, 1.0); // used in esquive_proba
+		equations[8] = new Equation(gen, 1, 18, 0.0, 1.0, 100.0, 0.35); // vol_de_vie
+		equations[9] = new Equation(gen, 1, 19, 2.5, true, 8.0, 0.9); // regen
+		equations[10] = new Equation(gen, 1, 20, 10+gen.nextInt(10), true, 200.0, 0.6); // charge maximale
+		equations[11] = new Equation(gen, 1, 21, 0.5+gen.nextDouble()*1.5, 0.0, 30.0, 0.5); // temps_traque
+		equations[12] = new Equation(gen, 1, 22, 0.5+gen.nextDouble()*2.0, 0.0, 35.0, 0.5); // temps_shop
+		equations[13] = new Equation(gen, 1, 23, 0.5+gen.nextDouble()*2.5, 0.0, 35.0, 0.5); // temps_forge
+		equations[14] = new Equation(gen, 1, 24, 4+gen.nextInt(12), 0.0, 60.0, 0.65); // temps_res			
+		equations[15] = new Equation(gen, 1, 25, 1.5, 1.0, 30.0, 0.6); // coeff_achat
+		equations[16] = new Equation(gen, 1, 26, 0.75, 1.0, 30.0, 0.6); // coeff_vente
+		equations[17] = new Equation(gen, 1, 27, 1.0, true, 3.0, 0.4); // multiplicateur_res
+		equations[18] = new Equation(gen, 1, 28, 0.02, 1.0, 60.0, 0.5); // chance_magique
+		equations[19] = new Equation(gen, 1, 29, 0.01, 1.0, 80.0, 0.5); // chance_rare
+		equations[20] = new Equation(gen, 1, 30, 0.02, 1.0, 70.0, 0.5); // chance_qualite
+		equations[21] = new Equation(gen, 1, 31, 2.0, 50.0, 300, 0.3); // quantite_drop
+		equations[22] = new Equation(gen, 1, 32, 0.1, 1.0, 30.0, 0.75); // puissance_ench_inf
+		equations[23] = new Equation(gen, 1, 33, 1.0, true, 5.0, 0.35); // multiplicateur_or
+		equations[24] = new Equation(gen, 1, 34, 1.0, true, 1.2, 0.55); // ed_mort_vivant
+		equations[25] = new Equation(gen, 1, 35, 1.0, true, 1.2, 0.55); // ed_animal
+		equations[26] = new Equation(gen, 1, 36, 1.0, true, 1.4, 0.6); // ed_humain
+		equations[27] = new Equation(gen, 1, 37, 1.0, true, 1.2, 0.55); // ed_peau_verte
+		equations[28] = new Equation(gen, 1, 38, 1.0, true, 1.0, 0.55); // ed_demon
+		equations[29] = new Equation(gen, 1, 39, 1.0, true, 1.0, 0.45); // ed_champion
+		equations[30] = new Equation(gen, 1, 40, 0.1, 1.0, 50.0, 0.8); // chance_fuite
+		equations[31] = new Equation(gen, 1, 41, 1.0, false, 3.0, 0.8); // temps_fuite
+		equations[32] = new Equation(gen, 1, 42, 0.5+gen.nextDouble()*2.0, 0.0,  75.0, 0.7); // initiative
+		equations[33] = new Equation(gen, 1, 43, 0.0, 1.0,  50.0, 0.75); // proba_immunite_final
+		equations[34] = new Equation(gen, 1, 44, 1.0, true, 2.0, 0.5); // facteur_temps
+		equations[35] = new Equation(gen, 1, 45, 0.0, true, 10.0, 0.7); // epines
+		equations[36] = new Equation(gen, 1, 46, 0.0, 1.0+gen.nextDouble()*4.0, 180.0, 0.4); // represailles
+		equations[37] = new Equation(gen, 1, 47, 0.0, 1.0+gen.nextDouble()*4.0, 170.0, 0.4); // necrophagie
+		equations[38] = new Equation(gen, 1, 48, 0.5+gen.nextDouble()*1.5, 0.0, 30, 1.0); // temps_craft
+		equations[39] = new Equation(gen, 1, 49, 0.4+gen.nextDouble()*0.5, 1.0,  75.0, 0.7); // rendement
+		equations[40] = new Equation(gen, 1, 50, 1.0, false, 2.0, 0.25); // economie_orbe
+		equations[41] = new Equation(gen, 1, 51, 1.0, true, 5.0, 0.4); // niveau_boutique	
+		equations[42] = new Equation(gen, 1, 52, 3+gen.nextInt(3), 50.0, 400.0, 0.5); // taille_boutique
+		equations[43] = new Equation(gen, 1, 53, 0.0, true, 4.0, 1.4); // detection_piege
+		equations[44] = new Equation(gen, 1, 54, 1.0, true, 1.2,0.35); // bonus_initiative_piege
+		equations[45] = new Equation(gen, 1, 55, 1.0, true, 0.8,0.3); // bonus_resistance_vs_piege
+		equations[46] = new Equation(gen, 1, 56, 0.0, true, 300.0, 0.65); // rente_par_rencontre
+		equations[47] = new Equation(gen, 1, 57, 4+gen.nextInt(3), true, 4.0,0.3); // points_par_niveau
+		equations[48] = new Equation(gen, 1, 58, 1.0, true, 1.8,0.35); // bonus_xp
+		equations[49] = new Equation(gen, 1, 59, 1.0, true, 0.03,0.3); // modif_exp_hlev
+		equations[50] = new Equation(gen, 1, 60, 0.0, 1.0, 50, 0.5); // modif_exp_lowlev
+		equations[51] = new Equation(gen, 1, 0.61, 0.0, true, 350.0, 1.2); // get_zone_level et get_zone_max_level
+		equations[52] = new Equation(gen, 1, 0.62, 1.0, true, 12.0, 1.1); // gold_drop
+		equations[53] = new Equation(gen, 0, 0.63, 10.0, true, 75.0, 1.45,0.1); //monster_points_for_level
+		equations[54] = new Equation(gen, 1, 0.64, 2.0, true, 20.0, 1.45,0.1); // niveau_champion
+		equations[55] = new Equation(gen, 0, 0.65, 1.0, true, 12.0, 2.6); // traps_dmg_for_level
+		equations[56] = new Equation(gen, 1, 66, 1.0, false, 0.5, 0.6); // penalty_reduction
+		equations[57] = new Equation(gen, 1, 67, 1.0, true, 4.0, 0.3); // zone_multiplier
+		equations[58] = new Equation(gen, 1, 68, 1.0, true, 0.8, 0.35); // points_divins_multiplier
+		equations[59] = new Equation(gen, 1, 0.69, 0.0, true, 30.0, 0.4); // points_divins_pour_x_orbe
+		equations[60] = new Equation(gen, 1, 70, 1.0, true, 1.5, 0.5); // multi_premier_coup
+		equations[61] = new Equation(gen, 1, 0.71, 0.0, true, 2500, 0.9,0.1); // xp_for_level
+		equations[62] = new Equation(gen, 1, 72, 1.0, true, 1.5, 0.28); // divine_cap_eq
+		equations[63] = new Equation(gen, 1, 73, 1.0, true, 1.8, 0.28); // divine_cap_const
+		equations[64] = new Equation(gen, 1, 0.74, 4.5, true, 80, 0.4); // points_divins_pour_niveau
+		equations[65] = new Equation(gen, 1, 75, 1.0, false, 2.0, 0.6); // resources_weight_multiplier
+		equations[66] = new Equation(gen, 1, 76, 1.0, false, 0.8, 0.3); // equipment_weight_multiplier
+		equations[67] = new Equation(gen, 1, 0.77, -0.075, 1.0,  400.0, 1.0); // proba_orbe_niveau_drop
+		equations[68] = new Equation(gen, 1, 0.75, 0.0, true, 75.0, 0.5); // points_competence_orbes
+		equations[69] = new Equation(gen, 1, 79, 1.0, false, 0.7, 0.6); // resistance_froid
+		equations[70] = new Equation(gen, 1, 80, 1.0, false, 0.6, 0.6); // resistance_chaud
+		equations[71] = new Equation(gen, 1, 81, 1.0, false, 0.8, 0.55); // resistance_precipitations
+		equations[72] = new Equation(gen, 1, 82, 1.0, true, 0.5, 0.35); // affinite_froid
+		equations[73] = new Equation(gen, 1, 83, 1.0, true, 0.55, 0.35); // affinite_chaud
+		equations[74] = new Equation(gen, 1, 84, 1.0, true, 1.0, 0.4); // affinite_precipitations
+		equations[75] = new Equation(gen, 1, 0.85, 1.0, true, 1.5, 0.3); // get_current_temperature
+		equations[76] = new Equation(gen, 1, 0.86, 1.0, true, 5.0, 1.0); // get_current_precipitation
+		equations[77] = new Equation(gen, 0, 0.87, 1.0, false, 50.0, 1.0); // base_overload_penalty
+		equations[78] = new Equation(gen, 1, 88, 1.0, false, 1.0, 0.7); // resistance_surcharge
+		equations[79] = new Equation(gen, 1, 89, 1.0, true, 0.65, 0.45); // affinite_souscharge
+		equations[80] = new Equation(gen, 1, 90, 1.0, true, 0.6, 0.4); // affinite_hautfaits
+		equations[81] = new Equation(gen, 1, 0.91, 1.0, true, 4.0, 0.6); // multiplicateur_res_marchands
+		equations[82] = new Equation(gen, 1, 0.645, 2.0, true, 20.0, 2.10,0.1); // niveau_super_champion
+		equations[83] = new Equation(gen, 1, 93, 1.5, true, 1.0, 0.55); // clearance_sale_inventory_multiplier
+		equations[84] = new Equation(gen, 1, 0.94, 1.0, true, 5.0, 0.3); // bonus_haut_faits_base
+		equations[85] = new Equation(gen, 1, 0.95, 0.0, true, 120.0, 0.75); // niveau_efficacite
+		equations[86] = new Equation(gen, 1, 0.96, 0.0, true, 80.0, 0.80); // niveau_enchantement
+		equations[87] = new Equation(gen, 1, 0.875, 1.0, true, 1.0, 0.4); // base_underload_bonus
+		equations[88] = new Equation(gen, 1, 98, 0.8, false, 0.5, 0.2); // discount_multiplier
+		equations[89] = new Equation(gen, 1, 0.646, 2.0, true, 5.0, 2.2); // niveau_pieges
 		
 		for(int i=0; i< nb_universe_equations; i++)
 			equations[i].id = i;
@@ -320,7 +323,34 @@ import java.util.*;
 		for(int i=0; i< nb_universe_equations; i++)
 			divine_cap[i+nb_universe_stats]=sortedEquations[i].divine_cap;
 		
-		map = new Map(gen,get_zone_level(14));
+		map = new Map(gen);
+		
+		nuberSlotsAvailable = 0;
+		if(seed != 0)
+		{
+			for(int i=0; i< StaticItem.nb_pos-1; i++) {
+				if (gen.nextDouble() > 0.33 && i!=12) {binVar[i] = true; nuberSlotsAvailable+=1;}
+				else binVar[i] = false;
+			}
+			binVar[12] = true; // les armes existent toujours
+			nuberSlotsAvailable+=1;
+		}
+		if(seed == 0)
+		{
+			for(int i=0; i< StaticItem.nb_pos-1; i++) {binVar[i] = true; nuberSlotsAvailable+=1;}
+			binVar[7] = false; 
+			nuberSlotsAvailable=nuberSlotsAvailable-1;
+		}
+		
+		ItemUnlockOrder = new ArrayList<Integer>(nuberSlotsAvailable);
+	
+		for(int i=0; i< StaticItem.nb_pos-1; i++)
+			if (binVar[i] && i!=12)
+				ItemUnlockOrder.add(i);
+		
+		Collections.shuffle(ItemUnlockOrder,gen.gen);
+		ItemUnlockOrder.add(0, 12);
+		
 		joueur = new Player(this,false);
 	}
 			
@@ -528,26 +558,26 @@ import java.util.*;
 		return equations[48].eval(x);
 		}
 
-	public double modif_exp_hlev(double x,int levdiff) {
+	public double modif_exp_hlev(double x,double levdiff) {
 		return equations[49].eval(x*levdiff);
 		}
 
-	public double modif_exp_lowlev(double x,int levdiff) {
+	public double modif_exp_lowlev(double x,double levdiff) {
 		return equations[50].eval((5.0*x+50.0)/-levdiff);
 		}
 
 	
-	public int get_zone_level(int zone)
+	public double get_zone_level(int zone)
 	{
 		if(zone==0) return 100;
 		if(zone==1) return 2000;
-		return (int)(equations[51].eval(zone-2)+1.0);
+		return Math.floor(equations[51].eval(zone-2)+1.0);
 	}
-	public int get_zone_max_level(int zone)
+	public double get_zone_max_level(int zone)
 	{
 		if(zone==0) return 200;
 		if(zone==1) return 2500;
-		return (int)(equations[51].eval(zone-1));
+		return Math.floor(equations[51].eval(zone-1));
 	}
 	
 	public double gold_drop(double level)
@@ -654,54 +684,77 @@ import java.util.*;
 		return equations[78].eval(x);
 	}
 	
-	public double multiplicateur_res_marchands(double x) {
+	public double affinite_souscharge(double x) {
 		return equations[79].eval(x);
 	}
 	
-	public double niveau_super_champion(double lvl)	{
-		return equations[80].eval(lvl);
+	public double affinite_hautfaits(double x) {
+		return equations[80].eval(x);
 	}
 	
-	public double clearance_sale_inventory_multiplier(double x) {
+	public double multiplicateur_res_marchands(double x) {
 		return equations[81].eval(x);
 	}
 	
+	public double niveau_super_champion(double lvl)	{
+		return equations[82].eval(lvl);
+	}
+	
+	public double clearance_sale_inventory_multiplier(double x) {
+		return equations[83].eval(x);
+	}
+	
 	public double bonus_haut_faits_base(double x) {
-		return equations[82].eval(x);
+		return equations[84].eval(x);
+	}
+	
+	public double niveau_efficacite(double x) {
+		return equations[85].eval(x);
+	}
+	
+	public double niveau_enchantement(double x) {
+		return equations[86].eval(x);
+	}
+	
+	public double base_underload_bonus(double x) {
+		return equations[87].eval(x);
+	}
+		
+	public double discount_multiplier(double x) {
+		return equations[88].eval(x);
+	}
+	
+	public double niveau_pieges(double x) {
+		return equations[89].eval(x);
 	}
 	
 	public double points_divins_totaux(double x, double y, double lvl) {
 		return points_divins_multiplier(x)*(points_divins_pour_x_orbe(y)+points_divins_pour_niveau(lvl));
 	}
 	
-	public double modif_exp_lvl(double BONUS_LOWLEV, double BONUS_HLEV, int levdiff)
+	public double modif_exp_lvl(double BONUS_LOWLEV, double BONUS_HLEV, double levdiff)
 	{
 	if(levdiff >= 1) return modif_exp_hlev(BONUS_HLEV,levdiff);
 		if(levdiff <= -1) return modif_exp_lowlev(BONUS_LOWLEV,levdiff);
 		return 1.0;}
 
-	public double vie_depart() {
-		return adjusted_constant(0);
-		}
+	public double vie_depart() 
+	{ return adjusted_constant(0); }
 		
-    public double vie_max(double VITA, double CON) {
-		return adjusted_constant(0) + pv_per_vita(CON)*VITA;
-		}
+    public double vie_max(double VITA, double CON)
+	{ return adjusted_constant(0) + pv_per_vita(CON)*VITA; }
 	
-	public double proba_rencontrer_piege() {
-		return adjusted_constant(1);
-		}
+	public double points_initiaux()
+	{ return adjusted_constant(1); }
 		
-	public double puissance_ench_sup() {
-		return adjusted_constant(2);
-		}
-		
-	public double points_initiaux(){
-		return adjusted_constant(3);
-		}
-		
+	public double proba_rencontrer_piege() 
+	{ return adjusted_constant(2); }
+	
+	public double proba_promo()
+	{ return adjusted_constant(3); }
+	
 	public double proba_clearance_sale()
-	{ return adjusted_constant(4);}
+	{ return adjusted_constant(4); }
 	
 	public double proba_champion()
 	{ return adjusted_constant(5); }
@@ -775,6 +828,9 @@ import java.util.*;
 	
 	double efficacite_base()
 	{ return adjusted_constant(25); }
+	
+	public double puissance_ench_sup() 
+	{ return adjusted_constant(26); }
 	
 	double adjusted_constant(int idx)
 	{ return adjust_constant(points_divins[idx],constantes[idx],constantes_min[idx], constantes_max[idx]); }

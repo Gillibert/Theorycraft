@@ -141,8 +141,9 @@ public class EditUniverse extends javax.swing.JDialog  {
 	}
 	if(mustRefreshInfos)
 	{
+	mustRefreshInfos = false;
 	try{infos.setText(infoHTML());}
-	catch (Exception e){System.out.println(e);}
+	catch (Exception e){System.out.println("MustRefreshInfos problem: " + e);}
 	
 	prompt.setText(String.format(Local.DISTRIBUTION_OF_GOD_POINTS,Joueur.points_divins_a_distribuer()));
 	for (int i=0; i< Joueur.universe.nb_universe_stats ; i++)
@@ -167,7 +168,6 @@ public class EditUniverse extends javax.swing.JDialog  {
 	double divine_cap = Joueur.divine_cap(table.getSelectedRow());
 	plus.setEnabled(pts < 0 || Joueur.points_divins_a_distribuer() >= 1 && pts+1.0 <= divine_cap);
 	moins.setEnabled(pts > 0 || Joueur.points_divins_a_distribuer() >= 1  && pts-1.0 >= -divine_cap);
-	mustRefreshInfos = false;
 	}
     }
 	
@@ -197,8 +197,8 @@ public class EditUniverse extends javax.swing.JDialog  {
 		table.getColumnModel().getColumn(4).setPreferredWidth(30);
 		
 	    javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
-		    public void valueChanged(javax.swing.event.ListSelectionEvent e) 
-			{mustRefreshInfos=true; refresh();}};
+		    public void valueChanged(javax.swing.event.ListSelectionEvent evt) 
+			{if (!evt.getValueIsAdjusting()) {mustRefreshInfos=true; refresh();}}}; 
 				
 	    table.getSelectionModel().addListSelectionListener(refresher);
 			
@@ -262,7 +262,11 @@ public class EditUniverse extends javax.swing.JDialog  {
 	    equi.setText(Local.AUTO_DISTRIBUTION);
 	    equi.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
-				 equirepartir();
+				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0)
+				{
+				 equirepartir(true);
+				}
+				else equirepartir(false);
 		    }
 		});
 		
@@ -299,7 +303,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 	private void updateMustRefresh(int idx)
 	{
 		Game.MW.mustRefreshCurves=true;
-		if (idx == 3 || idx == 14 || idx == 23 || idx == 24) Game.MW.mustRefreshMonsters=true;
+		if (idx == 1 || idx == 14 || idx == 21 || idx == 23 || idx == 24) Game.MW.mustRefreshMonsters=true;
 		if (idx == 17) Game.MW.mustRefreshWeather=true;
 		if(idx >= Joueur.universe.nb_universe_stats)
 		{
@@ -337,7 +341,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 	if (eidx >= 0) Joueur.universe.sortedEquations[eidx].update(Joueur.universe.points_divins[idx]);
     }
 
-	private void equirepartir()
+	private void equirepartir(boolean fullauto)
 	{
 		mustRefreshInfos = true;
 		Game.MW.mustRefreshCurves=true;
@@ -348,19 +352,28 @@ public class EditUniverse extends javax.swing.JDialog  {
 		for (int idx=0; idx< Joueur.universe.nb_universe_stats+Joueur.universe.nb_universe_equations ; idx++)
 	    {
 			double can_be_dist = Joueur.points_divins_a_distribuer();
+			int eidx = idx-Joueur.universe.nb_universe_stats;
 			if (Joueur.universe.points_divins[idx] > 0.01)
 			{
 				double cap = Math.min(Joueur.divine_cap(idx)-Joueur.universe.points_divins[idx],can_be_dist);
 				double to_dist = Math.floor(cap);
 				Joueur.universe.points_divins[idx] += to_dist; 
 			}
-			if (Joueur.universe.points_divins[idx] < -0.01)
+			else if (Joueur.universe.points_divins[idx] < -0.01)
 			{
 				double cap = Math.min(Joueur.divine_cap(idx)+Joueur.universe.points_divins[idx],can_be_dist);
 				double to_dist = Math.floor(cap);
 				Joueur.universe.points_divins[idx] -= to_dist; 
 			}
-			int eidx = idx-Joueur.universe.nb_universe_stats;
+			if (Math.abs(Joueur.universe.points_divins[idx]) < 0.01 && eidx >=0 && fullauto)
+			{
+				double cap = Math.min(Joueur.divine_cap(idx)+Joueur.universe.points_divins[idx],can_be_dist);
+				double to_dist = Math.floor(cap);
+				int auto_dist_strategy = Joueur.universe.sortedEquations[eidx].auto_dist_strategy;
+				if(auto_dist_strategy == 1) Joueur.universe.points_divins[idx] += to_dist;
+				if(auto_dist_strategy == 0) Joueur.universe.points_divins[idx] -= to_dist;
+			}
+
 			if (eidx >= 0) Joueur.universe.sortedEquations[eidx].update(Joueur.universe.points_divins[idx]);
 	    }
 	}

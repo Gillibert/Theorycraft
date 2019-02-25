@@ -1,6 +1,7 @@
 import java.util.Random;
+import java.io.*;
 
-public class TheoryGenerator {
+public class TheoryGenerator implements Serializable {
 	public Random gen;
 	private int seed;
 	

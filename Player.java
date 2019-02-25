@@ -22,20 +22,10 @@ public class Player implements Serializable {
     public double[] stats; // répartition des points de compétences
     public double[] stats_with_bonus; // For fast access
     public double[] item_bonus; // For fast access, used only in LevlUp
+    public int[] auto_dist_coeff; // For auto_dist
 
 	public double temperature_diff = 0.0;
 	public double precipitation_strength = 0.0;
-	
-	// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
-    // VDV(8) VITA(9) CON(10) REGEN(11) RESUR(12) LOAD(13) RUN(14) 
-    // RESF(15) MF(16) RF(17) QALF(18) QTYF(19) POWF(20) GF(21)
-    // ED_MV(22) ED_ANI(23) ED_HUM(24) ED_PV(25) ED_DEM(26) ED_CHAMP(27)
-    // ESTI(28) FLEE(29) FLEE_SPD(30) INIT(31) IMUN_FINAL(32) TIME_SPD(33) 
-	// EPIN(34) REP(35) NECRO(36) CRAFT_SPD(37) CRAFT_REND(38) ECO_ORB(39) 
-	// SHOP_LEVEL(40) SHOP_SIZE(41) TRAP_DET(42) TRAP_INIT(43) TRAP_RES(44)
-	// RENTE(45) EDUC(46) BONUS_XP(47) BONUS_LOWLEV(48) BONUS_HLEV(49)
-	// REDUC_PEN(50) ZONE_ACCESS (51) DIEU(52) FIRST_STRIKE(53)
-	// EQ_MASTER(54) CONST_MASTER(55) LIGHTER_RES(56) LIGHTER_EQP(57)
 
     public static String[] stats_name =  Local.SKILLS_NAME; // nom des compétences 
 
@@ -56,7 +46,7 @@ public class Player implements Serializable {
     public ArrayList<ObjectRule> rules; // régles et filtres d'inventaires
 
     public double charge;
-    public int level;  // niveau
+    public double level;  // niveau
     public double money; // argent
     public int zone; // zone
     public double xp_pt; // exp
@@ -87,8 +77,16 @@ public class Player implements Serializable {
 	public double overload_penalty()
 	{
 		double cm = charge_max();
-		if (charge < cm) return 1.0;
+		if (charge <= cm) return 1.0;
 		else return universe.base_overload_penalty((charge/cm-1.0)*overload_resistance());
+	}
+	
+	public double underload_bonus() // Base load ratio is limited to 10000
+	{
+		double cm = charge_max();
+		if (charge >= cm) return 1.0;
+		double cha = Math.max(charge,0.0001);
+		return universe.base_underload_bonus(Math.min(cm/cha,10000))*underload_affinity();
 	}
 	
 	public double precipitation_penalty()
@@ -170,9 +168,21 @@ public class Player implements Serializable {
 	refresh_stats_with_bonus();
     }
 
+	public double prix_achat(Item b)
+	{
+		if (b.discount) return discount_multiplier()*coeff_achat()*b.prix();
+		else return coeff_achat()*b.prix();
+	}
+	
+	public double prix_vente(Item b)
+	{
+		if (b.discount) return discount_multiplier()*coeff_vente()*b.prix();
+		else return coeff_vente()*b.prix();
+	}
+	
     public boolean can_buy(Item b)
     {
-	return (money - coeff_achat()*b.prix() >= 0 || (b.stackable && money > 0.01));
+	return (money - prix_achat(b) >= 0 || (b.stackable && money > 0.01));
     }
 	
 	public void buy(Item it)
@@ -186,7 +196,6 @@ public class Player implements Serializable {
     public void buy(ArrayList<Item> slist)
     {
 	if (slist.size()==0 || money<0.01) return;
-	double coeff_ach = coeff_achat();
 
 	double perte_base = 0.0;
 	double perte_mat = 0.0;
@@ -200,7 +209,7 @@ public class Player implements Serializable {
 	String partial;
 	for(Item the_object : slist)
 	{
-	double prix = coeff_ach*the_object.prix();
+	double prix = prix_achat(the_object);
 	if(total_prix+prix <= money)
 	{
 		toAdd.add(the_object);
@@ -219,15 +228,17 @@ public class Player implements Serializable {
 		break;
 	}
 	}
+	
 	for(Item the_object : toAdd)
 	{
-	double prix = coeff_ach*the_object.prix();
+	double prix = prix_achat(the_object);
 	if(the_object.rare == 0) perte_base += prix;
 	else if(the_object.rare == 4 || the_object.rare == 5) perte_mat += prix;
 	else if(the_object.rare == 6) perte_orb += prix;
 	else perte_other += prix;
 	charge += the_object.poids_final(this);
 	}
+	
 	inventory.addAll(toAdd);
 	shop.inventory.removeAll(toRemove);
 	
@@ -255,7 +266,7 @@ public class Player implements Serializable {
 	if(perte_other > 0.0)
 		money_loss(perte_other,TimeStats.LOSS_BUY_OTHER);
 
-	if(inventory.size() > 50) clean_list(inventory);
+	clean_list(inventory);
 	if(disp) Game.MW.addLog(String.format(Local.BUYING_OBJECTS,buyStr,shop.name,total_prix));
     }
 
@@ -277,7 +288,6 @@ public class Player implements Serializable {
 	int nbitem = slist.size();
 	if(nbitem == 0) return;
 	get_shop();
-	double cv = coeff_vente();
 	
 	double gain_base = 0.0;
 	double gain_magique = 0.0;
@@ -303,7 +313,7 @@ public class Player implements Serializable {
 	
 	for(Item the_object : slist)
 	{
-	double prix = cv*the_object.prix();
+	double prix = prix_vente(the_object);
 	//inventory.remove(the_object);
 	charge -= the_object.poids_final(this);
 	if(the_object.equiped) {equiped = true; the_object.equiped = false;}
@@ -333,25 +343,15 @@ public class Player implements Serializable {
 		money_gain(gain_other,TimeStats.GAIN_SELL_OTHER);	
 	
 	if(disp) Game.MW.addLog(String.format(Local.SELLING_OBJECTS,sellStr,shop.name,gain_total));
+	if (charge<0.0) charge = 0.0;
     }
 	
-    public void sell(Item b)
+    public void sell(Item it)
     {
-	get_shop();
-	double prix = coeff_vente()*b.prix();
-	deposit_item(b,shop.inventory);
-	if(b.rare == 0)
-		money_gain(prix,TimeStats.GAIN_SELL_BASE);
-	else if(b.rare == 1)
-		money_gain(prix,TimeStats.GAIN_SELL_MAGIC);
-	else if(b.rare == 2)
-		money_gain(prix,TimeStats.GAIN_SELL_RARE);
-	else if(b.rare == 4 || b.rare == 5)
-		money_gain(prix,TimeStats.GAIN_SELL_MAT);
-	else
-		money_gain(prix,TimeStats.GAIN_SELL_OTHER);		
-	if(disp) Game.MW.addLog(String.format(Local.SELLING_OBJECTS,b.name,shop.name,prix));
-    }
+		ArrayList<Item> tmp =  new ArrayList<Item>();
+		tmp.add(it);
+		sell(tmp);
+	}
 
     public Item get_similar(ArrayList<Item> inventory, Item i)
     {
@@ -363,6 +363,7 @@ public class Player implements Serializable {
 
 	public static void clean_list(ArrayList<Item> slist)
 	{
+		try{
 		ArrayList<Item> slist2;
 		Collections.sort(slist, new Comparator<Item>() 
 		{public int compare(Item i1, Item i2) {return  i1.name.compareTo(i2.name);}});
@@ -374,6 +375,7 @@ public class Player implements Serializable {
 			if (current.name.equals(previous.name) && previous.stackable)
 			{
 				previous.add_qty(current.qty);
+				if(current.discount) previous.discount = true;
 				it.remove();
 			}
 			else
@@ -381,7 +383,66 @@ public class Player implements Serializable {
 				previous = current;
 			}
 		}
+		}
+		catch (Exception e)
+		{System.out.println("clean_list fail");}
 	}
+	
+	public void craftAuto()
+	{
+		// Vide l'inventaire de la forge
+		int crs = craftInventory.size();
+		for(int i=0; i< crs; i++)
+			get_craft(craftInventory.get(0));
+
+		clean_list(inventory);
+
+		// Sélectionne les règles de craft
+		ArrayList<ObjectRule> crrules = new ArrayList<ObjectRule> ();
+		for (ObjectRule r: rules)
+			if(r.meta_type == ObjectRule.CRAFT_RULE)
+				crrules.add(r);
+		
+		while(!crrules.isEmpty())
+		for (ObjectRule r: crrules)
+			{
+				boolean rule_fail = false;
+				ArrayList<Item> crlist = new ArrayList<Item> ();
+				for (ObjectRule r2: r.ruleList)
+				{
+				// On peut avoir une règle sur le joueur pour une formule de craft
+				// Elle doit être vraie pour que la règle s'applique
+				if (r2.meta_type == ObjectRule.PLAYER_RULE) 
+				{
+					rule_fail = r2.IsTrue(this,null,null) ; break;
+				}
+				boolean item_found = false;
+				for(Item the_object : inventory)
+					if(r2.IsTrue(this,the_object,null) && !crlist.contains(the_object))
+					{
+						item_found = true;
+						crlist.add(the_object);
+						break;
+					}
+				if(item_found == false) {rule_fail = true; break;}
+				}
+				/*System.out.println("rule "+ r.name + "(fail="+ rule_fail +") crrules="+crrules.size());
+				for(Item the_object : crlist)
+					System.out.println(the_object.name);*/
+
+				if(!rule_fail)
+				{
+					put_craft(crlist);
+					craft();
+					crs = craftInventory.size();
+					if(craftInventory.size() == crlist.size()) rule_fail = true;
+					for(int i=0; i< crs; i++)
+						get_craft(craftInventory.get(0));
+				}
+				if(rule_fail) {crrules.remove(r); break;}
+			}
+	}
+	
 	
 	public void put_craft(ArrayList<Item> slist)
     {
@@ -416,6 +477,7 @@ public class Player implements Serializable {
 	if(equiped) refresh_stats_with_bonus();
 	
 	if(disp) Game.MW.addLog(String.format(Local.DROPPING_OBJECTS,name,putStr));
+	if (charge<0.0) charge = 0.0;
     }
 	
     public void put_craft(Item b)
@@ -432,6 +494,14 @@ public class Player implements Serializable {
 	if(disp) Game.MW.addLog(String.format(Local.THROW_AWAY_OBJECTS,name,b.name));
     }
 
+	public void invToConsole()
+	{
+		System.out.print("(");
+		for(Item the_object : inventory)
+			System.out.print(the_object.name + " ");
+		System.out.println(")");
+	}
+	
     public void get_item(Item b)
     {
 	Item tmp;
@@ -481,6 +551,7 @@ public class Player implements Serializable {
 	for(int i=0; i<nb_stats; i++) 
 		{
 		item_bonus[i]=0;
+		if (stats[i] != stats[i]) stats[i] = 0.0; // NaN != NaN
 	    stats_with_bonus[i]=stats[i];
 		}
 		
@@ -494,6 +565,7 @@ public class Player implements Serializable {
 			}
 	    }
 	refresh_charge();
+	vie=vie_max();
     }
 	
 	public String short_infos()
@@ -510,10 +582,10 @@ public class Player implements Serializable {
 		double levList[] = {universe.get_zone_level(zone), universe.get_zone_max_level(zone),level,level*0.75};
 		Arrays.sort(levList);
 		if (level < 10) levList = levListShort;
-		int lvl0=(int)levList[0];
-		int lvl1=(int)levList[1];
-		int lvl2=(int)levList[2];
-		int lvl3=(int)levList[3]; 
+		double lvl0=Math.floor(levList[0]);
+		double lvl1=Math.floor(levList[1]);
+		double lvl2=Math.floor(levList[2]);
+		double lvl3=Math.floor(levList[3]); 
 		if(lvl3==lvl2) lvl3*=1.25;
 		
 		return String.format(Local.PLAYER_INFOS,
@@ -565,9 +637,10 @@ public class Player implements Serializable {
 			resources_weight_multiplier(),equipment_weight_multiplier(),
 			cold_resistance(), heat_resistance(), precipitation_resistance(), overload_resistance(),
 			100*(1-cold_penalty()), 100*(1-heat_penalty()), 100*(1-precipitation_penalty()), 100*(1-overload_penalty()),
-			cold_affinity(), heat_affinity(), precipitation_affinity(),
-			100*(cold_bonus()-1.0), 100*(heat_bonus()-1.0), 100*(precipitation_bonus()-1.0),100*(bonus_haut_faits()-1.0),
-			clearance_sale_inventory_multiplier()
+			cold_affinity(), heat_affinity(), precipitation_affinity(), underload_affinity(),achievements_affinity(),
+			100*(cold_bonus()-1.0), 100*(heat_bonus()-1.0), 100*(precipitation_bonus()-1.0),
+			100*(underload_bonus()-1.0),100*(bonus_haut_faits()-1.0),
+			clearance_sale_inventory_multiplier(),discount_multiplier()
 			);
 	}
 
@@ -620,7 +693,7 @@ public class Player implements Serializable {
     {return stats_with_bonus[Universe.RUN]*overload_penalty();}
 
     public double RESF()
-    {return stats_with_bonus[Universe.RESF]*bonus_haut_faits();}
+    {return stats_with_bonus[Universe.RESF]*underload_bonus();}
 
     public double MF()
     {return stats_with_bonus[Universe.MF];}
@@ -638,7 +711,7 @@ public class Player implements Serializable {
     {return stats_with_bonus[Universe.POWF];}
 
     public double GF()
-    {return stats_with_bonus[Universe.GF];}
+    {return stats_with_bonus[Universe.GF]*bonus_haut_faits();}
 
     public double ED_MV()
     {return stats_with_bonus[Universe.ED_MV];}
@@ -710,7 +783,7 @@ public class Player implements Serializable {
 	{return stats_with_bonus[Universe.TRAP_RES];}
 	
 	public double RENTE()
-	{return stats_with_bonus[Universe.RENTE];}
+	{return stats_with_bonus[Universe.RENTE]*bonus_haut_faits();}
 	
 	public double EDUC()
 	{return stats_with_bonus[Universe.EDUC];}
@@ -769,9 +842,18 @@ public class Player implements Serializable {
 	public double OVERLOAD_RES()
 	{return stats_with_bonus[Universe.OVERLOAD_RES];}
 	
+	public double UNDERLOAD_BONUS()
+	{return stats_with_bonus[Universe.UNDERLOAD_BONUS];}
+	
+	public double ACHI_BONUS()
+	{return stats_with_bonus[Universe.ACHI_BONUS];}
+	
 	public double SHOPPING_ADDICT()
 	{return stats_with_bonus[Universe.SHOPPING_ADDICT];}
 
+	public double DISCOUNT_SPEC()
+	{return stats_with_bonus[Universe.DISCOUNT_SPEC];}
+	
 	public double total_skill_points()
 	{
 		double res=0;
@@ -831,7 +913,7 @@ public class Player implements Serializable {
 	public double points_a_distribuer() {return points_totaux()-points_distribues();}
 	public double points_divins_a_distribuer() {return points_divins_totaux()-points_divins_distribues();}
 	public double bonus_xp() {return universe.bonus_xp(BONUS_XP());}
-	public double modif_exp_lvl(int levdiff) {return universe.modif_exp_lvl(BONUS_LOWLEV(), BONUS_HLEV(), levdiff);}
+	public double modif_exp_lvl(double levdiff) {return universe.modif_exp_lvl(BONUS_LOWLEV(), BONUS_HLEV(), levdiff);}
 	public double proba_trouver_piege(double hidden_lvl) {return universe.proba_trouver_piege(TRAP_DET(), hidden_lvl);}
     public double penalty_reduction() {return universe.penalty_reduction(REDUC_PEN());}
 	public double max_zone_level() {return level*universe.zone_multiplier(ZONE_ACCESS());}
@@ -849,12 +931,30 @@ public class Player implements Serializable {
 	public double heat_affinity() {return universe.affinite_chaud(HOT_BONUS());}
 	public double precipitation_affinity() {return universe.affinite_precipitations(PRECI_BONUS());}
 	public double overload_resistance() {return universe.resistance_surcharge(OVERLOAD_RES());}
+	public double underload_affinity() {return universe.affinite_souscharge(UNDERLOAD_BONUS());}
+	public double achievements_affinity() {return universe.affinite_hautfaits(ACHI_BONUS());}
 	public double clearance_sale_inventory_multiplier() {return universe.clearance_sale_inventory_multiplier(SHOPPING_ADDICT());}
-	public double bonus_haut_faits() {return universe.bonus_haut_faits_base(points_haut_faits);}
+	public double discount_multiplier() {return universe.discount_multiplier(DISCOUNT_SPEC());}
+	public double bonus_haut_faits() {return universe.bonus_haut_faits_base(points_haut_faits*achievements_affinity());}
 	
 	public double divine_cap(int i){
 		if(i < universe.nb_universe_stats) return universe.divine_cap[i] * universe.divine_cap_const(CONST_MASTER());
 		else return universe.divine_cap[i] * universe.divine_cap_eq(EQ_MASTER());
+	}
+	
+	public void auto_dist()
+	{
+		double sum = 0.0;
+		for(int i=0; i<nb_stats; i++)
+			{sum += auto_dist_coeff[i];}
+		if (sum<=0.0001) return;
+		
+		double toAdd = points_a_distribuer();	
+		for(int i=0; i<nb_stats; i++)
+		{
+			stats[i] += Math.floor(toAdd*auto_dist_coeff[i]/sum); 
+		}
+		refresh_stats_with_bonus();
 	}
 	
 	public int niveau_boutique_base() 
@@ -947,15 +1047,15 @@ public class Player implements Serializable {
 		for (int i=0; i< StaticItem.nb_pos-1 ; i++)
 		{
 			tmp = new ObjectRule(2,0,i,ObjectRule.ITEM_RULE);
-			tmp.name = StaticItem.Emplacement[i];
+			tmp.name = Local.SLOT_NAME[i];
 			tmp.filter_rule = universe.slot_est_disponible(i);
 			rules.add(tmp);
 		}
 		
-		for (int i=0; i< StaticItem.Rarete.length ; i++)
+		for (int i=0; i< Local.RARITY_NAME.length ; i++)
 		{
 			tmp = new ObjectRule(0,0,i,ObjectRule.ITEM_RULE);
-			String name  =StaticItem.Rarete[i];
+			String name = Local.RARITY_NAME[i];
 			tmp.name = name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase();
 			tmp.filter_rule = true;
 			rules.add(tmp);
@@ -1002,9 +1102,10 @@ public Player()
 	stats = new double[nb_stats];
 	stats_with_bonus = new double[nb_stats];
 	item_bonus = new double[nb_stats];
+	auto_dist_coeff = new int[nb_stats];
 	
 	for(int i=0; i<nb_stats; i++) 
-		{stats[i]=0; stats_with_bonus[i]=0; item_bonus[i]=0;}
+		{stats[i]=0; stats_with_bonus[i]=0; item_bonus[i]=0; auto_dist_coeff[i]=10;}
 	refresh();
 	}
 	else
@@ -1033,7 +1134,7 @@ public Player()
     {
 	Item it = new Item(300,this,Item.ITEM_SHOP);
 	
-	for (int i=0;i<20;i++)
+	for (int i=1;i<500;i+=1)
 	    {
 		it = new Item(i,this,Item.ITEM_DROP);
 		if(it.stackable) it.set_qty(5.0);
@@ -1043,7 +1144,7 @@ public Player()
 	for(int j=0; j<StaticItem.ORB.length; j++)	
 	    {
 		it = new Item(StaticItem.ORB[j],StaticItem.RESSOURCE_ORB);
-		it.set_qty(5000000000.0);
+		it.set_qty(1.0e20);
 		inventory.add(it);
 	    }
 	
@@ -1175,11 +1276,11 @@ public Player()
 	refresh_weather_penalties();
 	}
 	
-	public int get_mob_level()
+	public double get_mob_level()
 	{
-		int zl = universe.get_zone_level(zone);
-		int diff = universe.get_zone_max_level(zone)-zl+1;
-		int zlevel = zl + (int)(Math.random() * diff);
+		double zl = universe.get_zone_level(zone);
+		double diff = universe.get_zone_max_level(zone)-zl+1;
+		double zlevel = zl + Math.floor(Math.random() * diff);
 		return zlevel;
 	}
 	
@@ -1187,7 +1288,7 @@ public Player()
 	// peut être précédée par un piège
     public void get_mob()
     {
-	int mob_level = get_mob_level();
+	double mob_level = get_mob_level();
 	t_stats.addEvent(1.0,TimeStats.EVENT_FIND_MONSTER);
 	mob = new Monster(mob_level,universe,zone);
     }
@@ -1460,7 +1561,7 @@ public Player()
 			Game.MW.addLog(String.format(Local.ITEMS_LOOT,name,lootStr, p2.name));
 		if(dontLootStr != "" && disp)
 			Game.MW.addLog(String.format(Local.OBJECTS_LEFT_BEHIND, dontLootStr));
-	    if(inventory.size() > 50) clean_list(inventory);
+	    clean_list(inventory);
 		}
 		
 	double nec = necrophagie()*p2.vie_max();
@@ -1524,19 +1625,19 @@ public Player()
     }
 
 	
-    public double xp_level(int x)
+    public double xp_level(double x)
     {
-	if (x==1) return 0;
+	if (x<=1.1) return 0;
 	return 1000.0+((x-1.0)*(x-2.0)*1000.0);
     }
 
-	public int level_for_xp(double x)
+	public double level_for_xp(double x)
     {
 	if(x < 1000.0) return 1;
-	else return (int)Math.min((1.5 + (0.5/Math.sqrt(250.0)) * Math.sqrt(x - 750)),MAX_LEVEL);
+	else return Math.floor(Math.min((1.5 + (0.5/Math.sqrt(250.0)) * Math.sqrt(x - 750)),MAX_LEVEL));
 	}
 	
-    public void gain_xp(double sx,int type, int gainLevel)
+    public void gain_xp(double sx,int type, double gainLevel)
     {
 	double x = Math.floor(sx*bonus_xp()*modif_exp_lvl(gainLevel-level));
 	xp_pt+=x;
@@ -1544,7 +1645,7 @@ public Player()
 	if(disp) Game.MW.addLog(String.format(Local.EARN_EXPERIENCE,name,x,sx,bonus_xp(),modif_exp_lvl(gainLevel-level)));
 
 	if (level == MAX_LEVEL) return;
-	int levelback=level;
+	double levelback=level;
 	level = level_for_xp(xp_pt);
 	
 	if(levelback != level)
@@ -1630,7 +1731,7 @@ public Player()
 	{
 		Universe new_u = new Universe(universe.seed+1);
 		new_u.joueur = this;
-		new_u.number_of_travel = universe.number_of_travel+1;
+		new_u.numberOfTravels = universe.numberOfTravels+1;
 		universe = new_u;
 		zone = 2;
 		nb_encounters = 0;

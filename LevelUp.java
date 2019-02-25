@@ -9,9 +9,11 @@ public class LevelUp extends javax.swing.JDialog  {
     private Player Joueur;
     private javax.swing.JPanel ivjJFrameContentPane = null;
 
+	private JButton plus;
     private JButton moins;
+	private JButton plus2;
+    private JButton moins2;
 	private JButton equi;
-    private JButton plus;
     private JLabel prompt;
     private JButton ok;
     private JButton anu;
@@ -42,12 +44,14 @@ public class LevelUp extends javax.swing.JDialog  {
 	for (int i=0; i< Joueur.nb_stats ; i++)
 	    {
 		rowData[i][1] = String.format("%g",Joueur.stats[i]);
-		rowData[i][2] = String.format("%.2f",Joueur.item_bonus[i]);
+		rowData[i][2] = String.format("%g",Joueur.item_bonus[i]);
 		rowData[i][3] = String.format("%g",Joueur.stats[i]+Joueur.item_bonus[i]);
+		rowData[i][4] = String.format("%d",Joueur.auto_dist_coeff[i]);
 	    }
 	table.repaint();
 	plus.setEnabled(Joueur.points_a_distribuer() >= 1);
 	moins.setEnabled(stats_tmp[table.getSelectedRow()] < Joueur.stats[table.getSelectedRow()]);
+	moins2.setEnabled(Joueur.auto_dist_coeff[table.getSelectedRow()]>0);
 	infos.setText(Joueur.infos());
     }
 	
@@ -55,7 +59,7 @@ public class LevelUp extends javax.swing.JDialog  {
     private javax.swing.JPanel getJFrameContentPane() {
 	if (ivjJFrameContentPane == null) {
 			
-	    rowData = new String[Joueur.nb_stats][4];
+	    rowData = new String[Joueur.nb_stats][5];
 	    for (int i=0; i< Joueur.nb_stats ; i++)
 		{
 		    rowData[i][0] = Joueur.stats_name[i];
@@ -68,9 +72,12 @@ public class LevelUp extends javax.swing.JDialog  {
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	    table.setRowSelectionInterval(0,0);
 	    table.getColumnModel().getColumn(0).setPreferredWidth(200);
-	    table.getColumnModel().getColumn(1).setPreferredWidth(75);
-	    table.getColumnModel().getColumn(3).setPreferredWidth(75);
-
+	    table.getColumnModel().getColumn(1).setPreferredWidth(90);
+	    table.getColumnModel().getColumn(2).setPreferredWidth(90);
+	    table.getColumnModel().getColumn(3).setPreferredWidth(90);
+	    table.getColumnModel().getColumn(4).setPreferredWidth(90);
+		table.getTableHeader().setReorderingAllowed(false);
+		
 	    javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
 		    public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh();}};
 				
@@ -81,7 +88,7 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    scroll = new JScrollPane(table);
 	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	    scroll.setBounds(new Rectangle(10, 32, 370+50, 320));
+	    scroll.setBounds(new Rectangle(10, 32, 770, 300));
 
 	    infos = new JTextArea();
 	    infos.setEditable(false);
@@ -90,17 +97,16 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    scroll2 = new JScrollPane(infos);
 	    scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	    scroll2.setBounds(new Rectangle(385+50, 32, 275+70, 320));
+	    scroll2.setBounds(new Rectangle(10, 332+8+21+8, 770, 235));
 
 	    plus = new JButton();
-	    plus.setBounds(new Rectangle(245, 365, 44, 21));
+	    plus.setBounds(new Rectangle(245+15, 332+8, 44, 21));
 	    plus.setText(Local.PLUS);
 	    plus.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) 
 				{
-					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_a_distribuer())))*0.5,5.0);
-					plus(step);
+					plus(step(Joueur.points_a_distribuer()));
 				}
 				else plus(1);
 		    }
@@ -108,31 +114,56 @@ public class LevelUp extends javax.swing.JDialog  {
 	    plus.setMnemonic(KeyEvent.VK_ADD);
 
 	    moins = new JButton();
-	    moins.setBounds(new Rectangle(294, 365, 44, 21));
+	    moins.setBounds(new Rectangle(294+15, 332+8, 44, 21));
 	    moins.setText(Local.MINUS);
 	    moins.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0)
 				{
-					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_a_distribuer())))*0.5,5.0);
-					moins(step);
+					moins(step(Joueur.points_a_distribuer()));
 				}
 				else moins(1);
 		    }
 		});
 	    moins.setMnemonic(KeyEvent.VK_SUBTRACT);
 		
+		plus2 = new JButton();
+	    plus2.setBounds(new Rectangle(650, 332+8, 44, 21));
+	    plus2.setText(Local.PLUS);
+	    plus2.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {
+				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) 
+				{
+					plus2(step(Joueur.auto_dist_coeff[table.getSelectedRow()]));
+				}
+				else plus2(1);
+		    }
+		});
+
+	    moins2 = new JButton();
+	    moins2.setBounds(new Rectangle(650+49, 332+8, 44, 21));
+	    moins2.setText(Local.MINUS);
+	    moins2.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {
+				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0)
+				{
+					moins2(step(Joueur.auto_dist_coeff[table.getSelectedRow()]));
+				}
+				else moins2(1);
+		    }
+		});
+		
 		equi = new JButton();
-	    equi.setBounds(new Rectangle(294+49, 365, 150, 21));
-	    equi.setText(Local.EQUAL_DISTRIBUTION);
+	    equi.setBounds(new Rectangle(10, 332+8, 150, 21));
+	    equi.setText(Local.AUTO_DISTRIBUTION);
 	    equi.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
-				equirepartir();
+				Joueur.auto_dist(); refresh();
 		    }
 		});
 
 	    ok = new JButton();
-	    ok.setBounds(new Rectangle(10, 365, 110, 21));
+	    ok.setBounds(new Rectangle(670, 611, 110, 21));
 	    ok.setText(Local.VALIDATE);
 	    ok.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {valider();
@@ -140,7 +171,7 @@ public class LevelUp extends javax.swing.JDialog  {
 		});
 
 	    anu = new JButton();
-	    anu.setBounds(new Rectangle(125, 365, 110, 21));
+	    anu.setBounds(new Rectangle(550, 611, 110, 21));
 	    anu.setText(Local.CANCEL);
 	    anu.addActionListener(new java.awt.event.ActionListener() {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {cancel();
@@ -149,7 +180,7 @@ public class LevelUp extends javax.swing.JDialog  {
 
 	    prompt.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 14));
 	    table.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
-	    infos.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 11));
+	    infos.setFont(new Font(Local.FONT_TIMES, Font.PLAIN, 12));
 
 	    ivjJFrameContentPane = new javax.swing.JPanel();
 	    ivjJFrameContentPane.setLayout(null);
@@ -160,6 +191,8 @@ public class LevelUp extends javax.swing.JDialog  {
 	    ivjJFrameContentPane.add(anu);
 	    ivjJFrameContentPane.add(plus);
 	    ivjJFrameContentPane.add(moins);
+	    ivjJFrameContentPane.add(plus2);
+	    ivjJFrameContentPane.add(moins2);
 		ivjJFrameContentPane.add(equi);
 	    ivjJFrameContentPane.add(scroll2);
 
@@ -172,7 +205,7 @@ public class LevelUp extends javax.swing.JDialog  {
     private void initialize() {
 
 	this.setLocation(new Point(15, 15));
-	this.setSize(new Dimension(670+70+50, 420));
+	this.setSize(new Dimension(670+70+50, 660));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -216,23 +249,28 @@ public class LevelUp extends javax.swing.JDialog  {
 	
     private void plus(double x)
     {
-	/*System.out.println("points_totaux="+Joueur.points_totaux());
-	System.out.println("points_a_distribuer="+Joueur.points_a_distribuer());
-	System.out.println("points_distribues="+Joueur.points_distribues());*/
-	
 	double toAdd = Math.min(Math.floor(Joueur.points_a_distribuer()),x);
 	Joueur.stats[table.getSelectedRow()] += toAdd; 
 	refresh();
     }
 	
-    private void equirepartir()
+	
+	private void moins2(double x)
+    {
+	Joueur.auto_dist_coeff[table.getSelectedRow()] -= x; 
+	if(Joueur.auto_dist_coeff[table.getSelectedRow()] <0) Joueur.auto_dist_coeff[table.getSelectedRow()] = 0;
+	refresh();
+    }
+	
+	private void plus2(double x)
+    {
+	Joueur.auto_dist_coeff[table.getSelectedRow()] += x; 
+	refresh();
+    }
+	
+	double step(double x)
 	{
-		double toAdd = Math.floor(Joueur.points_a_distribuer()/Joueur.nb_stats);
-		for(int i=0; i<Joueur.nb_stats; i++)
-		{
-			Joueur.stats[i] += toAdd; 
-		}
-		refresh();
+		return Math.max(Math.pow(10.0,Math.floor(Math.log10(x)))*0.5,5.0);
 	}
 	
     private void moins(double x)

@@ -1039,7 +1039,7 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case 48:
 			{
-			int lev1, lev2, lev3;
+			double lev1, lev2, lev3;
 			lev1 = -5;
 			lev2 = -10;
 			lev3 = -(int)(Math.max(max_pt/10.0,20.0));
@@ -1064,7 +1064,7 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case 49:
 			{
-			int lev1, lev2, lev3;
+			double lev1, lev2, lev3;
 			lev1 = 5;
 			lev2 = 10;
 			lev3 = (int)(Math.max(max_pt/10.0,20.0));
@@ -1284,6 +1284,30 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case 65:
 			{
+			curve_to_draw.title = Local.UNDERLOAD_AFFINITY;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.affinite_souscharge(tx);
+			}
+			}
+		break;
+		case 66:
+			{
+			curve_to_draw.title = Local.ACHIEVEMENTS_AFFINITY;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.affinite_hautfaits(tx);
+			}
+			}
+		break;
+		case 67:
+			{
 
 			curve_to_draw.title = Local.CLEARANCE_SALE_INVENTORY_MULTIPLIER;
 			
@@ -1292,6 +1316,19 @@ public class Courbes extends javax.swing.JDialog  {
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 				curve_to_draw.arr_x[x] = tx;
 				curve_to_draw.arr_y[x] = Joueur.universe.clearance_sale_inventory_multiplier(tx);
+			}
+			}
+		break;
+		case 68:
+			{
+
+			curve_to_draw.title = Local.DISCOUNT_PRICE_MULTIPLIER;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.discount_multiplier(tx);
 			}
 			}
 		break;

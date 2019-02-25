@@ -3,7 +3,7 @@ import java.util.ArrayList;
 class Trap {
 
 	public String name;
-	public int level;
+	public double level;
 	public double speed;
 	public double damage;
 	public double hidden;
@@ -17,23 +17,19 @@ public static String[] trap_zoo_names = Local.TRAP_NAMES;
 
 public static int trap_zoo_size = trap_zoo_names.length;
 
-public void setLevel(int lev, Player p)
-{
-	level = lev;
-	speed = Math.pow(lev*2,1.3);
-	damage = p.universe.traps_dmg_for_level(lev);
-	hidden = lev * p.universe.plage_random();
-}
-
 public static Trap getTrap(Player p)
 {
-	int lev = p.get_mob_level();
-	double max_thorical_level = p.universe.get_zone_max_level(18);
+	double lev = p.get_mob_level();
+	double max_thorical_level = p.universe.get_zone_max_level((int)p.universe.nombre_zones()-2);
 	int normalized_lev = (int)(trap_zoo_size*(lev/max_thorical_level));
 	if(normalized_lev >= trap_zoo_size-1) normalized_lev = trap_zoo_size-1;
 	
 	Trap res = new Trap(trap_zoo_names[normalized_lev]);
-	res.setLevel(lev,p);
+	
+	res.level = p.universe.niveau_pieges(lev);
+	res.speed = Math.pow(res.level*2,1.3);
+	res.damage = p.universe.traps_dmg_for_level(res.level);
+	res.hidden = res.level * p.universe.plage_random();
 	return res;
 }
 

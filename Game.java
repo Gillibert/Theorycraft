@@ -43,7 +43,7 @@ public class Game {
 		Player joueur = new Player(U, false);
 		joueur.disp = false;
 		joueur.defi = ChallengeList.list.get(cli);
-		int previous_level = joueur.level;
+		double previous_level = joueur.level;
 		int defaite_count = 0;
 		int victory_count = 0;
 		int trap_death_count = 0;

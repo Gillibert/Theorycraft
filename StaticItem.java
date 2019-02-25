@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 class StaticItem {
     public static int RESSOURCE_ELEM = 0;
@@ -21,24 +22,21 @@ class StaticItem {
     // 13 Fourreau
 	// 14 Lunettes
     // 15 Ressources
-    
-    public static String[] MaterialFamily = Local.MATERIAL_FAMILY_NAME;
-    public static String[] Rarete = Local.RARITY_NAME;
-    public static String[] Emplacement = Local.SLOT_NAME;
-    public static String[] RareNames = Local.RARE_NAMES;
 
-    public static int nb_pos = Emplacement.length;
+    public static int nb_pos = Local.SLOT_NAME.length;
     public static int max_level = 301;
     public static NameGenerator nameGenerator = new NameGenerator(false);
     public static NameGenerator matNameGenerator = new NameGenerator(true);
 
+	public static ArrayList<ArrayList<Material>> MaterialByType;
     public static ItemSet[] WhiteItemByPosition;
-    public static ItemSet[] WhiteItemByLevel;
     public static ItemSet[] RessourceByLevel;
     public static String[] MaterialNames;
     public static String[] BaseItemNames;
+    public static String[] OrbsNames;
     public static ArrayList MaterialNamesList;
     public static ArrayList BaseItemNamesList;
+    public static ArrayList OrbsNamesList;
 
     public static double tailleMin(double a) {return Math.max(Math.floor(a)-1,0.001);}
     public static double tailleMax(double a) {return Math.floor(a)+2;}
@@ -229,57 +227,57 @@ class StaticItem {
     new BaseItem("pardessus","MS",         1,3,31,55,    1.00),
     new BaseItem("cape","FS",              1,3,31,60,    0.50),
 
-    new BaseItem("ceinture","FS",          1,4,10,8,     0.25),
-    new BaseItem("ceinturon","MS",         1,4,10,10,    0.25),
-    new BaseItem("sac banane","FS",        1,4,13,12,    0.40),
-    new BaseItem("maru obi","MS",          1,4,10,17,    0.12),
-    new BaseItem("fukuro obi","MS",        1,4,10,27,    0.12),
-    new BaseItem("nagoya obi","MS",        1,4,10,37,    0.12),
-    new BaseItem("hanhaba obi","MS",       1,4,10,47,    0.12),
-    new BaseItem("odori obi","MS",         1,4,10,54,    0.12),
-    new BaseItem("tenga obi","MS",         1,4,10,56,    0.12),
-    new BaseItem("heko obi","MS",          1,4,10,58,    0.12),
-    new BaseItem("tsuke obi","MS",         1,4,10,60,    0.12),
+    new BaseItem("ceinture","FS",          1,4,Universe.CON,50,            0.25),
+    new BaseItem("ceinturon","MS",         1,4,Universe.CON,50,            0.25),
+    new BaseItem("sac banane","FS",        1,4,Universe.LOAD,50,           0.40),
+    new BaseItem("maru obi","MS",          1,4,Universe.ESQ,50,            0.12),
+    new BaseItem("fukuro obi","MS",        1,4,Universe.OVERLOAD_RES,50,   0.12),
+    new BaseItem("nagoya obi","MS",        1,4,Universe.OVERLOAD_RES,50,   0.12),
+    new BaseItem("hanhaba obi","MS",       1,4,Universe.LIGHTER_RES,50,    0.12),
+    new BaseItem("odori obi","MS",         1,4,Universe.LIGHTER_RES,50,    0.12),
+    new BaseItem("tenga obi","MS",         1,4,Universe.LIGHTER_EQP,50,    0.12),
+    new BaseItem("heko obi","MS",          1,4,Universe.LOAD,50,           0.12),
+    new BaseItem("tsuke obi","MS",         1,4,Universe.LOAD,50,           0.12),
 
-    new BaseItem("guêtres","FP",           1,5,Universe.RUN,10,    0.20),
-    new BaseItem("grèves","FP",            1,5,Universe.RUN,20,    0.20),
-    new BaseItem("kyahan","MP",            1,5,Universe.RUN,60,    0.20),
-    new BaseItem("ocreas","FP",            2,5,2,20,     0.90),
-    new BaseItem("cnémides","FP",          2,5,2,40,     1.00),
-    new BaseItem("jambières","FP",         2,5,2,50,     1.10),
-    new BaseItem("suneate","MP",           2,5,2,60,     1.10),
+    new BaseItem("guêtres","FP",           1,5,Universe.ESQ,40,     0.20),
+    new BaseItem("grèves","FP",            1,5,Universe.REDUC,40,   0.20),
+    new BaseItem("kyahan","MP",            1,5,Universe.REDUC,40,   0.20),
+    new BaseItem("ocreas","FP",            2,5,Universe.RUN,40,     0.90),
+    new BaseItem("cnémides","FP",          2,5,Universe.RUN,40,     1.00),
+    new BaseItem("jambières","FP",         2,5,Universe.ABS,40,     1.10),
+    new BaseItem("suneate","MP",           2,5,Universe.ABS,40,     1.10),
 
-	new BaseItem("escarpins","MP",         1,6,Universe.RUN,8,     0.20),
-    new BaseItem("chaussons","MP",         1,6,Universe.RUN,13,    0.20),
-    new BaseItem("charentaises","FP",      1,6,Universe.RUN,23,    0.20),
-    new BaseItem("pantoufles","FP",        1,6,Universe.RUN,33,    0.20),
-    new BaseItem("babouches","FP",         1,6,Universe.RUN,43,    0.20),
-    new BaseItem("sandales","FP",          2,6,Universe.RUN,53,    0.40),
-    new BaseItem("basquettes","FP",        1,6,Universe.RUN,60,    1.00),
-    new BaseItem("souliers","FP",          2,6,2,12,     0.50),
-    new BaseItem("galoches","FP",          2,6,2,22,     0.50),
-    new BaseItem("sabots","MP",            2,6,2,32,     1.20),
-    new BaseItem("chaussures","FP",        2,6,2,42,     1.10),
-    new BaseItem("bottines","FP",          2,6,2,52,     1.20),
-    new BaseItem("bottes","FP",            2,6,2,60,     1.30),
+	new BaseItem("escarpins","MP",         1,6,Universe.ESQ,50,    0.20),
+    new BaseItem("chaussons","MP",         1,6,Universe.ESQ,50,    0.20),
+    new BaseItem("charentaises","FP",      1,6,Universe.RUN,50,    0.20),
+    new BaseItem("pantoufles","FP",        1,6,Universe.RUN,50,    0.20),
+    new BaseItem("babouches","FP",         1,6,Universe.RUN,50,    0.20),
+    new BaseItem("sandales","FP",          2,6,Universe.RUN,50,    0.40),
+    new BaseItem("basquettes","FP",        1,6,Universe.RUN,50,    1.00),
+    new BaseItem("souliers","FP",          2,6,Universe.ABS,50,    0.50),
+    new BaseItem("galoches","FP",          2,6,Universe.ABS,50,    0.50),
+    new BaseItem("sabots","MP",            2,6,Universe.REDUC,50,  1.20),
+    new BaseItem("chaussures","FP",        2,6,Universe.REDUC,50,  1.10),
+    new BaseItem("bottines","FP",          2,6,Universe.REDUC,50,  1.20),
+    new BaseItem("bottes","FP",            2,6,Universe.REDUC,50,  1.30),
 
-    new BaseItem("mini-socquette","FP",    1,7,29,60,    0.04),
-    new BaseItem("socquettes","FP",        1,7,30,60,    0.05),
-    new BaseItem("mi-chaussettes","FP",    1,7,31,60,    0.06),
-    new BaseItem("bas","MP",               1,7,32,60,    0.06),
-    new BaseItem("chaussettes","FP",       1,7,33,60,    0.06),
-    new BaseItem("mi-bas","MP",            1,7,43,60,    0.06),
-    new BaseItem("tabis","FP",             1,7,Universe.RUN,60,    0.06),
+    new BaseItem("mini-socquette","FP",    1,7,Universe.ESQ,60,        0.04),
+    new BaseItem("socquettes","FP",        1,7,Universe.INIT,60,       0.05),
+    new BaseItem("mi-chaussettes","FP",    1,7,Universe.INIT,60,       0.06),
+    new BaseItem("bas","MP",               1,7,Universe.TRAP_INIT,60,  0.06),
+    new BaseItem("chaussettes","FP",       1,7,Universe.TRAP_INIT,60,  0.06),
+    new BaseItem("mi-bas","MP",            1,7,Universe.RUN,60,        0.06),
+    new BaseItem("tabis","FP",             1,7,Universe.RUN,60,        0.06),
 
-    new BaseItem("pendentif","MS",         3,8,15,30,    0.09),
-    new BaseItem("médaillon","MS",         3,8,16,30,    0.09),
-    new BaseItem("talisman","FS",          3,8,17,30,    0.09),
-    new BaseItem("collier","FS",           3,8,15,50,    0.09),
-    new BaseItem("chapelet","FS",          3,8,16,50,    0.10),
-    new BaseItem("amulette","FS",          3,8,17,50,    0.10),
-    new BaseItem("médaille","FS",          3,8,15,60,    0.10),
-    new BaseItem("sautoir","MS",           3,8,16,60,    0.10),
-    new BaseItem("solitaire","MS",         3,8,17,60,    0.10),
+    new BaseItem("pendentif","MS",         3,8,Universe.RESF,50,    0.09),
+    new BaseItem("médaillon","MS",         3,8,Universe.MF,50,      0.09),
+    new BaseItem("talisman","FS",          3,8,Universe.RF,50,      0.09),
+    new BaseItem("collier","FS",           3,8,Universe.QALF,50,    0.09),
+    new BaseItem("chapelet","FS",          3,8,Universe.QTYF,50,    0.10),
+    new BaseItem("amulette","FS",          3,8,Universe.POWF,50,    0.10),
+    new BaseItem("médaille","FS",          3,8,Universe.GF,50,      0.10),
+    new BaseItem("sautoir","MS",           3,8,Universe.RENTE,50,   0.10),
+    new BaseItem("solitaire","MS",         3,8,Universe.ECO_ORB,50, 0.10),
     
 	new BaseItem("affûtiau","MS",          3,9,16,13,    0.05),
     new BaseItem("colifichet","MS",        3,9,17,13,    0.05),
@@ -374,10 +372,13 @@ class StaticItem {
 
     public static void init(Universe universe)
     {
+	// Create MaterialNames, BaseItemNames, MaterialNamesList, BaseItemNamesList and OrbsNamesList array
 	for(int i=0; i< MA.length; i++)
     MaterialNames = new String[MA.length];
     BaseItemNames = new String[BA.length];
+	OrbsNames = new String[ORB.length];
     MaterialNamesList = new ArrayList<String>();
+	OrbsNamesList = new ArrayList<String>();
     BaseItemNamesList = new ArrayList<String>();
         
     for(int i=0; i < BA.length; i++)
@@ -391,9 +392,27 @@ class StaticItem {
         MaterialNames[i]=MA[i].name;
         MaterialNamesList.add(MA[i].name);
         }
-        
+		
+	for(int i=0; i < ORB.length; i++)
+        {
+		OrbsNames[i]=ORB[i].name;
+        OrbsNamesList.add(ORB[i].name);
+        }
+    
+	// Create MaterialByType array
+	MaterialByType = new ArrayList<ArrayList<Material>>();
+	for(int i=0; i< Local.MATERIAL_FAMILY_NAME.length; i++)
+	{
+		ArrayList<Material> tmp = new ArrayList<Material>();
+		for (int j=0; j< MA.length; j++)
+		{
+			if(MA[j].type == i)
+				tmp.add(MA[j]);
+		}
+		MaterialByType.add(tmp);
+	}
+	// Create WhiteItemByPosition and RessourceByLevel
     WhiteItemByPosition = new ItemSet[nb_pos];
-    WhiteItemByLevel = new ItemSet[max_level];
     RessourceByLevel = new ItemSet[max_level];
 
     for(int i=0; i< nb_pos; i++)
@@ -401,31 +420,22 @@ class StaticItem {
 
     for(int i=0; i< max_level; i++)
         {
-        WhiteItemByLevel[i] = new ItemSet();
         RessourceByLevel[i] = new ItemSet();
         }
 
     for(int i=0; i < BA.length; i++)
 	{
 		if (universe.slot_est_disponible(BA[i].pos) == false) continue;
-        for(int j=0; j < MA.length; j++)
-		{
-		if ((MA[j].type == 0 && BA[i].pref_level < 10 && BA[i].mat <= 2) 
-			|| (BA[i].mat == MA[j].type))
-            {
-            Item it = new Item(BA[i],MA[j],universe);
-			WhiteItemByPosition[it.pos].list.add(it);
-            WhiteItemByLevel[it.effectiveIlvl()].list.add(it);
-            }
-		}
+        Item it = new Item(BA[i],MA[0],universe);
+		WhiteItemByPosition[it.pos].list.add(it);
 	}
 	
     for(int j=0; j < MA.length; j++)
         {
         Item it = new Item(MA[j],RESSOURCE_ELEM);
-        RessourceByLevel[it.effectiveIlvl()].list.add(it);
+        RessourceByLevel[(int)it.effectiveIlvl()].list.add(it);
         it = new Item(MA[j],RESSOURCE_PRIM);
-        RessourceByLevel[it.effectiveIlvl()].list.add(it);
+        RessourceByLevel[(int)it.effectiveIlvl()].list.add(it);
         }
 
 
@@ -440,41 +450,12 @@ class StaticItem {
             }
             }*/
         
-/*
-    for(int i=0; i< max_level; i++)
-        {
-        if(WhiteItemByLevel[i].list.size() > 0)
-        {
-        System.out.println("\nWhite Item Level " + i);
-        for(Item it : WhiteItemByLevel[i].list)
-            System.out.print(it.name + " ");
-        }
-        }
-	*/
-    /*
-    for(int i=5; i<=45; i+=10)
-    {
-        System.out.println("\nBest white " + i);
-        for(int p=0; p<=13; p++)
-        {
-        Item best_for_slot = null;
-        int max = 0;
-        for(int j=0; j<= i; j++)
-            {
-            for(Item it : WhiteItemByLevel[j].list)
-            if(it.ilvl > max && it.pos == p)
-                {best_for_slot = it; max = it.ilvl;}
-            }
-        if(max > 0)
-            System.out.println("["+p+"] " + best_for_slot.name + " (" + best_for_slot.effectiveIlvl() +")");
-        }
-    }*/
 	
     }
 
     public static String rare_name()
     {
-    return RareNames[(int)(Math.random()*RareNames.length)];
+    return Local.RARE_NAMES[(int)(Math.random()*Local.RARE_NAMES.length)];
     }
 
 }

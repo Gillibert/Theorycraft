@@ -139,7 +139,9 @@ public class MyDraw extends JPanel {
 
 			if(ty<10.0) ster = String.format("%.2f",ty);
 			else if(ty<100.0) ster = String.format("%.1f",ty);
-			else ster = String.format("%.0f",ty);
+			else if(ty<10000.0) ster = String.format("%.0f",ty);
+			else ster = String.format("%2.2e",ty);
+			
 			graph.drawString(ster, 3, (int)ly+9);
 			}
 			

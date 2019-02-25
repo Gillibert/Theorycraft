@@ -47,6 +47,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 	
 	public void montre_charger()
 	{
+		refresh();
 		creer.setVisible(false);
 		effacer.setVisible(false);
 		this.setSize(new Dimension(300, 310));
@@ -202,7 +203,8 @@ public class MenuWindow extends javax.swing.JDialog  {
 	scroll.setBounds(new Rectangle(5, 40, 280, 155));
 	    
 	javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
-		public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh_buttons();}};
+		public void valueChanged(javax.swing.event.ListSelectionEvent evt) 
+		{if (!evt.getValueIsAdjusting()) {refresh_buttons();}}}; // Prevent double refresh
 		
 	sauvegardes.addListSelectionListener(refresher);
 	

@@ -119,7 +119,8 @@ public class Local {
 	public static String CHAMPIONS_LEVEL;
 	public static String SUPER_CHAMPIONS_LEVEL;
 	public static String BASE_MONSTER_LEVEL;
-		
+	public static String TRAP_LEVEL;
+	
 	public static String CHAMPIONS_SKILLS_POINTS;
 	public static String SUPER_CHAMPIONS_SKILLS_POINTS;
 	public static String TRAPS_DAMAGE;
@@ -252,13 +253,17 @@ public class Local {
 	public static String WEIGHT_VAL;
 	public static String REAL_PRICE_VAL;
 	public static String SELLING_PRICE_VAL;
+	public static String SELLING_PRICE_VAL_DISCOUNT;
 	public static String PURCHASE_PRICE_VAL;
+	public static String PURCHASE_PRICE_VAL_DISCOUNT;
 	public static String FAMILY_VAL;
 	public static String WEIGHT_COEFFICIENT_VAL;
 	public static String PRICE_COEFFICIENT_VAL;
 	public static String EFFICIENCY_COEFFICIENT_VAL;
 	public static String ENCHANTMENT_COEFFICIENT_VAL;
-
+	public static String EFFICIENCY_LEVEL_DROP;
+	public static String ENCHANTMENT_LEVEL_DROP;
+	
 	
 	public static String WE_START_GENTLY;
 	public static String DUNGEONS_AND_DRAGONS;
@@ -349,6 +354,7 @@ public class Local {
 	public static String RULE_ON_A_MONSTER;
 	public static String RULE_ON_THE_PLAYER;
 	public static String COMPOUND_RULE;
+	public static String CRAFT_RULE;
 	public static String NEGATION;
 	public static String AND;
 	public static String OR;
@@ -359,9 +365,11 @@ public class Local {
 	public static String FLEE_RULE;
 	public static String NON_INVOLVEMENT_RULE;
 	public static String MERCHANT_SEARCH;
+	public static String FORGE_SEARCH;
 	public static String SAVE;
 	public static String NEW_RULE;
 	public static String REMOVE;
+	public static String ADD;
 	public static String EXPORT;
 	public static String IMPORT;
 	public static String RULE;
@@ -488,13 +496,17 @@ public class Local {
 		
 	public static String TEMPERATURE_NORMALIZATION;
 	public static String PRECIPITATION_NORMALIZATION;	
-	public static String EQUAL_DISTRIBUTION;
 	public static String AUTO_DISTRIBUTION;
-	
+	public static String AUTO_CRAFT;
 	public static String OVERLOAD;
+	public static String UNDERLOAD;
 	public static String OVERLOAD_RESISTANCE;
+	public static String UNDERLOAD_AFFINITY;
+	public static String ACHIEVEMENTS_AFFINITY;
 	public static String OVERLOAD_PENALTY;
+	public static String UNDERLOAD_BONUS;
 	public static String CLEARANCE_SALE_INVENTORY_MULTIPLIER;
+	public static String DISCOUNT_PRICE_MULTIPLIER;
 	public static String CLEARANCE_SALE;
 	public static String ACHIEVEMENTS;
 	public static String ACHIEVEMENT_BONUS;
@@ -515,7 +527,7 @@ public class Local {
 		"Vitesse du temps","Épines","Représailles","Nécrophagie",
 		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
 		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge","Shopping addict"};
+		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Accro du shopping", "Promophile"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
@@ -558,7 +570,9 @@ public class Local {
 		"Coefficient magique",  // material.coeffPuissance
 		"Nom de l'objet de base", // objet.baseItem.name
 		"Nom du matériau", // objet.material.name
-		"Equipé" // objet.equiped
+		"Nom de l'orbe", // objet.material.name
+		"Equipé", // objet.equiped
+		"Soldé" // objet.discount
 		};
 		RULE_ITEM_TYPE_NAME = tmp10;
 
@@ -603,11 +617,13 @@ public class Local {
 		"Points de vie", // vie_max()
 		"Points de vie effectifs", // vie_max()/reduc()
 		"Dégats infligés aux attaquants", //epines()
-		"Dégats réfléchis sur les attaquants (%)" // 100*represailles()
+		"Dégats réfléchis sur les attaquants (%)", // 100*represailles()
+		"Points de compétences",
+		"Points de compétences à distribuer"
 		};
 		RULE_PLAYER_TYPE_NAME = tmp12;
 	
-		String[] tmp13 = {"Compétence","Points","Equipement","Total"};
+		String[] tmp13 = {"Compétence","Points","Equipement","Total","Priorité"};
 		LEVEL_UP_COLUMN_NAMES = tmp13;
 		
 		String[] tmp14 = {"l'Escroc","le Grippe-sou","le Radin","le Rapiat","l'Avare","l'Avide","le Cupide","le Rapace"};
@@ -623,9 +639,9 @@ public class Local {
 		EDIT_UNIVERSE_COLUMN_NAMES = tmp18;
 		
 		String[] tmp19 = {"Vie de départ",
-		"Probabilité de tomber sur un piège",
-		"Puissance maximale des enchantements",
 		"Points de compétences initiaux",
+		"Probabilité de tomber sur un piège",
+		"Probabilité qu'un objet soit soldé",
 		"Probabilité de déstockage",
 		"Probabilité qu'un monstre soit un champion",
 		"Probabilité qu'un champion soit un super-champion",
@@ -647,7 +663,8 @@ public class Local {
 		"Coût d'un voyage dimensionnel",
 		"Muliplicateur des points de compétences (champions)",
 		"Muliplicateur des points de compétences (super-champions)",
-		"Coefficient d'efficacité de base"};
+		"Coefficient d'efficacité de base",
+		"Puissance maximale des enchantements"};
 		UNIVERSE_STATS_NAME = tmp19;
 		
 		COLON = " :";
@@ -664,15 +681,15 @@ public class Local {
 		THROW_AWAY_OBJECTS = "%s jette %s";
 		PICKING_OBJECTS = "%s récupère %s depuis la forge mystique";
 		N_OBJECTS = "%d objets";
-		SHORT_INFOS = "Niveau %d\nTemps total de jeu : %g s\nOr : %g écus\nCharge : %g / %g\n";
-		LEVEL_N = "Niveau %d\n";
+		SHORT_INFOS = "Niveau %.0f\nTemps total de jeu : %g s\nOr : %g écus\nCharge : %g / %g\n";
+		LEVEL_N = "Niveau %.0f\n";
 		
 		LOOKING_FOR_AN_ENNEMY = "Recherche d'un ennemi : %g secondes";
 		LOOKING_FOR_A_TRADER = "Recherche d'un marchand : %g secondes";
-		ENCOUNTER = "%s rencontre %s (niveau %.0f)";
+		ENCOUNTER = "%s rencontre %s (niveau %g)";
 		LOOKING_FOR_A_MYSTIC_FORGE = "Recherche d'une forge : %g secondes";
 		A_HITS_B = "%s frappe %s en %g secondes (temps total pour %s : %g)\n";
-		A_VERSUS_B = "%s versus %s (niveau %d)";
+		A_VERSUS_B = "%s versus %s (niveau %.0f)";
 		VERSUS = "Versus";
 		INITIATIVES = "Initiatives : %g pour %s, %g pour %s";
 		MULTIPLIER = "   Multiplicateur ×%g (%s)\n";
@@ -689,7 +706,7 @@ public class Local {
 		FLEE_FAIL = "   Échec de la fuite (%g%% de probabilité)";
 		END_FIGHT_FLEE = "%s fuit face à %s (temps du combat %g secondes, vie restante %g)";
 		END_FIGHT_KILL = "%s tue %s (temps du combat %g secondes, vie restante %g)";
-		END_FIGHT_DEATH = "%s est tombé face à %s de niveau %d (temps du combat %g secondes)";
+		END_FIGHT_DEATH = "%s est tombé face à %s de niveau %.0f (temps du combat %g secondes)";
 		
 		NO_LOOT = "Pas de butin sur %s";
 		GOLD_LOOT = "%s ramasse %g écus sur le cadavre de %s";
@@ -699,13 +716,13 @@ public class Local {
 		RESET_BUILD = "Redistribution des points de compétence";
 		FULL_HEAL = "Récupération de %g points de vie en %g secondes";
 		EARN_EXPERIENCE = "%s reçoit %g points d'expérience (%g × %g × %g)";
-		LEVEL_UP = "%s passe du niveau %d au niveau %d";
+		LEVEL_UP = "%s passe du niveau %.0f au niveau %.0f";
 		UNIVERSE_CHANGE = "Pénalité de temps liée au changement d'univers : %g secondes (%g × %g)";
 		CHALLENGE_CHANGE = "Pénalité de temps liée au changement de défi : %g secondes (%g × %g)";
 		DEATH_GOLD_LOSS = "%s perd %g × %g%% de son or (%g écus)";
 		DEATH_TIME_PENALTY = "Pénalité de temps liée à la mort : %g secondes (%g × %g)";
 		RESURRECTION_TIME = "Résurrection : %g secondes";
-		NECROPHAGY = "%s dévore le cadavre de %s et récupère %f points de vie";
+		NECROPHAGY = "%s dévore le cadavre de %s et récupère %g points de vie";
 		
 		FIGHT = "Combat";
 		TRAPS = "Pièges";
@@ -747,6 +764,7 @@ public class Local {
 		MONSTER_LEVEL = "Niveau des monstres";
 		CHAMPIONS_LEVEL = "Niveau des champions (relatif aux monstres)";
 		SUPER_CHAMPIONS_LEVEL = "Niveau des super-champions (relatif aux monstres)";
+		TRAP_LEVEL = "Niveau des pièges (relatif au niveau de la zone)";
 		BASE_MONSTER_LEVEL = "Niveau des monstres de base (relatif)";
 		CHAMPIONS_SKILLS_POINTS = "Points de compétences des champions";
 		SUPER_CHAMPIONS_SKILLS_POINTS = "Points de compétences des super-champions";
@@ -848,12 +866,12 @@ public class Local {
 		PROPORTION_OF_THE_CADAVERS_HEALTH_POINTS_ABSORBED = "Proportion de la vie des cadavres récupérée";
 		COST_IN_ORBS_OF_AN_ORB = "Coût en orbes d'un orbe";
 		MERCHANT_LEVEL_MULTIPLIER = "Muliplicateur du niveau des marchands";
-		EXPERIENCE_SPECIFIC_MULTIPLIER = "Muliplicateur spécifique d'expérience (écart de niveau : %d)";
+		EXPERIENCE_SPECIFIC_MULTIPLIER = "Muliplicateur spécifique d'expérience (écart de niveau : %.0f)";
 		PENALTY_MULTIPLIER = "Mutiplicateur des pénalités";
 	
 		WINDOW_CURVES = "Courbes sur les mécanismes du jeu";
 		WINDOW_INVENTORY = "Inventaire";
-		WINDOW_SHOP = "Boutique de %s (niveau %.0f)";
+		WINDOW_SHOP = "Boutique de %s (niveau %g)";
 		WINDOW_FORGE = "Forge mystique";
 		WINDOW_INVENTORY_PROMPT = "Or : %g écus, charge : %g kg / %g kg";
 		EQUIP = "Équiper";
@@ -868,23 +886,28 @@ public class Local {
 
 		TYPE_VAL = "Type : %s (%s)\n\n";
 		BASE_VAL = "Base : %s\n";
-		EFFECTIVE_LEVEL_VAL = "Niveau effectif : %d\n";
+		EFFECTIVE_LEVEL_VAL = "Niveau effectif : %g\n";
 		SLOT_VAL = "Emplacement : %s\n";
 		QUALITY_VAL = "Qualité : %g%%\n";
-		EFFICIENCY_VAL = "Efficacité : %g (%d×%.3f×%.3f)\n";
-		ENCHANTMENT_VAL = "Enchantement : %g (%d×%g)\n";
+		EFFICIENCY_VAL = "Efficacité : %g\n     (%g×%.3f×%.3f)\n";
+		ENCHANTMENT_VAL = "Enchantement : %g\n     (%g×%.3f)\n";
 		NUMBER_OF_ENCHANTMENTS_VAL = "Nombre d'enchantements : %d\n";
 		SKILL_BONUS_VAL = "Bonus compétence : %g points\n";
 		QUANTITY_VAL = "Quantité : %g\n";
 		WEIGHT_VAL = "Poids (base) : %g kg\nPoids (allégé) : %g kg\n";
 		REAL_PRICE_VAL = "Prix réel : %g écus\n";
-		SELLING_PRICE_VAL = "Prix de vente : %g écus\n";
-		PURCHASE_PRICE_VAL = "Prix d'achat : %g écus\n\n";
+		SELLING_PRICE_VAL = "Prix de vente : %g\n\n";
+		SELLING_PRICE_VAL_DISCOUNT = "Prix de vente : %g (soldé ×%g)\n\n";
+		PURCHASE_PRICE_VAL = "Prix d'achat : %g\n";
+		PURCHASE_PRICE_VAL_DISCOUNT = "Prix d'achat : %g (soldé ×%g)\n";
 		FAMILY_VAL = "Famille : %s\n";
 		WEIGHT_COEFFICIENT_VAL = "Coefficient de poids : %g\n";
 		PRICE_COEFFICIENT_VAL = "Coefficient de prix : %g\n";
+		
 		EFFICIENCY_COEFFICIENT_VAL = "Coefficient d'efficacité : %g\n";
 		ENCHANTMENT_COEFFICIENT_VAL = "Coefficient d'enchantement : %g\n";
+		EFFICIENCY_LEVEL_DROP = "Niveau d'efficacité en fonction du niveau du butin";
+		ENCHANTMENT_LEVEL_DROP = "Niveau d'enchantement en fonction du niveau du butin";
 		
 		WE_START_GENTLY = "On commence en douceur";
 		DUNGEONS_AND_DRAGONS = "Donjons et dragons";
@@ -972,6 +995,7 @@ public class Local {
 		RULE_ON_A_MONSTER = "Règle sur un monstre";
 		RULE_ON_THE_PLAYER = "Règle sur le joueur";
 		COMPOUND_RULE = "Règle composée";
+		CRAFT_RULE = "Règle de craft";
 		NEGATION = "Négation";
 		AND = "et";
 		OR = "ou";
@@ -982,9 +1006,11 @@ public class Local {
 		FLEE_RULE = "Règle de fuite";
 		NON_INVOLVEMENT_RULE = "Règle de non-engagement";
 		MERCHANT_SEARCH = "Recherche de marchand";
+		FORGE_SEARCH = "Recherche de forge mystique";
 		SAVE = "Enregister";
 		NEW_RULE = "Nouvelle règle";
 		REMOVE = "Supprimer";
+		ADD = "Ajouter";
 		EXPORT = "Exporter";
 		IMPORT = "Importer";
 		RULE = "Règle ";
@@ -1001,9 +1027,9 @@ public class Local {
 		LOAD_A_HERO = "Charger un héros";
 		CREATE_A_HERO = "Créer un héros";
 		DELETE_A_HERO = "Supprimer un héros";
-		SEED_TIME = "%s (%d)\nSeed : %d\tTemps : %f";
+		SEED_TIME = "%s (%.0f)\nSeed : %d\tTemps : %f";
 		
-		YOU_COME_ACROSS = "%s tombe sur : %s (niveau %d).";
+		YOU_COME_ACROSS = "%s tombe sur : %s (niveau %.0f).";
 		SUCCESSFUL_TRAP_DETECTION = "Réussite de la détection (score du piège : %g, probabilité de détection : %g%%).";
 		COMPLETELY_AVOIDS = "%s évite entièrement %s.";
 		FAILED_DETECTION = "Échec de la détection (score du piège : %g, probabilité de détection : %g%%).";
@@ -1040,11 +1066,11 @@ public class Local {
 		YOU_HAVE_ALREADY_FINISHED_THE_GAME = "%s a déjà fini le jeu !";
 		YOU_HAVE_DEFEATED_THE_FINAL_BOSS = "%s a vaincu le boss final !";
 		TIME_PASSED = "Temps passé : %g secondes !";
-		AVOIDS_MONSTER = "%s évite %s (niveau %d)";
+		AVOIDS_MONSTER = "%s évite %s (niveau %.0f)";
 
 		HTML_BODY = "<html><body>";
 		PLAYER_STATISTICS = "Statistiques sur le joueur";
-		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %d<br>\nDéfi : %s<br>\nTemps total de jeu : %g secondes<br>\nOr : %g<br>\nCharge : %g / %g<br>\nExpérience : %g<br>\nTotal des points de compétences : %g (%g orbes sacrifiés)<br>\nTotal des points divins : %g (%g orbes sacrifiés)<br>";
+		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %.0f<br>\nDéfi : %s<br>\nTemps total de jeu : %g secondes<br>\nOr : %g<br>\nCharge : %g / %g<br>\nExpérience : %g<br>\nTotal des points de compétences : %g (%g orbes sacrifiés)<br>\nTotal des points divins : %g (%g orbes sacrifiés)<br>";
 		UNIVERSE_CONST = "<br>Constantes de l'univers :<ul>";
 		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>Univers : %d<br>Nombre de voyages dimensionnels : %d<br>Niveau maximal du joueur : %d";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Objets disponibles :</h3>";
@@ -1055,17 +1081,17 @@ public class Local {
 		H3_ZONE_INFORMATION_H3 = "<h3>Informations sur les zones</h3>";
 		NUMBER_OF_ZONES = "Nombre de zones : ";
 		DL = "<dl>";
-		DT_ZONE = "<dt>%s (%d-%d) %s</dt>";
+		DT_ZONE = "<dt>%s (%.0f-%.0f) %s</dt>";
 		NO_LOOT_Z = "(pas de butin)";
 		PRECIPITATION_AND_TEMPERATURE = "<dd>Température moyenne : %g°, précipitations : %g%%";
 		PRECIPITATION_AND_TEMPERATURE_NOW = "<dd>Température actuelle : %g°, précipitations : %g%%";
 		TRAPS_AND_CHAMPION_PROBABILITY = "<dd>Probabilité de tomber sur un piège : %g%%<br>Probabilité de tomber sur un champion : %g%%<br>Probabilité de tomber sur un super-champion : %g%%";
-		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des monstres : %d à %d (%g à %g points), moyen %g (%g points)";
-		CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des champions : %d à %d (%g à %g points), moyen %g (%g points)";
-		SUPER_CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des super-champions : %d à %d (%g à %g points), moyen %g (%g points)</dd>";
+		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des monstres : %.0f à %.0f (%g à %g points), moyen %g (%g points)";
+		CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des champions : %.0f à %.0f (%g à %g points), moyen %g (%g points)";
+		SUPER_CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Niveau des super-champions : %.0f à %.0f (%g à %g points), moyen %g (%g points)</dd>";
 		DL_END = "</dl>";
 		H2_CRAFTING_H2 = "<h2>Crafting</h2>";
-		H2_ACHIEVEMENTS_H2 = "<h2>Haut-faits (%d/%d)</h2>";
+		H2_ACHIEVEMENTS_H2 = "<h2>Haut-faits</h2>";
 		BODY_HTML_END = "</body></html>";
 		INFORMATION_AND_STATISTICS = "Informations et statistiques";
 
@@ -1091,7 +1117,7 @@ public class Local {
 		MAX_LEVEL="Niveau maximal";
 		ORB_PROBABILITY_FOR_LEVEL = "Probabilité qu'une ressource soit un orbe en fonction du niveau du butin";
 		MONSTERS = "Monstres";
-		H2_LEVEL_H2 = "<h2>Niveau %d</h2>";
+		H2_LEVEL_H2 = "<h2>Niveau %.0f</h2>";
 		DD = "<dd>";
 		DT = "<dt>";
 		
@@ -1116,14 +1142,19 @@ public class Local {
 		
 		TEMPERATURE_NORMALIZATION = "Normalisation de la température";
 		PRECIPITATION_NORMALIZATION = "Normalisation des précipitations";
-		EQUAL_DISTRIBUTION = "Équirépartition";
 		AUTO_DISTRIBUTION = "Auto-distribution";
+		AUTO_CRAFT = "Auto-craft";
 		OVERLOAD = "Surcharge";
+		UNDERLOAD = "Sous-charge";
 		OVERLOAD_RESISTANCE  = "Muliplicateur du malus liée à la surcharge";
+		UNDERLOAD_AFFINITY  = "Muliplicateur du bonus liée à la sous-charge";
+		ACHIEVEMENTS_AFFINITY = "Muliplicateur du bonus de haut-faits";
 		OVERLOAD_PENALTY  = "Malus liée à la surcharge";
+		UNDERLOAD_BONUS  = "Bonus liée à la sous-charge";
 		TOWER = "Tour";
 		FLOOR = " étage %d";
 		CLEARANCE_SALE_INVENTORY_MULTIPLIER = "Muliplicateur d'inventaire lors des déstockages";
+		DISCOUNT_PRICE_MULTIPLIER = "Muliplicateur du prix des objets soldés";
 		CLEARANCE_SALE = "Déstockage";
 		ACHIEVEMENTS = "Haut-faits";
 		ACHIEVEMENT_BONUS = "Bonus de haut-faits";
@@ -1146,7 +1177,7 @@ public class Local {
 		"Speed of time","Thorns","Reprisals","Necrophagy",
 		"Speed of craft", "Craft performance", "Saving orbs", 
 		"Merchant level", "Merchant inventory", 
-		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Shopping addict"};
+		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Shopping addict","Discount specialist"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"junk","fabric/leather","metal","gemstone","conceptual","alloy"};
@@ -1189,7 +1220,9 @@ public class Local {
 		"Enchantment coefficient", // material.coeffPuissance
 		"Name of the base object", // object.baseItem.name
 		"Material name", // object.material.name
-		"Equipped" // object.equiped
+		"Orb name", // object.material.name
+		"Equipped", // object.equiped
+		"Discounted" // object.discount
 		};
 		RULE_ITEM_TYPE_NAME = tmp10;
 
@@ -1211,7 +1244,7 @@ public class Local {
 		"Health points", // vie_max()
 		"Effective health points", // vie_max()/reduc()
 		"Damage inflicted on attackers", //epines()
-		"Damage reflected on attackers (%)" // 100*represailles()
+		"Damage reflected on attackers (%)"// 100*represailles()
 		};
 		RULE_MONSTER_TYPE_NAME = tmp11;
 		
@@ -1234,11 +1267,13 @@ public class Local {
 		"Health points", // vie_max()
 		"Effective health points", // vie_max()/reduc()
 		"Damage inflicted on attackers", //epines()
-		"Damage reflected on attackers (%)" // 100*represailles()
+		"Damage reflected on attackers (%)", // 100*represailles()
+		"Skill points",
+		"Unallocated skill points"
 		};
 		RULE_PLAYER_TYPE_NAME = tmp12;
 		
-		String[] tmp13 = {"Skill","Points","Equipement","Total"};
+		String[] tmp13 = {"Skill","Points","Equipement","Total","Priority"};
 		LEVEL_UP_COLUMN_NAMES = tmp13;
 		
 		String[] tmp14 = {"the Tight-fisted", "the Capitalist","the Stingy","the Scrimpy","the Avaricious","the Crook","the Racketeer","the Scoundrel"};
@@ -1254,9 +1289,9 @@ public class Local {
 		EDIT_UNIVERSE_COLUMN_NAMES = tmp18;
 		
 		String[] tmp19 = {"Base health points",
-		"Trap probability",
-		"Maximum enchantment power",
 		"Initial skill points",
+		"Trap probability",
+		"Discount probability",
 		"Clearance sale probability",
 		"Champion probability",
 		"Super-champion probability",
@@ -1278,7 +1313,8 @@ public class Local {
 		"Cost of a dimensional trip",
 		"Champions skill points multiplier",
 		"Super-champions skill points multiplier",
-		"Basic efficiency coefficient"};
+		"Basic efficiency coefficient",
+		"Maximum enchantment power"};
 		UNIVERSE_STATS_NAME = tmp19;
 		
 		COLON = ":";
@@ -1295,15 +1331,15 @@ public class Local {
 		PICKING_OBJECTS = "%s picks %s from the mystic forge";
 		THROW_AWAY_OBJECTS = "You throw away %s";
 		N_OBJECTS = "%d objects";
-		SHORT_INFOS = "Level %d\nTotal time: %g s\nMoney: %g gold coins\nLoad: %g / %g\n";
-		LEVEL_N = "Level %d\n";
+		SHORT_INFOS = "Level %.0f\nTotal time: %g s\nMoney: %g gold coins\nLoad: %g / %g\n";
+		LEVEL_N = "Level %.0f\n";
 		
 		LOOKING_FOR_AN_ENNEMY = "Looking for an ennemy: %g seconds";
 		LOOKING_FOR_A_TRADER = "Looking for a trader: %g seconds";
-		ENCOUNTER = "%s encounters %s (level %.0f)";
+		ENCOUNTER = "%s encounters %s (level %g)";
 		LOOKING_FOR_A_MYSTIC_FORGE = "Looking for a mystic forge: %g seconds";
 		A_HITS_B = "%s hits %s in %g seconds (total time for %s: %g)\n";
-		A_VERSUS_B = "%s versus %s (level %d)";
+		A_VERSUS_B = "%s versus %s (level %.0f)";
 		VERSUS = "Versus";
 		INITIATIVES = "Initiatives: %g for %s, %g for %s";
 		MULTIPLIER = "   Multiplier ×%g (%s)\n";
@@ -1320,7 +1356,7 @@ public class Local {
 		FLEE_FAIL = "   Flee fail (%g%% probability)";
 		END_FIGHT_FLEE = "%s flees %s (fight duration %g seconds, health points left %g)";
 		END_FIGHT_KILL = "%s kills %s (fight duration %g seconds, health points left %g)";
-		END_FIGHT_DEATH = "%s looses against %s of level %d (fight duration %g seconds)";
+		END_FIGHT_DEATH = "%s looses against %s of level %.0f (fight duration %g seconds)";
 		
 		NO_LOOT = "No loot on %s";
 		GOLD_LOOT = "%s loots %g gold coins on the corpse of %s";
@@ -1330,13 +1366,13 @@ public class Local {
 		RESET_BUILD = "Redistribution of skills points";
 		FULL_HEAL = "Recovery of %g health points in %g seconds";
 		EARN_EXPERIENCE = "%s earns %g experience points (%g × %g × %g)";
-		LEVEL_UP = "%s rises from level %d to level %d";
+		LEVEL_UP = "%s rises from level %.0f to level %.0f";
 		UNIVERSE_CHANGE = "Time penalty for universe change: %g seconds (%g × %g)";
 		CHALLENGE_CHANGE = "Time penalty for challenge change: %g seconds (%g × %g)";
 		DEATH_GOLD_LOSS = "%s loses %g × %g%% of his gold (%g gold coins)";
 		DEATH_TIME_PENALTY = "Time penalty for death: %g seconds (%g × %g)";
 		RESURRECTION_TIME = "Resurrection: %g seconds";
-		NECROPHAGY = "%s devours the corpse of %s and recover %f points of life";
+		NECROPHAGY = "%s devours the corpse of %s and recover %g points of life";
 		
 		FIGHT = "Fight";
 		TRAPS = "Traps";
@@ -1375,6 +1411,7 @@ public class Local {
 		CHAMPIONS_LEVEL = "Champions level (relative to monsters)";
 		SUPER_CHAMPIONS_LEVEL = "Super-champions level (relative to monsters)";
 		BASE_MONSTER_LEVEL = "Base monsters level (relative)";
+		TRAP_LEVEL = "Trap level (relative to zone level)";
 		
 		DIVINE_POINTS = "Divine points";
 		DIVINE_POINTS_ORBS = "Divine points (for a given number of sacrificed orbs)";
@@ -1472,7 +1509,7 @@ public class Local {
 		PROPORTION_OF_THE_CADAVERS_HEALTH_POINTS_ABSORBED = "Proportion of the cadaver's health points absorbed";
 		COST_IN_ORBS_OF_AN_ORB = "Cost in orbs of an orb";
 		MERCHANT_LEVEL_MULTIPLIER = "Merchant level multiplier";
-		EXPERIENCE_SPECIFIC_MULTIPLIER = "Experience-specific multiplier (level gap: %d)";
+		EXPERIENCE_SPECIFIC_MULTIPLIER = "Experience-specific multiplier (level gap: %.0f)";
 		PENALTY_MULTIPLIER  = "Penalties multiplier";
 		
 		TIME_GLOBAL = "Time (global)";
@@ -1485,7 +1522,7 @@ public class Local {
 		
 		WINDOW_CURVES = "Charts on the game mechanics";
 		WINDOW_INVENTORY = "Inventory";
-		WINDOW_SHOP = "%s's shop (level %.0f)";
+		WINDOW_SHOP = "%s's shop (level %g)";
 		WINDOW_FORGE = "Mystic forge";
 		WINDOW_INVENTORY_PROMPT = "Money: %g gold coins, load: %g kg / %g kg";
 		EQUIP = "Equip";
@@ -1500,23 +1537,27 @@ public class Local {
 		
 		TYPE_VAL = "Type: %s (%s)\n\n";
 		BASE_VAL = "Base: %s\n";
-		EFFECTIVE_LEVEL_VAL = "Effective level: %d\n";
+		EFFECTIVE_LEVEL_VAL = "Effective level: %g\n";
 		SLOT_VAL = "Slot: %s\n";
 		QUALITY_VAL = "Quality: %g%%\n";
-		EFFICIENCY_VAL = "Efficiency: %g (%d×%.3f×%.3f)\n";
-		ENCHANTMENT_VAL = "Enchantment: %g (%d×%g)\n";
+		EFFICIENCY_VAL = "Efficiency: %g\n     (%g×%.3f×%.3f)\n";
+		ENCHANTMENT_VAL = "Enchantment: %g\n     (%g×%.3f)\n";
 		NUMBER_OF_ENCHANTMENTS_VAL = "Number of enchantments: %d\n";
 		SKILL_BONUS_VAL = "Skill bonus: %g points\n";
 		QUANTITY_VAL = "Quantity: %g\n";
 		WEIGHT_VAL = "Weight (base): %g kg\nWeight (lightened): %g kg\n";
 		REAL_PRICE_VAL = "Real price: %g gold coins\n";
-		SELLING_PRICE_VAL = "Selling price: %g gold coins\n";
-		PURCHASE_PRICE_VAL = "Purchase price: %g gold coins\n\n";
+		SELLING_PRICE_VAL = "Sale price: %g\n\n";
+		SELLING_PRICE_VAL_DISCOUNT = "Sale price: %g (discounted ×g)\n\n";
+		PURCHASE_PRICE_VAL = "Purchase price: %g\n";
+		PURCHASE_PRICE_VAL_DISCOUNT = "Purchase price: %g (discounted ×g)\n";
 		FAMILY_VAL = "Family: %s\n";
 		WEIGHT_COEFFICIENT_VAL = "Weight coefficient: %g\n";
 		PRICE_COEFFICIENT_VAL = "Price coefficient: %g\n";
 		EFFICIENCY_COEFFICIENT_VAL = "Efficiency coefficient: %g\n";
 		ENCHANTMENT_COEFFICIENT_VAL = "Enchantment coefficient: %g\n";
+		EFFICIENCY_LEVEL_DROP = "Efficiency level according to the loot level";
+		ENCHANTMENT_LEVEL_DROP = "Enchantment level according to the loot level";
 		
 		WE_START_GENTLY = "We start gently";
 		DUNGEONS_AND_DRAGONS = "Dungeons and Dragons";
@@ -1605,6 +1646,7 @@ public class Local {
 		RULE_ON_A_MONSTER = "Rule on a monster";
 		RULE_ON_THE_PLAYER = "Rule on the player";
 		COMPOUND_RULE = "Compound rule";
+		CRAFT_RULE = "Crafting rule";
 		NEGATION = "Negation";
 		AND = "and";
 		OR = "or";
@@ -1615,9 +1657,11 @@ public class Local {
 		FLEE_RULE = "Flee rule";
 		NON_INVOLVEMENT_RULE = "Non-involvement rule";
 		MERCHANT_SEARCH = "Merchant search";
+		FORGE_SEARCH = "Mystic forge search";
 		SAVE = "Save";
 		NEW_RULE = "New rule";
 		REMOVE = "Remove";
+		ADD = "Add";
 		EXPORT = "Export";
 		IMPORT = "Import";
 		RULE = "Rule ";
@@ -1634,9 +1678,9 @@ public class Local {
 		LOAD_A_HERO = "Load a hero";
 		CREATE_A_HERO = "Create a hero";
 		DELETE_A_HERO = "Delete a hero";
-		SEED_TIME = "%s (%d)\nSeed: %d\tTime: %f";
+		SEED_TIME = "%s (%.0f)\nSeed: %d\tTime: %f";
 		
-		YOU_COME_ACROSS = "%s comes across: %s (level %d).";
+		YOU_COME_ACROSS = "%s comes across: %s (level %.0f).";
 		SUCCESSFUL_TRAP_DETECTION = "Successful trap detection (trap score: %g, probability of detection: %g%%).";
 		COMPLETELY_AVOIDS = "%s completely avoids %s.";
 		FAILED_DETECTION = "Failed detection (trap score: %g, probability of detection: %g%%).";
@@ -1673,11 +1717,11 @@ public class Local {
 		YOU_HAVE_ALREADY_FINISHED_THE_GAME = "%s has already finished the game!";
 		YOU_HAVE_DEFEATED_THE_FINAL_BOSS = "%s has defeated the final boss!";
 		TIME_PASSED = "Time passed: %g seconds!";
-		AVOIDS_MONSTER = "%s avoids %s (level %d)";
+		AVOIDS_MONSTER = "%s avoids %s (level %.0f)";
 		
 		HTML_BODY = "<html><body>";
 		PLAYER_STATISTICS = "Player statistics";
-		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %d <br>\nChallenge: %s <br>\nTotal game time: %g seconds <br>\nGold: %g <br>\nLoad: %g / %g<br>\nExperience: %g<br>\nTotal skill points: %g (%g sacrificed orbs)<br>Total divine points: %g (%g sacrificed orbs)";
+		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %.0f <br>\nChallenge: %s <br>\nTotal game time: %g seconds <br>\nGold: %g <br>\nLoad: %g / %g<br>\nExperience: %g<br>\nTotal skill points: %g (%g sacrificed orbs)<br>Total divine points: %g (%g sacrificed orbs)";
 		
 		UNIVERSE_CONST = "<br>Universe constants: <ul>";
 		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>Universe: %d<br>Number of dimensional trips: %d<br>Maximum player level: %d";
@@ -1688,17 +1732,17 @@ public class Local {
 		H3_ZONE_INFORMATION_H3 = "<h3>Zone information</h3>";
 		NUMBER_OF_ZONES = "Number of zones:";
 		DL = "<dl>";
-		DT_ZONE = "<dt>%s (%d-%d) %s</dt>";
+		DT_ZONE = "<dt>%s (%.0f-%.0f) %s</dt>";
 		NO_LOOT_Z = "(no loot)";
 		PRECIPITATION_AND_TEMPERATURE = "<dd>Average temperature: %g°, precipitation: %g%%";
 		PRECIPITATION_AND_TEMPERATURE_NOW = "<dd>Current temperature: %g°, precipitation: %g%%";
 		TRAPS_AND_CHAMPION_PROBABILITY = "<dd>Trap probability: %g%%<br>Champion probability: %g%%<br>Super-champion probability: %g%%";
-		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Monster level: %d to %d (%g to %g points), average %g (%g points)";
-		CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Champion level: %d to %d (%g to %g points), average %g (%g points)";
-		SUPER_CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Super-champion level: %d to %d (%g to %g points), average %g (%g points)</dd>";
+		MONSTER_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Monster level: %.0f to %.0f (%g to %g points), average %g (%g points)";
+		CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Champion level: %.0f to %.0f (%g to %g points), average %g (%g points)";
+		SUPER_CHAMPION_LEVEL_MINIMUM_AVERAGE_MAXIMUM = "<br>Super-champion level: %.0f to %.0f (%g to %g points), average %g (%g points)</dd>";
 		DL_END = "</dl>";
 		H2_CRAFTING_H2 = "<h2>Crafting</h2>";
-		H2_ACHIEVEMENTS_H2 = "<h2>Achievements(%d/%d)</h2>";
+		H2_ACHIEVEMENTS_H2 = "<h2>Achievements</h2>";
 		BODY_HTML_END = "</body></html>";
 		INFORMATION_AND_STATISTICS = "Information and statistics";
 
@@ -1724,7 +1768,7 @@ public class Local {
 		MAX_LEVEL="Maximum level";
 		ORB_PROBABILITY_FOR_LEVEL = "Probability that a resource is an orb according to the loot level";
 		MONSTERS = "Monsters";
-		H2_LEVEL_H2 = "<h2>Level %d</h2>";
+		H2_LEVEL_H2 = "<h2>Level %.0f</h2>";
 		DD = "<dd>";
 		DT = "<dt>";
 		
@@ -1748,14 +1792,19 @@ public class Local {
 		
 		TEMPERATURE_NORMALIZATION = "Temperature normalization";
 		PRECIPITATION_NORMALIZATION = "Precipitation normalization";
-		EQUAL_DISTRIBUTION = "Equal distribution";
 		AUTO_DISTRIBUTION = "Auto-distribution";
+		AUTO_CRAFT = "Auto-craft";
 		OVERLOAD = "Overload";
+		UNDERLOAD = "Underload";
 		OVERLOAD_RESISTANCE = "Overload malus multiplier";
+		UNDERLOAD_AFFINITY = "Underload bonus multiplier";
+		ACHIEVEMENTS_AFFINITY = "Achievements bonus multiplier";
 		OVERLOAD_PENALTY = "Overload malus";
+		UNDERLOAD_BONUS = "Underload bonus";
 		TOWER = "Tower";
 		FLOOR = " floor %d";
 		CLEARANCE_SALE_INVENTORY_MULTIPLIER = "Clearance sale inventory multiplier";
+		DISCOUNT_PRICE_MULTIPLIER = "Discount price multiplier";
 		CLEARANCE_SALE = "Clearance sale";
 		ACHIEVEMENTS = "Achievements";
 		ACHIEVEMENT_BONUS = "Achievement bonus";
@@ -1781,13 +1830,13 @@ public class Local {
 		"  " + Local.VERSUS + " " + Local.TAGS_NAME[4] + Local.COLON + " %g\n"+
 		"  " + Local.VERSUS + " " + Local.TAGS_NAME[5] + Local.COLON + " %g\n"+
 		Local.PROBABILITY_TO_HIT_A_MONSTER + Local.COLON + "\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
 		Local.PROBABILITY_TO_DODGE_AGAINST_A_MONSTER + Local.COLON + "\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
 		Local.DAMAGE_REDUCTION + Local.COLON + " %g%%\n"+
 		Local.TRAPS_REDUCTION_MULTIPLIER + Local.COLON + " %g\n"+
 		Local.TRAPS_DAMAGE_REDUCTION + Local.COLON + " %g%%\n"+
@@ -1836,17 +1885,17 @@ public class Local {
 		Local.AVERAGE_LEVEL_OF_MERCHANTS + Local.COLON + " %g\n"+
 		Local.NUMBER_OF_MERCHANTS_ITEMS + Local.COLON + " %g\n"+
 		Local.PROBABILITY_OF_DETECTING_A_TRAP + Local.COLON + "\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
 		Local.INCOME_PER_SECOND + Local.COLON + " %g\n"+
 		Local.SKILL_POINTS_PER_LEVEL + Local.COLON + " %g\n"+
 		Local.GENERAL_EXPERIENCE_BONUS + Local.COLON + " %g%%\n"+
 		Local.EXPERIENCE_BONUS_ON_A_MONSTER + Local.COLON + "\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
-		"  " + Local.OF_LEVEL + " %d"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
+		"  " + Local.OF_LEVEL + " %.0f"+ Local.COLON + " %g%%\n"+
 		Local.PENALTIES_REDUCTION + Local.COLON + " %g%%\n"+
 		Local.MAX_ZONE_LEVEL+"\n"+
 		Local.DIVINE_POINTS_MULTIPLIER + Local.COLON + " %g\n"+
@@ -1867,12 +1916,16 @@ public class Local {
 		Local.COLD_AFFINITY + Local.COLON + " %g\n"+
 		Local.HEAT_AFFINITY + Local.COLON + " %g\n"+
 		Local.PRECIPITATION_AFFINITY + Local.COLON + " %g\n"+
+		Local.UNDERLOAD_AFFINITY + Local.COLON + " %g\n"+
+		Local.ACHIEVEMENTS_AFFINITY + Local.COLON + " %g\n"+
 		Local.CURRENT_BONUS + "\n"+
 		"  (" + COLD + ") "+ SKILLS_NAME[0] + ", " + SKILLS_NAME[33] + Local.COLON + " %g%%\n"+
 		"  (" + HEAT + ") "+ SKILLS_NAME[2] + ", " + SKILLS_NAME[12] + Local.COLON + " %g%%\n"+
 		"  (" + PRECIPITATION + ") "+ SKILLS_NAME[4] + ", " + SKILLS_NAME[32] + Local.COLON + " %g%%\n"+
-		"  (" + ACHIEVEMENTS + ") "+ SKILLS_NAME[15] + Local.COLON + " %g%%\n"+
-		CLEARANCE_SALE_INVENTORY_MULTIPLIER + Local.COLON + " %g";
+		"  (" + UNDERLOAD + ") "+ SKILLS_NAME[15] + Local.COLON + " %g%%\n"+
+		"  (" + ACHIEVEMENTS + ") "+ SKILLS_NAME[21] + ", " + SKILLS_NAME[45] + Local.COLON + " %g%%\n"+
+		CLEARANCE_SALE_INVENTORY_MULTIPLIER + Local.COLON + " %g\n"+
+		DISCOUNT_PRICE_MULTIPLIER + Local.COLON + " %g";
 		return res;
 	}
 	
@@ -1957,10 +2010,17 @@ public class Local {
 	PRECIPITATION_NORMALIZATION,
 	OVERLOAD_PENALTY,
 	OVERLOAD_RESISTANCE,
+	UNDERLOAD_AFFINITY,
+	ACHIEVEMENTS_AFFINITY,
 	RESOURCES_MULTIPLIER_MERCHANT,
 	SUPER_CHAMPIONS_LEVEL,
 	CLEARANCE_SALE_INVENTORY_MULTIPLIER,
-	ACHIEVEMENT_BONUS};
+	ACHIEVEMENT_BONUS,
+	EFFICIENCY_LEVEL_DROP,
+	ENCHANTMENT_LEVEL_DROP,
+	UNDERLOAD_BONUS,
+	DISCOUNT_PRICE_MULTIPLIER,
+	TRAP_LEVEL};
 	return tmpStr;
 	}
 }

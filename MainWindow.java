@@ -621,12 +621,12 @@ public class MainWindow extends javax.swing.JDialog {
 	
 	
 
-    private boolean combatAuto(int defaite_count, int victory_count, int trap_count, int trap_death_count, int lvl_start)
+    private boolean combatAuto(int defaite_count, int victory_count, int trap_count, int trap_death_count, double lvl_start)
     {
 	int CS = 0;
 	if(Joueur.conditionToggle[CS+0] && defaite_count >= Joueur.conditionValues[CS+0]) return false; // "Défaites ="
 	if(Joueur.conditionToggle[CS+1] && victory_count >= Joueur.conditionValues[CS+1]) return false; // "Ennemis vaincus ="
-	if(Joueur.conditionToggle[CS+2] && (Joueur.level - lvl_start) >= Joueur.conditionValues[CS+2]) return false; // "Niveaux gagnés ="
+	if(Joueur.conditionToggle[CS+2] && Math.floor(Joueur.level - lvl_start) >= Joueur.conditionValues[CS+2]) return false; // "Niveaux gagnés ="
 	if(Joueur.conditionToggle[CS+3] && trap_death_count >= Joueur.conditionValues[CS+3]) return false; // "Morts sur des pièges ="
 	if(Joueur.conditionToggle[CS+4] && trap_count >= Joueur.conditionValues[CS+4]) return false; // "Victoires sur des pièges ="
 	return true;
@@ -640,14 +640,17 @@ public class MainWindow extends javax.swing.JDialog {
 		return false;
 	}
 
-	private boolean shoppingAuto()
+	private void autoVenteForgeDist()
 	{
 		for (ObjectRule r: Joueur.rules)
-			if(r.shopping_rule && r.IsTrue(Joueur,null,Joueur.mob))
-				return true;
-		return false;
+		{
+			if(r.shopping_rule && r.IsTrue(Joueur,null,Joueur.mob)) {venteAuto(); achatAuto();}
+			if(r.forge_rule && r.IsTrue(Joueur,null,Joueur.mob)) {Joueur.get_forge(); Joueur.craftAuto();}
+			if(r.dist_rule && r.IsTrue(Joueur,null,Joueur.mob)) Joueur.auto_dist();
+		}
 	}
 
+	
 	private boolean venteAutoCond(Item i)
 	{
 		for (ObjectRule r: Joueur.rules)
@@ -664,6 +667,7 @@ public class MainWindow extends javax.swing.JDialog {
 		return false;
 	}
 
+	
     private void venteAuto()
     {
 	Joueur.get_shop();
@@ -741,7 +745,7 @@ public class MainWindow extends javax.swing.JDialog {
 		refreshButtons();
 		Thread thread = new Thread() {
 			public void run() {
-			    int lvl_start = Joueur.level;
+			    double lvl_start = Joueur.level;
 			    int defaite_count = 0;
 			    int victory_count = 0;
 				int trap_death_count = 0;
@@ -768,8 +772,7 @@ public class MainWindow extends javax.swing.JDialog {
 						}
 					}
 					Joueur.heal();
-					if(shoppingAuto())
-						{venteAuto(); achatAuto();}
+					autoVenteForgeDist();
 					}
 			    while(combatAuto(defaite_count,victory_count,trap_count,trap_death_count,lvl_start) && !stopfight);
 			    infight = false;

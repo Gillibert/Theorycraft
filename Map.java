@@ -57,7 +57,7 @@ public class Map implements Serializable {
 	}
 	
 	
-	public Map(TheoryGenerator gen, int zl_14)
+	public Map(TheoryGenerator gen)
 		{
 		map_img="images/main_map2.png";
 
