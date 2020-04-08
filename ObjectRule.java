@@ -269,6 +269,7 @@ public class ObjectRule implements Serializable {
 		case 17: return (i.rare==6) && Check(StaticItem.OrbsNamesList.indexOf(i.material.name));
 		case 18: return Check((i.equiped) ? 1 : 0); // convert to int
 		case 19: return Check((i.discount) ? 1 : 0); // convert to int
+		case 20: return Check(i.nb_ench());
 		}
 	}
 	else if (meta_type == MONSTER_RULE)

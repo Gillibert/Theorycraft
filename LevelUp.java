@@ -205,7 +205,7 @@ public class LevelUp extends javax.swing.JDialog  {
     private void initialize() {
 
 	this.setLocation(new Point(15, 15));
-	this.setSize(new Dimension(670+70+50, 660));
+	this.setSize(new Dimension(790+Game.ADJUST_SIZE_X, 660+Game.ADJUST_SIZE_Y));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

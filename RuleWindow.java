@@ -732,7 +732,7 @@ public class RuleWindow extends javax.swing.JDialog  {
     private void initialize() {
 	this.setTitle(Local.PROGRAMMING);
 	this.setLocation(new Point(15, 15));
-	this.setSize(new Dimension(625, 442));
+	this.setSize(new Dimension(625+Game.ADJUST_SIZE_X, 442+Game.ADJUST_SIZE_Y));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

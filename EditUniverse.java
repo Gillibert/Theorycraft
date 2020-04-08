@@ -289,7 +289,7 @@ public class EditUniverse extends javax.swing.JDialog  {
     private void initialize() {
 
 	this.setLocation(new Point(5, 5));
-	this.setSize(new Dimension(790, 300+300));
+	this.setSize(new Dimension(790+Game.ADJUST_SIZE_X, 600+Game.ADJUST_SIZE_Y));
 	this.setResizable(false);
 	this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

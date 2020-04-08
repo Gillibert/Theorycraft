@@ -117,7 +117,7 @@ public class MainWindow extends javax.swing.JDialog {
 	this.setContentPane(getJFrameContentPane());
 	this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	this.setLocation(new Point(0, 0));
-	this.setSize(new Dimension(795, 680));		
+	this.setSize(new Dimension(795+Game.ADJUST_SIZE_X, 680+Game.ADJUST_SIZE_Y));		
 	this.setResizable(false);
 
 	this.setTitle(String.format(Local.THEORYCRAFT_TITLE,Joueur.name,Joueur.defi.name));

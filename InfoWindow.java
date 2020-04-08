@@ -93,6 +93,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 		res += String.format(Local.UNIVERSE_INFORMATION_LIST,
 			Joueur.universe.seed,
 			Joueur.universe.numberOfTravels,
+			Local.HOLIDAY_NAME[Game.HOLIDAY],
 			Joueur.MAX_LEVEL);
 		res += Local.UNIVERSE_CONST;
 		for(int i=0; i< Local.UNIVERSE_STATS_NAME.length; i++)
@@ -109,7 +110,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[i] + Local.COLON + " %g",Joueur.universe.adjusted_constant(i));
 		}
 		res += "</ul>";
-			res += Local.H3_AVAILABLE_OBJECTS_H3;
+		res += Local.H3_AVAILABLE_OBJECTS_H3;
 
 			for(int i=0; i< Joueur.universe.nuberSlotsAvailable; i++)
 			{
@@ -128,6 +129,19 @@ public class InfoWindow extends javax.swing.JDialog  {
 			}
 			res = res.substring(0, res.length()-2);
 			res += ".";
+			
+			res += String.format(Local.H3_HOLIDAYS_H3,Local.HOLIDAY_NAME[Game.HOLIDAY]);
+			
+			res += "<ul>";
+			for(int i=0; i<Joueur.nb_tags; i++)
+			{
+				boolean[] tags = new boolean[Joueur.nb_tags]; tags[i]=true;
+				res += String.format(Local.HOLIDAY_LVL_MULT,Local.TAGS_NAME[i],Monster.MonsterLevelMultiplier(Joueur.universe,tags));
+			}
+			res += String.format(Local.HOLIDAY_DROP_MULT,Item.HolidayDropMultiplier(Joueur));
+			res += "</ul>";
+			
+			
 			
 			res += Local.BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS;
 			for(int i=0; i< Player.nb_stats; i++)
@@ -263,7 +277,7 @@ public class InfoWindow extends javax.swing.JDialog  {
     private void initialize() {
 
 	this.setLocation(new Point(15, 15));
-	this.setSize(new Dimension(670+120, 420));
+	this.setSize(new Dimension(790+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	this.setResizable(false);
 	//this.setModal(true);
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

@@ -56,7 +56,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     {
 	craft_mode = false;
 	this.setTitle(Local.WINDOW_INVENTORY);
-	this.setSize(new Dimension(600+10, 420));
+	this.setSize(new Dimension(610+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	sell.setVisible(false);
 	buy.setVisible(false);
 	put.setVisible(false);
@@ -83,7 +83,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     {
 	craft_mode = false;
 	this.setTitle(String.format(Local.WINDOW_SHOP, Joueur.shop.name, Joueur.shop.level));
-	this.setSize(new Dimension(805, 420));
+	this.setSize(new Dimension(805+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	sell.setVisible(true);
 	buy.setVisible(true);
 	put.setVisible(false);
@@ -110,7 +110,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     {
     craft_mode = true;
 	this.setTitle(Local.WINDOW_FORGE);
-	this.setSize(new Dimension(805, 420));
+	this.setSize(new Dimension(805+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	sell.setVisible(false);
 	buy.setVisible(false);
 	scroll2.setVisible(true);

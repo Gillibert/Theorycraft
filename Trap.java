@@ -6,8 +6,7 @@ class Trap {
 	public double level;
 	public double speed;
 	public double damage;
-	public double hidden;
-
+	
 	public Trap(String n)
 	{
 		name = n;
@@ -27,9 +26,8 @@ public static Trap getTrap(Player p)
 	Trap res = new Trap(trap_zoo_names[normalized_lev]);
 	
 	res.level = p.universe.niveau_pieges(lev);
-	res.speed = Math.pow(res.level*2,1.3);
-	res.damage = p.universe.traps_dmg_for_level(res.level);
-	res.hidden = res.level * p.universe.plage_random();
+	res.speed =  p.universe.initiative(2*lev);
+	res.damage = p.universe.traps_dmg_for_level(lev);
 	return res;
 }
 
@@ -39,16 +37,16 @@ public boolean trapEncounter(Player p)
 	p.t_stats.addEvent(1.0,TimeStats.EVENT_TRAP_ATTEMPT);
 	boolean res = true;
 	if(p.disp) Game.MW.addLog(String.format(Local.YOU_COME_ACROSS,p.name,lower_case_name,level));
-	double trap_find_proba = p.proba_trouver_piege(hidden);
+	double trap_find_proba = p.proba_trouver_piege(level);
 	if (Math.random() < trap_find_proba)
 		{
-			if(p.disp) Game.MW.addLog(String.format(Local.SUCCESSFUL_TRAP_DETECTION,hidden, 100*trap_find_proba));
+			if(p.disp) Game.MW.addLog(String.format(Local.SUCCESSFUL_TRAP_DETECTION,level, 100*trap_find_proba));
 			if(p.disp) Game.MW.addLog(String.format(Local.COMPLETELY_AVOIDS,p.name,lower_case_name));
 			p.t_stats.addEvent(1.0,TimeStats.EVENT_TRAP_AVOIDED);
 		}
 	else
 	{
-		if(p.disp) Game.MW.addLog(String.format(Local.FAILED_DETECTION,hidden, 100*trap_find_proba));
+		if(p.disp) Game.MW.addLog(String.format(Local.FAILED_DETECTION,level, 100*trap_find_proba));
 		double dmg_base = damage * p.universe.plage_random();
 		double bonus = p.bonus_initiative_piege();
 		double trap_init = p.universe.initiative(speed) ;
@@ -58,8 +56,8 @@ public boolean trapEncounter(Player p)
 		double dmg_red = p.resistance_vs_piege();
 		if (player_init < trap_init)
 			{
-				if(p.disp) Game.MW.addLog(Local.TRAP_RESISTANCE_DOUBLED);
-				dmg_red = dmg_red/2;
+				if(p.disp) Game.MW.addLog(Local.TRAP_DAMAGE_HALVED);
+				dmg_red = dmg_red/2.0;
 			}
 		double dmg_abs = p.absorption();
 			

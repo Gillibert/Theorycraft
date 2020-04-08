@@ -22,7 +22,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	this.setContentPane(getJFrameContentPane());
 	this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	this.setLocation(new Point(0, 0));
-	this.setSize(new Dimension(565, 345));
+	this.setSize(new Dimension(565+Game.ADJUST_SIZE_X, 345+Game.ADJUST_SIZE_Y));
 	this.setResizable(false);
 	this.setModal(true);
     }
@@ -60,7 +60,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	choisir.setVisible(true);
 	titre.setText(Local.CHOOSE_A_CHALLENGE);
 	this.setTitle(Local.CHOICE_OF_THE_CHALLENGE);
-	this.setSize(new Dimension(565, 345));
+	this.setSize(new Dimension(565+Game.ADJUST_SIZE_X, 345+Game.ADJUST_SIZE_Y));
 	refresh();
 	setVisible(true);
     }
@@ -77,7 +77,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	choisir.setVisible(true);
 	titre.setText(Local.CHOOSE_A_CHALLENGE);
 	this.setTitle(Local.CHOICE_OF_THE_CHALLENGE);
-	this.setSize(new Dimension(565, 345));
+	this.setSize(new Dimension(565+Game.ADJUST_SIZE_X, 345+Game.ADJUST_SIZE_Y));
 	refresh();
 	setVisible(true);
     }
@@ -90,7 +90,7 @@ public class ChallengeWindow extends javax.swing.JDialog  {
 	choisir.setVisible(false);
 	titre.setText(Local.BEST_TIMES);
 	this.setTitle(Local.HISCORES);
-	this.setSize(new Dimension(565, 315));
+	this.setSize(new Dimension(565+Game.ADJUST_SIZE_X, 315+Game.ADJUST_SIZE_Y));
 	refresh();
 	setVisible(true);
     }

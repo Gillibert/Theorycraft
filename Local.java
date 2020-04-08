@@ -26,6 +26,8 @@ public class Local {
 	public static String[] UNIVERSE_STATS_NAME;
 	public static String[] UNIVERSE_EQUATIONS_NAME;
 	public static String[] EDIT_UNIVERSE_COLUMN_NAMES;
+	public static String[] HOLIDAY_NAME;
+	public static String[] HOLIDAY_FORMAT;
 	
 	public static String COLON;
 	public static String SECONDS;
@@ -393,7 +395,7 @@ public class Local {
 	public static String SUCCESSFUL_TRAP_DETECTION;
 	public static String COMPLETELY_AVOIDS;
 	public static String FAILED_DETECTION;
-	public static String TRAP_RESISTANCE_DOUBLED;
+	public static String TRAP_DAMAGE_HALVED;
 	public static String IS_DEAD;
 
 	public static String THEORYCRAFT_TITLE;
@@ -510,7 +512,12 @@ public class Local {
 	public static String CLEARANCE_SALE;
 	public static String ACHIEVEMENTS;
 	public static String ACHIEVEMENT_BONUS;
-		
+	public static String HOLIDAY_EFFECT_MULTIPLIER;
+	public static String H3_HOLIDAYS_H3;
+	public static String HOLIDAY_LVL_MULT;
+	public static String HOLIDAY_DROP_MULT;
+	public static String MUTUAL_FLEE;
+	
 	public static void init(int lang)
 	{
 	if(lang == 0)
@@ -527,7 +534,7 @@ public class Local {
 		"Vitesse du temps","Épines","Représailles","Nécrophagie",
 		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
 		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Accro du shopping", "Promophile"};
+		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Affinité aux vacances", "Accro du shopping", "Promophile"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
@@ -572,7 +579,8 @@ public class Local {
 		"Nom du matériau", // objet.material.name
 		"Nom de l'orbe", // objet.material.name
 		"Equipé", // objet.equiped
-		"Soldé" // objet.discount
+		"Soldé", // objet.discount
+		"Nombre d'enchantements" // object.nb_ench()
 		};
 		RULE_ITEM_TYPE_NAME = tmp10;
 
@@ -664,8 +672,15 @@ public class Local {
 		"Muliplicateur des points de compétences (champions)",
 		"Muliplicateur des points de compétences (super-champions)",
 		"Coefficient d'efficacité de base",
-		"Puissance maximale des enchantements"};
+		"Puissance maximale des enchantements",
+		"Nombre maximal de coups échangés dans un combat"};
 		UNIVERSE_STATS_NAME = tmp19;
+		
+		String[] tmp20 = {"Pas de vacances","Nouvel an","Fête du travail","Halloween","Noël","Équinoxe du printemps"};
+		HOLIDAY_NAME = tmp20;
+		
+		String[] tmp21 = {"%s","%s ivre","%s en grève","%s d'Halloween","%s de Noël","%s printanier"};
+		HOLIDAY_FORMAT = tmp21;
 		
 		COLON = " :";
 		SECONDS = "secondes";
@@ -1030,10 +1045,10 @@ public class Local {
 		SEED_TIME = "%s (%.0f)\nSeed : %d\tTemps : %f";
 		
 		YOU_COME_ACROSS = "%s tombe sur : %s (niveau %.0f).";
-		SUCCESSFUL_TRAP_DETECTION = "Réussite de la détection (score du piège : %g, probabilité de détection : %g%%).";
+		SUCCESSFUL_TRAP_DETECTION = "Réussite de la détection (niveau du piège : %g, probabilité de détection : %g%%).";
 		COMPLETELY_AVOIDS = "%s évite entièrement %s.";
-		FAILED_DETECTION = "Échec de la détection (score du piège : %g, probabilité de détection : %g%%).";
-		TRAP_RESISTANCE_DOUBLED = "Résistance aux pièges doublée.";
+		FAILED_DETECTION = "Échec de la détection (niveau du piège : %g, probabilité de détection : %g%%).";
+		TRAP_DAMAGE_HALVED = "Le piège inflige des demi-dégats.";
 		IS_DEAD = "%s est mort.";
 		
 		THEORYCRAFT_TITLE = "Theorycraft - %s - %s";
@@ -1072,7 +1087,7 @@ public class Local {
 		PLAYER_STATISTICS = "Statistiques sur le joueur";
 		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %.0f<br>\nDéfi : %s<br>\nTemps total de jeu : %g secondes<br>\nOr : %g<br>\nCharge : %g / %g<br>\nExpérience : %g<br>\nTotal des points de compétences : %g (%g orbes sacrifiés)<br>\nTotal des points divins : %g (%g orbes sacrifiés)<br>";
 		UNIVERSE_CONST = "<br>Constantes de l'univers :<ul>";
-		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>Univers : %d<br>Nombre de voyages dimensionnels : %d<br>Niveau maximal du joueur : %d";
+		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>Univers : %d<br>Nombre de voyages dimensionnels : %d<br>Vacances : %s<br>Niveau maximal du joueur : %d";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Objets disponibles :</h3>";
 		H3_UNAVAILABLE_OBJECTS_H3 = "<h3>Objets indisponibles :</h3>";
 		BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS = "<h3>Répartition de base des points des monstres</h3><ul>";
@@ -1158,6 +1173,11 @@ public class Local {
 		CLEARANCE_SALE = "Déstockage";
 		ACHIEVEMENTS = "Haut-faits";
 		ACHIEVEMENT_BONUS = "Bonus de haut-faits";
+		HOLIDAY_EFFECT_MULTIPLIER = "Muliplicateur de l'effet des vacances";
+		H3_HOLIDAYS_H3 = "<h3>Effet des vacances (%s) :</h3>";
+		HOLIDAY_LVL_MULT = "<li>Muliplicateur de niveau pour %s : %g";
+		HOLIDAY_DROP_MULT = "<li>Muliplicateur de ressources : %g";
+		MUTUAL_FLEE = "Le combat s'éternise. Après %d coups échangés, %s et %s abandonnent tous les deux.";
 		
 		PLAYER_INFOS = getPlayerInfos();
 		UNIVERSE_EQUATIONS_NAME = getEquationName();
@@ -1177,7 +1197,7 @@ public class Local {
 		"Speed of time","Thorns","Reprisals","Necrophagy",
 		"Speed of craft", "Craft performance", "Saving orbs", 
 		"Merchant level", "Merchant inventory", 
-		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Shopping addict","Discount specialist"};
+		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Holiday affinity","Shopping addict","Discount specialist"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"junk","fabric/leather","metal","gemstone","conceptual","alloy"};
@@ -1222,7 +1242,8 @@ public class Local {
 		"Material name", // object.material.name
 		"Orb name", // object.material.name
 		"Equipped", // object.equiped
-		"Discounted" // object.discount
+		"Discounted", // object.discount
+		"Number of enchantments" // object.nb_ench()
 		};
 		RULE_ITEM_TYPE_NAME = tmp10;
 
@@ -1314,8 +1335,15 @@ public class Local {
 		"Champions skill points multiplier",
 		"Super-champions skill points multiplier",
 		"Basic efficiency coefficient",
-		"Maximum enchantment power"};
+		"Maximum enchantment power",
+		"Maximal length of a fight (number of attacks)"};
 		UNIVERSE_STATS_NAME = tmp19;
+		
+		String[] tmp20 = {"No holiday","New year","International Workers' Day","Halloween","Christmas","Spring equinox"};
+		HOLIDAY_NAME = tmp20;
+		
+		String[] tmp21 = {"%","Drunken %s","%s on strike","Halloween %s","Christmas %s","Spring %s"};
+		HOLIDAY_FORMAT = tmp21;
 		
 		COLON = ":";
 		SECONDS = "seconds";
@@ -1684,7 +1712,7 @@ public class Local {
 		SUCCESSFUL_TRAP_DETECTION = "Successful trap detection (trap score: %g, probability of detection: %g%%).";
 		COMPLETELY_AVOIDS = "%s completely avoids %s.";
 		FAILED_DETECTION = "Failed detection (trap score: %g, probability of detection: %g%%).";
-		TRAP_RESISTANCE_DOUBLED = "Trap resistance doubled.";
+		TRAP_DAMAGE_HALVED = "Trap inflic half the damage.";
 		IS_DEAD = "%s is dead.";
 
 		THEORYCRAFT_TITLE = "Theorycraft - %s - %s";
@@ -1724,7 +1752,7 @@ public class Local {
 		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %.0f <br>\nChallenge: %s <br>\nTotal game time: %g seconds <br>\nGold: %g <br>\nLoad: %g / %g<br>\nExperience: %g<br>\nTotal skill points: %g (%g sacrificed orbs)<br>Total divine points: %g (%g sacrificed orbs)";
 		
 		UNIVERSE_CONST = "<br>Universe constants: <ul>";
-		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>Universe: %d<br>Number of dimensional trips: %d<br>Maximum player level: %d";
+		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>Universe: %d<br>Number of dimensional trips: %d<br>Holiday: %s<br>Maximum player level: %d";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Unavailable objects:</h3>";
 		BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS = "<h3>Base distribution of monster skill points</h3><ul>";
 		LI_SKILL_POINTS = "<li>%s: %g%% of skill points";
@@ -1808,6 +1836,11 @@ public class Local {
 		CLEARANCE_SALE = "Clearance sale";
 		ACHIEVEMENTS = "Achievements";
 		ACHIEVEMENT_BONUS = "Achievement bonus";
+		HOLIDAY_EFFECT_MULTIPLIER = "Holiday effect multiplier";
+		H3_HOLIDAYS_H3 = "<h3>Holiday effects (%s):</h3>";
+		HOLIDAY_LVL_MULT = "<li>%s level multiplier: %g";
+		HOLIDAY_DROP_MULT = "<li>Resources multiplier: %g";
+		MUTUAL_FLEE = "The fight is taking forever. After %d attacks, %s and %s both give up.";
 		
 		PLAYER_INFOS = getPlayerInfos();
 		UNIVERSE_EQUATIONS_NAME = getEquationName();
@@ -1918,6 +1951,7 @@ public class Local {
 		Local.PRECIPITATION_AFFINITY + Local.COLON + " %g\n"+
 		Local.UNDERLOAD_AFFINITY + Local.COLON + " %g\n"+
 		Local.ACHIEVEMENTS_AFFINITY + Local.COLON + " %g\n"+
+		Local.HOLIDAY_EFFECT_MULTIPLIER + Local.COLON + " %g\n"+
 		Local.CURRENT_BONUS + "\n"+
 		"  (" + COLD + ") "+ SKILLS_NAME[0] + ", " + SKILLS_NAME[33] + Local.COLON + " %g%%\n"+
 		"  (" + HEAT + ") "+ SKILLS_NAME[2] + ", " + SKILLS_NAME[12] + Local.COLON + " %g%%\n"+
@@ -2020,7 +2054,8 @@ public class Local {
 	ENCHANTMENT_LEVEL_DROP,
 	UNDERLOAD_BONUS,
 	DISCOUNT_PRICE_MULTIPLIER,
-	TRAP_LEVEL};
+	TRAP_LEVEL,
+	HOLIDAY_EFFECT_MULTIPLIER};
 	return tmpStr;
 	}
 }

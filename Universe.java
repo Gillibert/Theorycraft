@@ -39,7 +39,8 @@ import java.util.*;
 	// EQ_MASTER(54) CONST_MASTER(55) LIGHTER_RES(56) LIGHTER_EQP(57)
 	// COLD_RES(58) HOT_RES(59) PRECI_RES(60) 
 	// COLD_BONUS(61) HOT_BONUS(62) PRECI_BONUS(63) OVERLOAD_RES(64) 
-	// UNDERLOAD_BONUS(65) ACHI_BONUS(66) SHOPPING_ADDICT(67) DISCOUNT_SPEC(68)
+	// UNDERLOAD_BONUS(65) ACHI_BONUS(66) HOLIDAY_BONUS(67)
+	// SHOPPING_ADDICT(68) DISCOUNT_SPEC(69)
 
 	
 	public static int IAS = 0;
@@ -109,8 +110,10 @@ import java.util.*;
 	public static int OVERLOAD_RES = 64;
 	public static int UNDERLOAD_BONUS = 65;
 	public static int ACHI_BONUS = 66;
-	public static int SHOPPING_ADDICT = 67;
-	public static int DISCOUNT_SPEC = 68;
+	public static int HOLIDAY_BONUS = 67;
+	public static int SHOPPING_ADDICT = 68;
+	public static int DISCOUNT_SPEC = 69;
+
 	
 	Universe(int sd)
 	{
@@ -151,10 +154,11 @@ import java.util.*;
 		constantes_min[20] = 0.0; // quantite_ressource_base_marchands()
 		constantes_min[21] = 10.0; // nombre_zones()
 		constantes_min[22] = 0.0; // travel_cost()
-		constantes_min[23] = 2.0; // mul_points_competences_champions()
+		constantes_min[23] = 1.5; // mul_points_competences_champions()
 		constantes_min[24] = 20.0; // mul_points_competences_super_champions()
 		constantes_min[25] = 0.0; // efficacite_base()
-		constantes_min[26] = 0.0; // puissance_ench_sup
+		constantes_min[26] = 0.0; // puissance_ench_sup()
+		constantes_min[27] = 3.0; // nombre_maximal_coup()
 		
 		constantes_max[0] = 100; // vie de départ()
 		constantes_max[1] = 200; // points_initiaux()
@@ -182,7 +186,8 @@ import java.util.*;
 		constantes_max[23] = 5.0; // mul_points_competences_champions()
 		constantes_max[24] = 50.0; // mul_points_competences_super_champions()
 		constantes_max[25] = 5.0; // efficacite_base()
-		constantes_max[26] = 0.6; // puissance_ench_sup
+		constantes_max[26] = 0.6; // puissance_ench_sup()
+		constantes_max[27] = 10000; // nombre_maximal_coup()
 		
 		constantes[0] = (int)(gen.nextInt(8)+6); // vie de départ()
 		constantes[1] = (int)(gen.nextInt(25)+8.0); // points_initiaux()
@@ -207,10 +212,11 @@ import java.util.*;
 		constantes[20] = 2.0+gen.nextDouble()*4.0; // quantite_ressource_base_marchands()
 		constantes[21] = (int)(gen.nextInt(15)+12); // nombre_zones()
 		constantes[22] = (int)(gen.nextInt(300)+50); // travel_cost()
-		constantes[23] = 2.0+gen.nextDouble()*2.0; // mul_points_competences_champions()
+		constantes[23] = 1.5+gen.nextDouble()*2.0; // mul_points_competences_champions()
 		constantes[24] = 20.0+gen.nextDouble()*20.0; // mul_points_competences_super_champions()
 		constantes[25] = 0.2+gen.nextDouble()*0.8; // efficacite_base()
-		constantes[26] = 0.20+gen.nextDouble()*0.30;; // puissance_ench_sup
+		constantes[26] = 0.20+gen.nextDouble()*0.30; // puissance_ench_sup()
+		constantes[27] = (int)(gen.nextInt(960)+20); // nombre_maximal_coup()
 		
 		equations = new Equation[nb_universe_equations];
 			
@@ -304,6 +310,7 @@ import java.util.*;
 		equations[87] = new Equation(gen, 1, 0.875, 1.0, true, 1.0, 0.4); // base_underload_bonus
 		equations[88] = new Equation(gen, 1, 98, 0.8, false, 0.5, 0.2); // discount_multiplier
 		equations[89] = new Equation(gen, 1, 0.646, 2.0, true, 5.0, 2.2); // niveau_pieges
+		equations[90] = new Equation(gen, 1, 90.5, 1.0, true, 2.0, 0.2); // affinite_vacances
 		
 		for(int i=0; i< nb_universe_equations; i++)
 			equations[i].id = i;
@@ -728,6 +735,10 @@ import java.util.*;
 		return equations[89].eval(x);
 	}
 	
+	public double affinite_vacances(double x) {
+		return equations[90].eval(x);
+	}
+	
 	public double points_divins_totaux(double x, double y, double lvl) {
 		return points_divins_multiplier(x)*(points_divins_pour_x_orbe(y)+points_divins_pour_niveau(lvl));
 	}
@@ -831,6 +842,9 @@ import java.util.*;
 	
 	public double puissance_ench_sup() 
 	{ return adjusted_constant(26); }
+	
+	public double nombre_maximal_coup() 
+	{ return adjusted_constant(27); }
 	
 	double adjusted_constant(int idx)
 	{ return adjust_constant(points_divins[idx],constantes[idx],constantes_min[idx], constantes_max[idx]); }

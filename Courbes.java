@@ -58,8 +58,8 @@ public class Courbes extends javax.swing.JDialog  {
 	
 	public void montre()
 	{
-	refresh();
 	this.setVisible(true);
+	refresh();
 	}
 
 	public void refresh()
@@ -82,8 +82,6 @@ public class Courbes extends javax.swing.JDialog  {
 		CurveObject curve_to_draw3 = new CurveObject();
 		CurveObject curve_to_draw4 = new CurveObject();
 		CurveObject curve_to_draw5 = new CurveObject();
-		CurveObject curve_to_draw6 = new CurveObject();
-		CurveObject curve_to_draw7 = new CurveObject();
 
 		double sizar = curve_to_draw.arr_x.length;
 		curves_to_draw.add(curve_to_draw);
@@ -1308,6 +1306,18 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case 67:
 			{
+			curve_to_draw.title = Local.HOLIDAY_EFFECT_MULTIPLIER;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.affinite_vacances(tx);
+			}
+			}
+		break;
+		case 68:
+			{
 
 			curve_to_draw.title = Local.CLEARANCE_SALE_INVENTORY_MULTIPLIER;
 			
@@ -1319,7 +1329,7 @@ public class Courbes extends javax.swing.JDialog  {
 			}
 			}
 		break;
-		case 68:
+		case 69:
 			{
 
 			curve_to_draw.title = Local.DISCOUNT_PRICE_MULTIPLIER;
@@ -1399,7 +1409,7 @@ public class Courbes extends javax.swing.JDialog  {
 
 	private void initialize() {
 		this.setLocation(new Point(15, 15));
-		this.setSize(new Dimension(670, 420));
+		this.setSize(new Dimension(670+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 		this.setResizable(false);
 		this.setModal(false);
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

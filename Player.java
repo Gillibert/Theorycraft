@@ -432,10 +432,18 @@ public class Player implements Serializable {
 
 				if(!rule_fail)
 				{
+					//System.out.println("rule "+ r.name);
+					/*for(Item the_object : crlist)
+						System.out.println(the_object.name + "(" + the_object.nb_ench() +")");*/
+					
 					put_craft(crlist);
 					craft();
 					crs = craftInventory.size();
 					if(craftInventory.size() == crlist.size()) rule_fail = true;
+					
+					//or(Item the_object : craftInventory)
+					//	if(the_object.nb_ench() > 0) System.out.println(the_object.name + "(" + the_object.nb_ench() +")");
+					
 					for(int i=0; i< crs; i++)
 						get_craft(craftInventory.get(0));
 				}
@@ -637,7 +645,7 @@ public class Player implements Serializable {
 			resources_weight_multiplier(),equipment_weight_multiplier(),
 			cold_resistance(), heat_resistance(), precipitation_resistance(), overload_resistance(),
 			100*(1-cold_penalty()), 100*(1-heat_penalty()), 100*(1-precipitation_penalty()), 100*(1-overload_penalty()),
-			cold_affinity(), heat_affinity(), precipitation_affinity(), underload_affinity(),achievements_affinity(),
+			cold_affinity(), heat_affinity(), precipitation_affinity(), underload_affinity(),achievements_affinity(),bonus_vacances(),
 			100*(cold_bonus()-1.0), 100*(heat_bonus()-1.0), 100*(precipitation_bonus()-1.0),
 			100*(underload_bonus()-1.0),100*(bonus_haut_faits()-1.0),
 			clearance_sale_inventory_multiplier(),discount_multiplier()
@@ -848,6 +856,9 @@ public class Player implements Serializable {
 	public double ACHI_BONUS()
 	{return stats_with_bonus[Universe.ACHI_BONUS];}
 	
+	public double HOLIDAY_BONUS()
+	{return stats_with_bonus[Universe.HOLIDAY_BONUS];}
+	
 	public double SHOPPING_ADDICT()
 	{return stats_with_bonus[Universe.SHOPPING_ADDICT];}
 
@@ -936,6 +947,7 @@ public class Player implements Serializable {
 	public double clearance_sale_inventory_multiplier() {return universe.clearance_sale_inventory_multiplier(SHOPPING_ADDICT());}
 	public double discount_multiplier() {return universe.discount_multiplier(DISCOUNT_SPEC());}
 	public double bonus_haut_faits() {return universe.bonus_haut_faits_base(points_haut_faits*achievements_affinity());}
+	public double bonus_vacances() {return universe.affinite_vacances(HOLIDAY_BONUS());}
 	
 	public double divine_cap(int i){
 		if(i < universe.nb_universe_stats) return universe.divine_cap[i] * universe.divine_cap_const(CONST_MASTER());
@@ -1008,6 +1020,27 @@ public class Player implements Serializable {
 	//Game.MW.refreshInFight();
     }
 
+	public void addOptimizedRules()
+	{
+		ObjectRule tmp;
+		ObjectRule fus = new ObjectRule(17,0,4,ObjectRule.ITEM_RULE);
+		fus.name = "Orbe de fusion";
+		rules.add(fus);
+		
+		for (int i=3; i< 62 ; i++)
+		{
+			tmp = new ObjectRule(20,0,i,ObjectRule.ITEM_RULE);
+			tmp.name = "Nombre d'enchantements "+i;
+			ArrayList<ObjectRule> lvlR = new ArrayList<ObjectRule>();
+			lvlR.add(tmp); lvlR.add(tmp); lvlR.add(fus);
+			ObjectRule tmp2 = new ObjectRule(lvlR,0);
+			tmp2.meta_type = ObjectRule.CRAFT_RULE;
+			tmp2.name = "Fusion "+i;
+			rules.add(tmp);
+			rules.add(tmp2);
+		}
+	}
+	
 	public void addDefaultRules()
 	{
 		// Inventory filter rules
@@ -1018,7 +1051,8 @@ public class Player implements Serializable {
 		tmp.pickup_rule = true;
 		tmp.system_rule = true;
 		rules.add(tmp);
-		tmp = new ObjectRule(17,0,1,ObjectRule.ITEM_RULE);
+		
+		tmp = new ObjectRule(18,0,1,ObjectRule.ITEM_RULE);
 		tmp.name = Local.EQUIPPED;
 		tmp.filter_rule = true;
 		rules.add(tmp);
@@ -1036,6 +1070,8 @@ public class Player implements Serializable {
 		tmp.avoid_rule = true;
 		tmp.name = Local.MONSTER_TOO_WEAK; rules.add(tmp);
 
+		
+		
 		// Shopping and sell rules
 	/*	tmp = new ObjectRule(2,1,2,ObjectRule.PLAYER_RULE);
 		tmp.shopping_rule = true;
@@ -1044,6 +1080,7 @@ public class Player implements Serializable {
 		tmp.sell_rule = true;
 		tmp.name = "Vente des déchets"; rules.add(tmp);*/
 
+		
 		for (int i=0; i< StaticItem.nb_pos-1 ; i++)
 		{
 			tmp = new ObjectRule(2,0,i,ObjectRule.ITEM_RULE);
@@ -1061,8 +1098,7 @@ public class Player implements Serializable {
 			rules.add(tmp);
 		}
 		
-		//	for (int i=0; i< rules.size() ; i++)
-		//		System.out.println(rules.get(i).desc());
+		addOptimizedRules();
 
 	}
 public Player()
@@ -1416,6 +1452,7 @@ public Player()
 	if(real) t_stats.addEvent(1.0,TimeStats.EVENT_FIGHT_ATTEMPT);
 	boolean has_flee = false;
 	crit_taken = 0;
+	int nb_coup = 0;
 	boolean lost;
 	Player p2 = mob;
 	if(disp) Game.MW.addLog(String.format(Local.A_VERSUS_B, name, p2.name,p2.level));
@@ -1438,6 +1475,12 @@ public Player()
 	
 	while (vie() >0 && p2.vie() >0)
 	    {
+		if(nb_coup >= universe.nombre_maximal_coup())
+			{
+				if(disp) Game.MW.addLog(String.format(Local.MUTUAL_FLEE,nb_coup,name,p2.name));
+				has_flee = true;
+				break;
+			}
 		if(this == t1 && real && must_flee())
 		    {
 			double t_att = universe.plage_random()*temps_fuite(); // Durée de la fuite
@@ -1460,10 +1503,11 @@ public Player()
 			    {
 				if(disp) Game.MW.addLog(String.format(Local.FLEE_FAIL,100-100*chance_fuite()));
 			    }
-		    }
+			}
 		else
 		    {
 			tmp = t1.cogne(t2, (real && this == t1));
+			nb_coup++;
 			if(disp) Game.MW.addLog(tmp);
 		    }
 		if(real && this == t1) 

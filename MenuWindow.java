@@ -30,7 +30,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 	this.setContentPane(getJFrameContentPane());
 	this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 	this.setLocation(new Point(0, 0));
-	this.setSize(new Dimension(300, 370));
+	this.setSize(new Dimension(300+Game.ADJUST_SIZE_X, 370+Game.ADJUST_SIZE_Y));
 	this.setResizable(false);
 	this.setTitle(Local.THEORYCRAFT);
 
@@ -41,7 +41,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 	{
 		creer.setVisible(true);
 		effacer.setVisible(true);
-		this.setSize(new Dimension(300, 370));
+		this.setSize(new Dimension(300+Game.ADJUST_SIZE_X, 370+Game.ADJUST_SIZE_Y));
 		this.setVisible(true);
 	}
 	
@@ -50,7 +50,7 @@ public class MenuWindow extends javax.swing.JDialog  {
 		refresh();
 		creer.setVisible(false);
 		effacer.setVisible(false);
-		this.setSize(new Dimension(300, 310));
+		this.setSize(new Dimension(300+Game.ADJUST_SIZE_X, 310+Game.ADJUST_SIZE_Y));
 		this.setVisible(true);
 	}
 	

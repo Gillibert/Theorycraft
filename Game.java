@@ -12,7 +12,10 @@ public class Game {
 	public static boolean FILL_SCORE = false;
 	public static boolean LOG_IN_FILE = true;
 	public static int LOG_WINDOW_MAX_LINES = 50;
+	public static int HOLIDAY = 0;
 	public static int LANG = 0;
+	public static int ADJUST_SIZE_X = 12;
+	public static int ADJUST_SIZE_Y = 12;
 	public static HiScore HI;
 
 	
@@ -160,7 +163,19 @@ public class Game {
 	    {
 			System.out.println("can't load theorycraft.config");
 	    }
-		
+	
+	Calendar cal = Calendar.getInstance();
+	int month = cal.get(Calendar.MONTH);
+	int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+	System.out.println("month="+month+" dayOfMonth="+dayOfMonth);
+	
+	if(month==0 && dayOfMonth==1) HOLIDAY = 1; // New year
+	if(month==4 && dayOfMonth==1) HOLIDAY = 2; // International Workers' Day
+	if(month==9 && dayOfMonth==31) HOLIDAY = 3; // Halloween
+	if(month==11 && dayOfMonth==25) HOLIDAY = 4; //Christmas
+	if(month==2 && dayOfMonth==20) HOLIDAY = 5; // Spring equinox
+	HOLIDAY = 3; // TODO REMOVE
+	
 	Local.init(LANG);
 	HI = HiScore.loadScore();
 	Monster.initZoo();

@@ -2,6 +2,7 @@ import java.util.*;
 import java.io.Serializable;
 
 class Item implements Serializable {
+static private final long serialVersionUID = 47195734;
 public static int ITEM_SHOP=1;
 public static int ITEM_DROP=2;
 
@@ -922,7 +923,13 @@ static class ComparateurItem implements Comparator<Item> {
 		return time;
 	}
 
-  
+	public static double HolidayDropMultiplier(Player p)
+	{
+		double res=1.0;
+		if (Game.HOLIDAY == 1 || Game.HOLIDAY == 4) {res = 2*p.bonus_vacances();}
+		return res;
+	}
+	
     public Item(double niveau, Player p, int iType)
     {
 	// sert à remplir l'inventaire d'un marchand
@@ -949,7 +956,7 @@ static class ComparateurItem implements Comparator<Item> {
 	if(Math.random() < p.universe.proba_ressource()) // ressource
 	    {
 		this.copy(get_ressouce_base(niveau,p));
-		qty = p.universe.quantite_ressource_base_drops()*p.multiplicateur_res()*p.universe.plage_random();
+		qty = p.universe.quantite_ressource_base_drops()*p.multiplicateur_res()*p.universe.plage_random()*HolidayDropMultiplier(p);
 		update_poids();
 	    }
 	else // objet de base ou magique ou rare
@@ -1030,8 +1037,9 @@ public void transform_rare(Player p)
 	return count;
 	}
 	
-	private int nb_ench()
+	public int nb_ench()
 	{
+	if (stackable) return 0;
 	int count = 0;
 	for(int i=0; i<Player.nb_stats; i++)
 	    {
