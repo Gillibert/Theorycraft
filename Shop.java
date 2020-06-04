@@ -10,10 +10,7 @@ public static String[] SurNames = Local.SHOP_SURNAMES;
 public Shop(Player p)
 	{
 	double levelD = p.niveau_boutique_base() * p.multiplicateur_niveau_boutique();
-	level = Math.floor(levelD);
-    double fPart = levelD - level;
-	if(Math.random() < fPart) {level++;}
-	
+	level = Math.ceil(levelD);
 	int nbitem =  StaticItem.getRandomInt(p.taille_boutique());
 	name = StaticItem.nameGenerator.getName() + " " + SurNames[(int)(Math.random()*SurNames.length)];
 	

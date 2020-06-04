@@ -16,6 +16,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
     private	JButton	toggle;
     private JButton	sell;
     private	JButton	buy;
+	private	JButton	autoshop;
     private	JButton	put;
     private	JButton	get;
     private	JButton	forge;
@@ -59,6 +60,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	this.setSize(new Dimension(610+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	sell.setVisible(false);
 	buy.setVisible(false);
+	autoshop.setVisible(false);
 	put.setVisible(false);
 	get.setVisible(false);
 	forge.setVisible(false);
@@ -66,6 +68,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	scroll2.setVisible(false);
 	destroy.setVisible(true);
 	buy.repaint();
+	autoshop.repaint();
 	sell.repaint();
 	scroll2.repaint();
 	put.repaint();
@@ -86,6 +89,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	this.setSize(new Dimension(805+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	sell.setVisible(true);
 	buy.setVisible(true);
+	autoshop.setVisible(true);
 	put.setVisible(false);
 	get.setVisible(false);
 	scroll2.setVisible(true);
@@ -93,6 +97,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	autoc.setVisible(false);
 	destroy.setVisible(false);
 	buy.repaint();
+	autoshop.repaint();
 	sell.repaint();
 	scroll2.repaint();
 	put.repaint();
@@ -113,6 +118,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	this.setSize(new Dimension(805+Game.ADJUST_SIZE_X, 420+Game.ADJUST_SIZE_Y));
 	sell.setVisible(false);
 	buy.setVisible(false);
+	autoshop.setVisible(false);
 	scroll2.setVisible(true);
 	put.setVisible(true);
 	get.setVisible(true);
@@ -120,6 +126,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	autoc.setVisible(true);
 	destroy.setVisible(true);
 	buy.repaint();
+	autoshop.repaint();
 	sell.repaint();
 	scroll2.repaint();
 	put.repaint();
@@ -379,6 +386,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 		    }
 		});
 	    buy.setMnemonic('a');
+	
 			
 	    put = new JButton();
 	    put.setBounds(new Rectangle(10+3*105, 365, 100, 21));
@@ -421,6 +429,20 @@ public class InventoryWindow extends javax.swing.JDialog  {
 				refresh(0);
 		    }
 		});
+		autoc.setMnemonic('o');
+		
+		autoshop = new JButton();
+	    autoshop.setBounds(new Rectangle(535+50, 365, 120, 21));
+	    autoshop.setText(Local.AUTOSHOP);
+	    autoshop.addActionListener(new java.awt.event.ActionListener() {
+		    public void actionPerformed(java.awt.event.ActionEvent e) {
+				Joueur.venteAuto();
+				Joueur.achatAuto();
+				idx_tmp = -2; // force le refresh complet
+				refresh(0);
+		    }
+		});
+	    autoshop.setMnemonic('o');
 		
 	    forge = new JButton();
 	    forge.setBounds(new Rectangle(535+50+105, 365, 100, 21));
@@ -450,6 +472,7 @@ public class InventoryWindow extends javax.swing.JDialog  {
 	    ivjJFrameContentPane.add(split);
 	    ivjJFrameContentPane.add(toggle);
 	    ivjJFrameContentPane.add(sell);
+		ivjJFrameContentPane.add(autoshop);
 	    ivjJFrameContentPane.add(buy);
 	    ivjJFrameContentPane.add(put);
 	    ivjJFrameContentPane.add(get);

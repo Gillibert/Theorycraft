@@ -494,8 +494,7 @@ public class MainWindow extends javax.swing.JDialog {
 	shop_cmd.setText(Local.SHOPPING);
 	shop_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		    venteAuto();
-		    achatAuto();
+			Joueur.get_shop();
 		    InvWindow.montre_shop();
 		}
 	    });
@@ -644,49 +643,12 @@ public class MainWindow extends javax.swing.JDialog {
 	{
 		for (ObjectRule r: Joueur.rules)
 		{
-			if(r.shopping_rule && r.IsTrue(Joueur,null,Joueur.mob)) {venteAuto(); achatAuto();}
+			if(r.shopping_rule && r.IsTrue(Joueur,null,Joueur.mob)) {Joueur.venteAuto(); Joueur.achatAuto();}
 			if(r.forge_rule && r.IsTrue(Joueur,null,Joueur.mob)) {Joueur.get_forge(); Joueur.craftAuto();}
 			if(r.dist_rule && r.IsTrue(Joueur,null,Joueur.mob)) Joueur.auto_dist();
 		}
 	}
 
-	
-	private boolean venteAutoCond(Item i)
-	{
-		for (ObjectRule r: Joueur.rules)
-			if(r.sell_rule && r.IsTrue(Joueur,i,null))
-				return true;
-		return false;
-	}
-
-	private boolean achatAutoCond(Item i)
-	{
-		for (ObjectRule r: Joueur.rules)
-			if(r.buy_rule && r.IsTrue(Joueur,i,null))
-				return true;
-		return false;
-	}
-
-	
-    private void venteAuto()
-    {
-	Joueur.get_shop();
-	ArrayList<Item> tmplst = new ArrayList<Item>();
-	for(Item the_object : Joueur.inventory)
-	    if(venteAutoCond(the_object) && !the_object.equiped)
-			tmplst.add(the_object);
-	Joueur.sell(tmplst);
-    }
-
-    private void achatAuto()
-    {
-	Joueur.get_shop();
-	ArrayList<Item> tmplst = new ArrayList<Item>();
-	for(Item the_object : Joueur.shop.inventory)
-	    if(achatAutoCond(the_object))
-			tmplst.add(the_object);
-	Joueur.buy(tmplst);
-    }
 
     public void addLog(String S)
     {

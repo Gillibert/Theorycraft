@@ -58,8 +58,8 @@ public class Courbes extends javax.swing.JDialog  {
 	
 	public void montre()
 	{
-	this.setVisible(true);
 	refresh();
+	this.setVisible(true);
 	}
 
 	public void refresh()

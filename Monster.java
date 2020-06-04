@@ -372,14 +372,14 @@ public static void initZoo()
 	*/
     }
 
-public static double MonsterLevelMultiplier(Universe u, boolean[] tags)
+public static double MonsterLevelMultiplier(Player p, boolean[] tags)
 {
 	double res = 1.0;
 	if(Game.HOLIDAY == 1 || Game.HOLIDAY == 2 || (tags[0] && Game.HOLIDAY == 3) 
 		|| (tags[4] && Game.HOLIDAY == 4) || (tags[1] && Game.HOLIDAY == 5))
 	{
-		if(Game.HOLIDAY == 2 || Game.HOLIDAY == 1) {res = 1.0/(2*u.joueur.bonus_vacances());}
-		else {res = 2*u.joueur.bonus_vacances();}
+		if(Game.HOLIDAY == 2 || Game.HOLIDAY == 1) {res = 1.0/(2*p.bonus_vacances());}
+		else {res = 2*p.bonus_vacances();}
 	}
 	return res;
 }
@@ -408,14 +408,16 @@ public Monster(double lev, Universe u, int zone)
 	else if (m.prefered_level < normalized_lev)
 		name += " " + fort(m.masculin);
 
-	level = lev;
 	tags = new boolean[nb_tags];
 	for(int t=0; t<nb_tags; t++) tags[t]=m.tags[t];
-
-	// Adjust name (Christmas, Halloween, International Workers' Day, Spring equinox)
-	double mul = MonsterLevelMultiplier(u,tags);
 	
+	// Adjust level for holiday (Christmas, Halloween, International Workers' Day, Spring equinox)
+	double mul = MonsterLevelMultiplier(u.joueur,tags);
+	// Adjust name for holiday (Christmas, Halloween, International Workers' Day, Spring equinox)
 	name = String.format(Local.HOLIDAY_FORMAT[Game.HOLIDAY],name); 
+
+	level = lev*mul;
+
 	double pts;
 
 	if(Math.random() > u.proba_champion() * u.map.boss_coeff.get(zone))

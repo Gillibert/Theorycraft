@@ -86,6 +86,14 @@ import java.util.*;
 		}
 		pts += achievementPts(ptmp);
 		
+		if(outs)
+		{
+			res += "<dt><b>Méta-man</b><dd>Accumulez des points de haut-faits<br>";
+			res += achievementStr(pts);
+		}
+		pts += achievementPts(pts);
+		
+		
 		p.points_haut_faits = pts;
 		
 		if(outs) {

@@ -15,7 +15,7 @@ public class Game {
 	public static int HOLIDAY = 0;
 	public static int LANG = 0;
 	public static int ADJUST_SIZE_X = 12;
-	public static int ADJUST_SIZE_Y = 12;
+	public static int ADJUST_SIZE_Y = 14;
 	public static HiScore HI;
 
 	
@@ -23,7 +23,7 @@ public class Game {
 	{
 		Player bestPlayer = new Player();
 		
-		for(int nlop=0; nlop<5; nlop++)
+		for(int nlop=0; nlop<1; nlop++)
 		{
 		System.out.println("nlop=" + nlop);
 		double best_time[] = new double[ChallengeList.list.size()];
@@ -31,7 +31,7 @@ public class Game {
 		best_time[0]=20000;
 		best_time[5]=900000;
 		
-		for(int i=0; i<100000; i++)
+		for(int i=0; i<50000; i++)
 		{
 		//if(i%100==0) System.out.println(i);
 		Universe U = new Universe(i);
@@ -117,7 +117,7 @@ public class Game {
 		if (joueur.temps_total <  best_time[cli])  best_time[cli] = joueur.temps_total;
 		if(joueur.defi.isCond() && joueur.defi.isTrue(joueur,false))
 			{
-			System.out.println(String.format("(%d) temps_total=%.2f level=%d (defaite=%d/%d) [%s]",i,joueur.temps_total,joueur.level,defaite_count,defaite_count+victory_count,joueur.defi.name));
+			System.out.println(String.format("(%d) temps_total=%.2f level=%f (defaite=%d/%d) [%s]",i,joueur.temps_total,joueur.level,defaite_count,defaite_count+victory_count,joueur.defi.name));
 			joueur.name = StaticItem.nameGenerator.getName();
 			joueur.victory();
 			if(joueur.level >= bestPlayer.level) bestPlayer = joueur;
@@ -126,7 +126,7 @@ public class Game {
 		{
 			joueur.name = StaticItem.nameGenerator.getName();
 			joueur.end_game();
-			System.out.println(String.format("(%d) temps_total=%.2f level=%d (defaite=%d/%d) [%s]",i,joueur.temps_total,joueur.level,defaite_count,defaite_count+victory_count,joueur.defi.name));
+			System.out.println(String.format("(%d) temps_total=%.2f level=%f (defaite=%d/%d) [%s]",i,joueur.temps_total,joueur.level,defaite_count,defaite_count+victory_count,joueur.defi.name));
 		}
 		if(joueur.defi.isCond() &&!joueur.defi.isTrue(joueur,false) && (cli==0 || cli==1))
 		{
@@ -147,11 +147,23 @@ public class Game {
 	
     public static void main(String args[])
     {
+	Calendar cal = Calendar.getInstance();
+	int month = cal.get(Calendar.MONTH);
+	int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+	
+	if(month==0 && dayOfMonth==1) HOLIDAY = 1; // New year
+	if(month==4 && dayOfMonth==1) HOLIDAY = 2; // International Workers' Day
+	if(month==9 && dayOfMonth==31) HOLIDAY = 3; // Halloween
+	if(month==11 && dayOfMonth==25) HOLIDAY = 4; //Christmas
+	if(month==2 && dayOfMonth==20) HOLIDAY = 5; // Spring equinox
+	
 	try{
 	    InputStream fileProp = new FileInputStream("theorycraft.config");
 		Properties prop = new Properties();
 		prop.load(fileProp);
 	    fileProp.close();
+		int fo = Integer.parseInt(prop.getProperty("FORCE_HOLIDAY"));
+		if(fo!=0) HOLIDAY=fo;
 		REAL_TIME = Boolean.parseBoolean(prop.getProperty("REAL_TIME"));
 		DEBUG_MODE_MAX_LOAD = Boolean.parseBoolean(prop.getProperty("DEBUG_MODE_MAX_LOAD"));
 		DEBUG_MODE_GIFT = Boolean.parseBoolean(prop.getProperty("DEBUG_MODE_GIFT"));
@@ -164,18 +176,6 @@ public class Game {
 			System.out.println("can't load theorycraft.config");
 	    }
 	
-	Calendar cal = Calendar.getInstance();
-	int month = cal.get(Calendar.MONTH);
-	int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-	System.out.println("month="+month+" dayOfMonth="+dayOfMonth);
-	
-	if(month==0 && dayOfMonth==1) HOLIDAY = 1; // New year
-	if(month==4 && dayOfMonth==1) HOLIDAY = 2; // International Workers' Day
-	if(month==9 && dayOfMonth==31) HOLIDAY = 3; // Halloween
-	if(month==11 && dayOfMonth==25) HOLIDAY = 4; //Christmas
-	if(month==2 && dayOfMonth==20) HOLIDAY = 5; // Spring equinox
-	HOLIDAY = 3; // TODO REMOVE
-	
 	Local.init(LANG);
 	HI = HiScore.loadScore();
 	Monster.initZoo();
@@ -185,8 +185,10 @@ public class Game {
 	if(FILL_SCORE==false)
 		MENU.montre_menu();
 	else 
-		fillScores();
-
-	//HI.cleanScores();
+	{
+		//HI.cleanScore();
+		//fillScores();
+		HI.fillScoresFromTheBest();
+	}
 	}
 }

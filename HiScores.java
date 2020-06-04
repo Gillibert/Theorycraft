@@ -74,7 +74,12 @@ public boolean addScore(Score news,boolean disp)
 	return res;
 }
 
-public void cleanScores()
+public void cleanScore()
+{
+	list.clear();
+}
+
+public void fillScoresFromTheBest()
 {
 	System.out.println("cleanScores");
 	int clsize = ChallengeList.list.size();
@@ -102,7 +107,6 @@ public void cleanScores()
 			list.add(ts2);
 		}
 	}
-	
 	save();
 }
 

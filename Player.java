@@ -388,6 +388,42 @@ public class Player implements Serializable {
 		{System.out.println("clean_list fail");}
 	}
 	
+	private boolean venteAutoCond(Item i)
+	{
+		for (ObjectRule r: rules)
+			if(r.sell_rule && r.IsTrue(this,i,null))
+				return true;
+		return false;
+	}
+
+	private boolean achatAutoCond(Item i)
+	{
+		for (ObjectRule r: rules)
+			if(r.buy_rule && r.IsTrue(this,i,null))
+				return true;
+		return false;
+	}
+	
+	public void venteAuto()
+    {
+	get_shop();
+	ArrayList<Item> tmplst = new ArrayList<Item>();
+	for(Item the_object : inventory)
+	    if(venteAutoCond(the_object) && !the_object.equiped)
+			tmplst.add(the_object);
+	sell(tmplst);
+    }
+
+    public void achatAuto()
+    {
+	get_shop();
+	ArrayList<Item> tmplst = new ArrayList<Item>();
+	for(Item the_object : shop.inventory)
+	    if(achatAutoCond(the_object))
+			tmplst.add(the_object);
+	buy(tmplst);
+    }
+	
 	public void craftAuto()
 	{
 		// Vide l'inventaire de la forge
@@ -417,8 +453,9 @@ public class Player implements Serializable {
 					rule_fail = r2.IsTrue(this,null,null) ; break;
 				}
 				boolean item_found = false;
+				// Un objet ne peut pas être équipé
 				for(Item the_object : inventory)
-					if(r2.IsTrue(this,the_object,null) && !crlist.contains(the_object))
+					if(the_object.equiped == false && r2.IsTrue(this,the_object,null) && !crlist.contains(the_object))
 					{
 						item_found = true;
 						crlist.add(the_object);
@@ -969,9 +1006,9 @@ public class Player implements Serializable {
 		refresh_stats_with_bonus();
 	}
 	
-	public int niveau_boutique_base() 
+	public double niveau_boutique_base() 
 	{ if(zone >= 2) 
-		return (int)(universe.get_zone_max_level(zone)*universe.niveau_boutique_pour_niveau_zone());
+		return universe.get_zone_max_level(zone)*universe.niveau_boutique_pour_niveau_zone();
 	  else
 		return 50*(zone+1); // Marchands peu puissants dans les arènes
 	}
@@ -1098,7 +1135,7 @@ public class Player implements Serializable {
 			rules.add(tmp);
 		}
 		
-		addOptimizedRules();
+		//addOptimizedRules();
 
 	}
 public Player()

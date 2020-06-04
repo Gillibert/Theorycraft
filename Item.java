@@ -220,6 +220,8 @@ public String item_description(Player p)
 
 static public Item get_ressouce_base(double il,Player p)
 {
+	if(il==0)
+		System.out.println("Get_ressouce_base called with il=0, seed="+p.universe.seed);
 	double obj_lev = Math.min((double)StaticItem.max_level-1,il);
 	if(Math.random() < p.universe.proba_orbe_niveau_drop(il))
 	{

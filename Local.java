@@ -238,6 +238,7 @@ public class Local {
 	public static String DISCARD;
 	public static String BUY;
 	public static String SALE;
+	public static String AUTOSHOP;
 	public static String DEPOSIT;
 	public static String PICK_UP;
 	public static String COMBINE;
@@ -516,6 +517,8 @@ public class Local {
 	public static String H3_HOLIDAYS_H3;
 	public static String HOLIDAY_LVL_MULT;
 	public static String HOLIDAY_DROP_MULT;
+	public static String HOLIDAY_PRECIPITATION_MULT;
+	public static String HOLIDAY_TEMPERATURE_MULT;
 	public static String MUTUAL_FLEE;
 	
 	public static void init(int lang)
@@ -895,6 +898,7 @@ public class Local {
 		DISCARD = "Jeter";
 		BUY = "Acheter";
 		SALE = "Vendre";
+		AUTOSHOP = "Auto-shopping";
 		DEPOSIT = "Déposer";
 		PICK_UP = "Ramasser";
 		COMBINE = "Combiner";
@@ -1177,6 +1181,9 @@ public class Local {
 		H3_HOLIDAYS_H3 = "<h3>Effet des vacances (%s) :</h3>";
 		HOLIDAY_LVL_MULT = "<li>Muliplicateur de niveau pour %s : %g";
 		HOLIDAY_DROP_MULT = "<li>Muliplicateur de ressources : %g";
+		HOLIDAY_PRECIPITATION_MULT = "<li>Muliplicateur de précipitations : %g";
+		HOLIDAY_TEMPERATURE_MULT = "<li>Muliplicateur de température : %g";
+		
 		MUTUAL_FLEE = "Le combat s'éternise. Après %d coups échangés, %s et %s abandonnent tous les deux.";
 		
 		PLAYER_INFOS = getPlayerInfos();
@@ -1559,6 +1566,7 @@ public class Local {
 		DISCARD = "Discard";
 		BUY = "Buy";
 		SALE = "Sale";
+		AUTOSHOP = "Auto-shopping";
 		DEPOSIT = "Deposit";
 		PICK_UP = "Pick up";
 		COMBINE = "Combine";
@@ -1840,6 +1848,8 @@ public class Local {
 		H3_HOLIDAYS_H3 = "<h3>Holiday effects (%s):</h3>";
 		HOLIDAY_LVL_MULT = "<li>%s level multiplier: %g";
 		HOLIDAY_DROP_MULT = "<li>Resources multiplier: %g";
+		HOLIDAY_PRECIPITATION_MULT = "<li>Precipitation multiplier: %g";
+		HOLIDAY_TEMPERATURE_MULT = "<li>Temperature multiplier: %g";
 		MUTUAL_FLEE = "The fight is taking forever. After %d attacks, %s and %s both give up.";
 		
 		PLAYER_INFOS = getPlayerInfos();

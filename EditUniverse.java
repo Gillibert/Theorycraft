@@ -233,7 +233,9 @@ public class EditUniverse extends javax.swing.JDialog  {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) 
 				{
-					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_divins_a_distribuer())))*0.5,5.0);
+					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_divins_a_distribuer())))*0.5,5.);
+					double cpts = Joueur.universe.points_divins[table.getSelectedRow()];
+					if(cpts<0 && step>Math.abs(cpts)) step=Math.abs(cpts);
 					plus(step);
 				}
 				else plus(1.0);
@@ -248,7 +250,9 @@ public class EditUniverse extends javax.swing.JDialog  {
 		    public void actionPerformed(java.awt.event.ActionEvent e) {
 				if((e.getModifiers() & InputEvent.SHIFT_MASK) != 0)
 				{
-					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_divins_a_distribuer())))*0.5,5.0);
+					double step = Math.max(Math.pow(10.0,Math.floor(Math.log10(Joueur.points_divins_a_distribuer())))*0.5,5.);
+					double cpts = Joueur.universe.points_divins[table.getSelectedRow()];
+					if(cpts>0 && step>cpts) step=cpts;
 					moins(step);
 				}
 				else moins(1.0);

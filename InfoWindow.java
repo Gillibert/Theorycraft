@@ -136,9 +136,11 @@ public class InfoWindow extends javax.swing.JDialog  {
 			for(int i=0; i<Joueur.nb_tags; i++)
 			{
 				boolean[] tags = new boolean[Joueur.nb_tags]; tags[i]=true;
-				res += String.format(Local.HOLIDAY_LVL_MULT,Local.TAGS_NAME[i],Monster.MonsterLevelMultiplier(Joueur.universe,tags));
+				res += String.format(Local.HOLIDAY_LVL_MULT,Local.TAGS_NAME[i],Monster.MonsterLevelMultiplier(Joueur,tags));
 			}
 			res += String.format(Local.HOLIDAY_DROP_MULT,Item.HolidayDropMultiplier(Joueur));
+			res += String.format(Local.HOLIDAY_PRECIPITATION_MULT,Map.HolidayPrecipitationMultiplier(Joueur));
+			res += String.format(Local.HOLIDAY_TEMPERATURE_MULT,Map.HolidayTemperatureMultiplier(Joueur));
 			res += "</ul>";
 			
 			

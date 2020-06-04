@@ -61,7 +61,14 @@ public class DrawMap extends JPanel {
 		tmp = Joueur.universe.map.zonesR.get(i);
 		g.fillRect(tmp.x, tmp.y, tmp.width, tmp.height);
 	    }
+		
 
+		g.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER,0.4f));
+		int radius = 8;
+		tmp = Joueur.universe.map.zonesR.get(Joueur.zone);
+		g.setColor(Color.black);
+		g.fillOval(tmp.x+tmp.width/2-radius, tmp.y+tmp.height/2-radius, 2*radius, 2*radius);
+		
 		g.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER,1.0f));
 		if (mzl < Joueur.universe.get_zone_level(zone))
 		    the_color = Color.red;

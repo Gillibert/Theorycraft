@@ -860,7 +860,9 @@ import java.util.*;
 	
 	public double get_current_temperature(int i)
 	{
-		return get_adjusted_temperature(i,map.current_temperature_modifier.get(i));
+		double mul=1.0;
+		if (joueur!=null) mul = Map.HolidayTemperatureMultiplier(joueur);
+		return get_adjusted_temperature(i,map.current_temperature_modifier.get(i)*mul);
 	}
 	
 	public double get_temperature(int i)
@@ -878,7 +880,9 @@ import java.util.*;
 	
 	public double get_current_precipitation(int i)
 	{
-		return get_adjusted_precipitation(i,map.current_precipitation_modifier.get(i));
+		double mul=1.0;
+		if (joueur!=null) mul = Map.HolidayPrecipitationMultiplier(joueur);
+		return get_adjusted_precipitation(i,map.current_precipitation_modifier.get(i)*mul);
 	}
 	
 	public double get_precipitation(int i)

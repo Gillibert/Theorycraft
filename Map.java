@@ -285,6 +285,22 @@ public class Map implements Serializable {
 		}*/
 		}
 	
+	public static double HolidayPrecipitationMultiplier(Player p)
+	{
+		double res=1.0;
+		if (Game.HOLIDAY == 4 || Game.HOLIDAY == 3) {res = 2*p.bonus_vacances();}
+		if (Game.HOLIDAY == 2 || Game.HOLIDAY == 5) {res = 1.0/(2*p.bonus_vacances());}
+		return res;
+	}
+	
+	public static double HolidayTemperatureMultiplier(Player p)
+	{
+		double res=1.0;
+		if (Game.HOLIDAY == 4) {res = 1.0/(2*p.bonus_vacances());}
+		if (Game.HOLIDAY == 2 || Game.HOLIDAY == 5) {res = 2*p.bonus_vacances();}
+		return res;
+	}
+	
 	public int get_zone(int x, int y, int nombre_zones) {
 		Rectangle pr = new Rectangle(x-4, y-24, 3, 3);
 		int count = 0;
