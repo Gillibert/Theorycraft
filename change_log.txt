@@ -1,6 +1,38 @@
+Version 1.3 21/04/2020 "More automation"
+CHANGE : Le niveau des monstres peut désormais dépasser la capacité d'un entier 32 bits.
+CHANGE : Le niveau des pièges peut désormais dépasser la capacité d'un entier 32 bits.
+CHANGE : C'est une équation qui régit désormais le niveau d'efficacité des objets en fonction du niveau des monstres.
+CHANGE : C'est une équation qui régit désormais le niveau d'enchantement des objets en fonction du niveau des monstres.
+CHANGE : Le niveau des pièges peut désormais dépasser le niveau de la zone et est régi par une équation.
+CHANGE : Les règles composées peuvent maintenant faire intervenir un nombre arbitraire de clauses.
+CHANGE : Refonte du système de haut-faits.
+CHANGE : Refonte des objets et du système de butin.
+CHANGE : Les règles de vente et d'achat automatique ne s'appliquent plus à l'ouverture de la fenêtre d'un marchand.
+
+FEATURE : La durée de combats est désormais limitée en nombre de coups. Cette limite peut être modifiée avec des points divins.
+FEATURE : Ajout des "vacances", des dates particulières où certains mécanismes du jeu sont modifiés.
+FEATURE : Les vacances affectent la température, les précipitations, le niveau des monstres et le butin ramassé.
+FEATURE : Ajout d'un système de solde et d'une constante définissant la probabilité qu'un objet soit soldés.
+FEATURE : Les objets soldés peuvent être achetés à prix cassé, mais sont aussi revendus à prix réduit.
+FEATURE : Si un objet soldé est utilisé dans la forge, la sortie sera aussi un objet soldé (pour la plupart des formules).
+FEATURE : Ajout d'un système permettant d'automatiser la distribution des points de compétences.
+FEATURE : Ajout d'un système de priorité pour les points de compétences, utilisée lors de leur distribution automatique.
+FEATURE : Ajout de règles pour filtrer les objets soldés.
+FEATURE : Ajout de règles pour filtrer les orbes en fonction de leur nom.
+FEATURE : Ajout de règles pour filtrer les objets en fonction du nombre d'enchantements.
+FEATURE : Ajout de règles pour la recherche automatique d'une forge mystique.
+FEATURE : Ajout de règles pour automatiser le crafting.
+FEATURE : Ajout des compétences "Promophile", "Affinité à la sous-charge", "Affinité au haut-faits" et "Affinité aux vacances".
+
+FIX : Il n'est plus possible de voir une règle concernant un autre joueur après avoir chargé une sauvegarde.
+FIX : La liste des héros est désormais correctement rafraichie quand on charge une sauvegarde.
+FIX : L'écran d'édition d'univers pouvait parfois arrêter d'afficher le texte décrivant les équations.
+FIX : Reformulation sur la façon dont l'initiative fonctionne face aux pièges.
+FIX : Le jeu ne crash plus en générant un marchand de niveau 0 dans le cas où la première zone est très bas niveau.
+
 Version 1.2 15/01/2019 "Climate change"
 FEATURE : Ajout d'un système de haut-faits.
-FEATURE : Les points de haut-faits augmentent la compétence Recherche de ressources.
+FEATURE : Les points de haut-faits augmentent la compétence "Recherche de ressources".
 FEATURE : Ajout des super-champions.
 FEATURE : Il est désormais possible de dépasser la charge maximale, moyennant une pénalité.
 FEATURE : Ajout d'informations sur les monstres.
@@ -43,7 +75,7 @@ FEATURE : Ajout d'un fichier theorycraft.config permettant de configurer le jeu.
 FEATURE : Voyager prend maintenant du temps (via le système de pénalités).
 FEATURE : Ajout d'un log gardant une trace complète de la partie (fichier .log portant le nom du héros).
 FEATURE : Ajout de courbes sur les dépenses et les pertes, le butin de base en or, le niveau relatif des champions, les points divins en fonction du nombre d'orbes sacrifiés et du niveau, l'expérience rapportée par les monstres et les pièges, et les nouvelles compétences.
-FEATURE : Ajout de statistiques sur les dépenses et les pertes (achat chez les marchands, pénalités liées à la mort).
+FEATURE : Ajout de statistiques sur les dépenses et les pertes (achats chez les marchands, pénalités liées à la mort).
 FEATURE : Les zones ont maintenant une propriété propre déterminant localement la probabilité de rencontrer un champion ou un piège.
 FEATURE : Ajout d'un système d'arènes. Dans les arènes il n'y a presque pas de pièges et de champions et les monstres ne donnent pas de butin.
 FEATURE : Il est désormais possible de séparer des objets chez les marchands.
