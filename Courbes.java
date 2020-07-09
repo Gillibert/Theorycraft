@@ -181,7 +181,7 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case -11:
 		{
-			curve_to_draw.title = Local.LOOKING_FOR_TRADER;
+			curve_to_draw.title = Local.LOOKING_FOR_SELLER;
 			curve_to_draw2.title = Local.LOOKING_FOR_MYSTIC_FORGE;
 			curve_to_draw3.title = Local.CRAFTING;
 			int asize = Joueur.t_stats.data.size();
@@ -620,7 +620,7 @@ public class Courbes extends javax.swing.JDialog  {
 		case 14:
 			{
 			curve_to_draw.title = Local.FINDING_A_MONSTER;
-			curve_to_draw2.title = Local.FINDING_A_TRADER;
+			curve_to_draw2.title = Local.FINDING_A_SELLER;
 			curve_to_draw3.title = Local.FINDING_A_FORGE;
 			for (int x = 0; x< sizar; x++)
 				{
@@ -1331,7 +1331,6 @@ public class Courbes extends javax.swing.JDialog  {
 		break;
 		case 69:
 			{
-
 			curve_to_draw.title = Local.DISCOUNT_PRICE_MULTIPLIER;
 			
 			for (int x = 0; x< sizar; x++)
@@ -1339,6 +1338,18 @@ public class Courbes extends javax.swing.JDialog  {
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 				curve_to_draw.arr_x[x] = tx;
 				curve_to_draw.arr_y[x] = Joueur.universe.discount_multiplier(tx);
+			}
+			}
+		break;
+		case 70:
+			{
+			curve_to_draw.title = Local.ADDITIONAL_COSMIC_POINTS;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.cosmologie(tx);
 			}
 			}
 		break;

@@ -45,7 +45,7 @@ public class LevelUp extends javax.swing.JDialog  {
 	    {
 		rowData[i][1] = String.format("%g",Joueur.stats[i]);
 		rowData[i][2] = String.format("%g",Joueur.item_bonus[i]);
-		rowData[i][3] = String.format("%g",Joueur.stats[i]+Joueur.item_bonus[i]);
+		rowData[i][3] = String.format("%g",Joueur.stats_with_bonus[i]);
 		rowData[i][4] = String.format("%d",Joueur.auto_dist_coeff[i]);
 	    }
 	table.repaint();
@@ -78,10 +78,9 @@ public class LevelUp extends javax.swing.JDialog  {
 	    table.getColumnModel().getColumn(4).setPreferredWidth(90);
 		table.getTableHeader().setReorderingAllowed(false);
 		
-	    javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
-		    public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh();}};
-				
-	    table.getSelectionModel().addListSelectionListener(refresher);
+	    //javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
+		//    public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh();}};
+		//table.getSelectionModel().addListSelectionListener(refresher);
 			
 	    prompt = new JLabel();
 	    prompt.setBounds(new Rectangle(10, 3, 400, 23));

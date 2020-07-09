@@ -28,6 +28,7 @@ public class Local {
 	public static String[] EDIT_UNIVERSE_COLUMN_NAMES;
 	public static String[] HOLIDAY_NAME;
 	public static String[] HOLIDAY_FORMAT;
+	public static String[] RANDOM_CLASS_NAME;
 	
 	public static String COLON;
 	public static String SECONDS;
@@ -56,7 +57,7 @@ public class Local {
 	public static String SHORT_INFOS;
 	public static String LEVEL_N;
 	public static String LOOKING_FOR_AN_ENNEMY;
-	public static String LOOKING_FOR_A_TRADER;
+	public static String LOOKING_FOR_A_SELLER;
 	public static String ENCOUNTER;
 	public static String LOOKING_FOR_A_MYSTIC_FORGE;
 	public static String A_HITS_B;
@@ -94,7 +95,7 @@ public class Local {
 	public static String REGENERATION;
 	public static String PENALTIES;
 	
-	public static String LOOKING_FOR_TRADER;
+	public static String LOOKING_FOR_SELLER;
 	public static String LOOKING_FOR_MYSTIC_FORGE;
 	public static String CRAFTING;
 	
@@ -116,6 +117,9 @@ public class Local {
 	public static String DIVINE_POINTS;
 	public static String DIVINE_POINTS_ORBS;
 	public static String DIVINE_POINTS_LEVEL;
+	public static String COSMIC_POINTS;
+	public static String COSMIC_POINTS_ORBS;
+	public static String COSMIC_POINTS_GOLD;
 	public static String SKILL_POINTS_ORBS;
 	public static String MONSTER_LEVEL;
 	public static String CHAMPIONS_LEVEL;
@@ -159,7 +163,7 @@ public class Local {
 	public static String INITIATIVE_BONUS_AGAINST_A_TRAP;
 	public static String INITIATIVE_TIME_AGAINST_A_TRAP;
 	public static String FINDING_A_MONSTER;
-	public static String FINDING_A_TRADER;
+	public static String FINDING_A_SELLER;
 	public static String FINDING_A_FORGE;
 
 	public static String MAXIMUM_LOAD;
@@ -275,7 +279,6 @@ public class Local {
 	public static String THIS_IS_SPARTA;
 	public static String BEGGAR;
 	public static String GROCER;
-	public static String TRADER;
 	public static String BANKER;
 	public static String BILL_GATES;
 	public static String WIRT_THE_PEG_LEG;
@@ -520,6 +523,14 @@ public class Local {
 	public static String HOLIDAY_PRECIPITATION_MULT;
 	public static String HOLIDAY_TEMPERATURE_MULT;
 	public static String MUTUAL_FLEE;
+	public static String BLACK_HOLE;
+	public static String ADDITIONAL_COSMIC_POINTS;
+	public static String MAXIMUM_OBJECT_QUALITY_LOOT;
+	public static String MAXIMUM_OBJECT_QUALITY_CRAFT;
+	public static String MAXIMUM_OBJECT_QUALITY_LOOT_S;
+	public static String MAXIMUM_OBJECT_QUALITY_CRAFT_S;
+	public static String CLASS;
+	public static String CHOICE_OF_CLASS;
 	
 	public static void init(int lang)
 	{
@@ -528,6 +539,7 @@ public class Local {
 		LANG = lang;
 		String[] tmp1 = {"Mort-vivant","Animal","Humain","Peau-verte","Démon","Champion"};
 		TAGS_NAME = tmp1;
+		
 		String[] tmp2 = {"Vitesse d'attaque", "Dégâts", "Réduction", "Absorption", "Esquive", "Précision",
 		"Chance de coup critique", "Dégâts des coups critiques", "Vol de vie", "Vitalité", "Constitution", "Régénération", 
 		"Résurrection", "Charge maximale", "Vitesse de marche", "Recherche de ressources","Recherche d'objets magiques",
@@ -537,7 +549,7 @@ public class Local {
 		"Vitesse du temps","Épines","Représailles","Nécrophagie",
 		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
 		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Affinité aux vacances", "Accro du shopping", "Promophile"};
+		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Affinité aux vacances", "Accro du shopping", "Promophile","Cosmologie"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
@@ -664,7 +676,7 @@ public class Local {
 		"Pénalité de temps à chaque mort",
 		"Pénalité d'or à chaque mort",
 		"Plage aléatoire",
-		"Qualité maximale des objets",
+		"Niveau maximal",
 		"Expérience pour le sacrifice d'un orbe",
 		"Température idéale",
 		"Niveau des marchands (pourcentage du niveau de la zone)",
@@ -676,7 +688,13 @@ public class Local {
 		"Muliplicateur des points de compétences (super-champions)",
 		"Coefficient d'efficacité de base",
 		"Puissance maximale des enchantements",
-		"Nombre maximal de coups échangés dans un combat"};
+		"Nombre maximal de coups échangés dans un combat",
+		"Multiplicateur de puissance des alliages",
+		"Limite d'effondrement de l'inventaire",
+		"Probabilité d'effondrement de l'inventaire",
+		"Bonus additif de classe",
+		"Bonus multiplicatif de classe",
+		"Malus multiplicatif de classe"};
 		UNIVERSE_STATS_NAME = tmp19;
 		
 		String[] tmp20 = {"Pas de vacances","Nouvel an","Fête du travail","Halloween","Noël","Équinoxe du printemps"};
@@ -684,6 +702,9 @@ public class Local {
 		
 		String[] tmp21 = {"%s","%s ivre","%s en grève","%s d'Halloween","%s de Noël","%s printanier"};
 		HOLIDAY_FORMAT = tmp21;
+		
+		String[] tmp22 = {"Disciple de %s","Condisciple de %s","Rejeton de %s","Héritier de %s","Élève de %s","Apprenti de %s"};
+		RANDOM_CLASS_NAME = tmp22;
 		
 		COLON = " :";
 		SECONDS = "secondes";
@@ -703,7 +724,7 @@ public class Local {
 		LEVEL_N = "Niveau %.0f\n";
 		
 		LOOKING_FOR_AN_ENNEMY = "Recherche d'un ennemi : %g secondes";
-		LOOKING_FOR_A_TRADER = "Recherche d'un marchand : %g secondes";
+		LOOKING_FOR_A_SELLER = "Recherche d'un marchand : %g secondes";
 		ENCOUNTER = "%s rencontre %s (niveau %g)";
 		LOOKING_FOR_A_MYSTIC_FORGE = "Recherche d'une forge : %g secondes";
 		A_HITS_B = "%s frappe %s en %g secondes (temps total pour %s : %g)\n";
@@ -753,7 +774,7 @@ public class Local {
 		INITIATIVE = "Initiative";
 		ATTACK = "Attaque";
 		FLEE = "Fuite";
-		LOOKING_FOR_TRADER = "Recherche de marchand";
+		LOOKING_FOR_SELLER = "Recherche de marchand";
 		LOOKING_FOR_MYSTIC_FORGE = "Recherche de forge";
 		CRAFTING = "Crafting";
 		LOSSES_AND_EXPENSES = "Pertes et dépenses";
@@ -778,6 +799,9 @@ public class Local {
 		DIVINE_POINTS = "Points divins";
 		DIVINE_POINTS_ORBS = "Points divins (en fonction des orbes sacrifiés)";
 		DIVINE_POINTS_LEVEL = "Points divins (en fonction du niveau)";
+		COSMIC_POINTS = "Points cosmiques";
+		COSMIC_POINTS_ORBS = "Points cosmiques (en fonction des orbes sacrifiés)";
+		COSMIC_POINTS_GOLD = "Points cosmiques (en fonction du prix des objets perdus)";
 		SKILL_POINTS_ORBS = "Points de compétences (en fonction des orbes sacrifiés)";
 		MONSTER_LEVEL = "Niveau des monstres";
 		CHAMPIONS_LEVEL = "Niveau des champions (relatif aux monstres)";
@@ -822,7 +846,7 @@ public class Local {
 		INITIATIVE_BONUS_AGAINST_A_TRAP = "Multiplicateur d'initiative face à un piège";
 		INITIATIVE_TIME_AGAINST_A_TRAP = "Temps d'initiative face à un piège";
 		FINDING_A_MONSTER = "Traque d'un adversaire";
-		FINDING_A_TRADER = "Recherche d'un marchand";
+		FINDING_A_SELLER = "Recherche d'un marchand";
 		FINDING_A_FORGE = "Recherche d'une forge";
 		
 		
@@ -935,7 +959,6 @@ public class Local {
 		THIS_IS_SPARTA = "This Is Sparta";
 		BEGGAR = "Mendiant";
 		GROCER = "Épicier";
-		TRADER = "Trader";
 		BANKER = "Banquier";
 		BILL_GATES = "Bill Gates";
 		WIRT_THE_PEG_LEG = "Wirt The Peg-Leg";
@@ -950,12 +973,12 @@ public class Local {
 		BILL_BOSS = "Bill";
 		GOAL = "\nObjectif : ";
 		REACH_LEVEL = "atteindre le niveau %d";
-		WIN_GOLD_COINS = "gagner %d pièces d'or";
+		WIN_GOLD_COINS = "gagner %d écus";
 		DEFEAT_BOSS = "vaincre %s";
 		LEVEL_REACHED_VICTORY = "Niveau %d atteint, victoire !";
 		YOU_MUST_BE_AT_LEAST_LEVEL = "%s doit être au moins niveau %d pour gagner.";
-		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possède %d pièces d'or, victoire !";
-		YOU_MUST_POSSESS_AT_LEAST = "%s doit posséder au moins %d pièces d'or pour gagner.";
+		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possède %d écus, victoire !";
+		YOU_MUST_POSSESS_AT_LEAST = "%s doit posséder au moins %d écus pour gagner.";
 
 		CHOOSE_A_SEED = "Choisissez une graine (un entier naturel)\n 0 pour les règles classiques";
 		CREATE_A_UNIVERSE = "Création d'un univers";
@@ -1089,9 +1112,9 @@ public class Local {
 
 		HTML_BODY = "<html><body>";
 		PLAYER_STATISTICS = "Statistiques sur le joueur";
-		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %.0f<br>\nDéfi : %s<br>\nTemps total de jeu : %g secondes<br>\nOr : %g<br>\nCharge : %g / %g<br>\nExpérience : %g<br>\nTotal des points de compétences : %g (%g orbes sacrifiés)<br>\nTotal des points divins : %g (%g orbes sacrifiés)<br>";
+		PLAYER_STATISTICS_LIST = "Nom : %s<br>\nNiveau : %.0f<br>\nDéfi : %s<br>\nTemps total de jeu : %g secondes<br>\nOr : %g<br>\nCharge : %g / %g<br>\nExpérience : %g (%g orbes sacrifiés)<br>\nTotal des points de compétences : %g (%g orbes sacrifiés)<br>\nTotal des points divins : %g (%g orbes sacrifiés)<br>\nTotal des points cosmiques : %g (%g orbes sacrifiés)<br>\nValeur totale des objets perdus dans des trous noirs : %g<br>";
 		UNIVERSE_CONST = "<br>Constantes de l'univers :<ul>";
-		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>Univers : %d<br>Nombre de voyages dimensionnels : %d<br>Vacances : %s<br>Niveau maximal du joueur : %d";
+		UNIVERSE_INFORMATION_LIST = "<h2>Informations sur l'univers</h2>Univers : %d<br>Nombre de voyages dimensionnels : %d<br>Vacances : %s";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Objets disponibles :</h3>";
 		H3_UNAVAILABLE_OBJECTS_H3 = "<h3>Objets indisponibles :</h3>";
 		BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS = "<h3>Répartition de base des points des monstres</h3><ul>";
@@ -1185,6 +1208,15 @@ public class Local {
 		HOLIDAY_TEMPERATURE_MULT = "<li>Muliplicateur de température : %g";
 		
 		MUTUAL_FLEE = "Le combat s'éternise. Après %d coups échangés, %s et %s abandonnent tous les deux.";
+		BLACK_HOLE = "L'inventaire de %s contient plus de %d objets différents. Il s'effondre et un trou noir se forme (%g%% de probabilité).\n%s recoit %g points cosmiques (%d objets sont détruits, pour une valeur totale de %g écus).";
+		ADDITIONAL_COSMIC_POINTS = "Points cosmiques additionnels";
+		MAXIMUM_OBJECT_QUALITY_LOOT = "Qualité maximale des objets en fonction des points cosmiques (butin)";
+		MAXIMUM_OBJECT_QUALITY_CRAFT = "Qualité maximale des objets en fonction des points cosmiques (crafting)";
+		
+		MAXIMUM_OBJECT_QUALITY_LOOT_S = "Qualité maximale des objets (butin)";
+		MAXIMUM_OBJECT_QUALITY_CRAFT_S = "Qualité maximale des objets (crafting)";
+		CLASS = "Classe";
+		CHOICE_OF_CLASS = "Choix de la classe";
 		
 		PLAYER_INFOS = getPlayerInfos();
 		UNIVERSE_EQUATIONS_NAME = getEquationName();
@@ -1204,7 +1236,7 @@ public class Local {
 		"Speed of time","Thorns","Reprisals","Necrophagy",
 		"Speed of craft", "Craft performance", "Saving orbs", 
 		"Merchant level", "Merchant inventory", 
-		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Holiday affinity","Shopping addict","Discount specialist"};
+		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Holiday affinity","Shopping addict","Discount specialist","Cosmology"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"junk","fabric/leather","metal","gemstone","conceptual","alloy"};
@@ -1331,7 +1363,7 @@ public class Local {
 		"Time penalty at each death",
 		"Gold penalty at each death ",
 		"Random range",
-		"Objects maximal quality",
+		"Maximum level",
 		"Experience for the sacrifice of an orb",
 		"Ideal temperature",
 		"Merchant level (percentage of zone level)",
@@ -1343,7 +1375,13 @@ public class Local {
 		"Super-champions skill points multiplier",
 		"Basic efficiency coefficient",
 		"Maximum enchantment power",
-		"Maximal length of a fight (number of attacks)"};
+		"Maximal length of a fight (number of attacks)",
+		"Alloy power multiplier",
+		"Inventory collapse limit",
+		"Inventory collapse probability",
+		"Class bonus (additive)",
+		"Class bonus (multiplicative)",
+		"Class malus (multiplicative)"};
 		UNIVERSE_STATS_NAME = tmp19;
 		
 		String[] tmp20 = {"No holiday","New year","International Workers' Day","Halloween","Christmas","Spring equinox"};
@@ -1351,6 +1389,9 @@ public class Local {
 		
 		String[] tmp21 = {"%","Drunken %s","%s on strike","Halloween %s","Christmas %s","Spring %s"};
 		HOLIDAY_FORMAT = tmp21;
+		
+		String[] tmp22 = {"Disciple of %s", "Classmate of %s", "Spawn of %s", "Heir of %s", "Student of %s", "Apprentice of %s"};
+		RANDOM_CLASS_NAME = tmp22;
 		
 		COLON = ":";
 		SECONDS = "seconds";
@@ -1370,7 +1411,7 @@ public class Local {
 		LEVEL_N = "Level %.0f\n";
 		
 		LOOKING_FOR_AN_ENNEMY = "Looking for an ennemy: %g seconds";
-		LOOKING_FOR_A_TRADER = "Looking for a trader: %g seconds";
+		LOOKING_FOR_A_SELLER = "Looking for a seller: %g seconds";
 		ENCOUNTER = "%s encounters %s (level %g)";
 		LOOKING_FOR_A_MYSTIC_FORGE = "Looking for a mystic forge: %g seconds";
 		A_HITS_B = "%s hits %s in %g seconds (total time for %s: %g)\n";
@@ -1420,7 +1461,7 @@ public class Local {
 		INITIATIVE = "Initiative";
 		ATTACK = "Attack";
 		FLEE = "Flee";
-		LOOKING_FOR_TRADER = "Looking for trader";
+		LOOKING_FOR_SELLER = "Looking for seller";
 		LOOKING_FOR_MYSTIC_FORGE = "Looking for forge";
 		CRAFTING = "Crafting";
 		LOSSES_AND_EXPENSES = "Losses and expenses";
@@ -1447,6 +1488,10 @@ public class Local {
 		SUPER_CHAMPIONS_LEVEL = "Super-champions level (relative to monsters)";
 		BASE_MONSTER_LEVEL = "Base monsters level (relative)";
 		TRAP_LEVEL = "Trap level (relative to zone level)";
+		
+		COSMIC_POINTS = "Cosmic points";
+		COSMIC_POINTS_ORBS = "Cosmic points (for a given number of sacrificed orbs)";
+		COSMIC_POINTS_GOLD = "Cosmic points (for a given price of lost items)";
 		
 		DIVINE_POINTS = "Divine points";
 		DIVINE_POINTS_ORBS = "Divine points (for a given number of sacrificed orbs)";
@@ -1491,7 +1536,7 @@ public class Local {
 		INITIATIVE_BONUS_AGAINST_A_TRAP = "Initiative multiplier against a trap";
 		INITIATIVE_TIME_AGAINST_A_TRAP = "Initiative time against a trap";
 		FINDING_A_MONSTER = "Finding a monster";
-		FINDING_A_TRADER = "Finding a trader";
+		FINDING_A_SELLER = "Finding a seller";
 		FINDING_A_FORGE = "Finding a forge";
 
 		MAXIMUM_LOAD = "Maximum load";
@@ -1602,7 +1647,6 @@ public class Local {
 		THIS_IS_SPARTA = "This Is Sparta";
 		BEGGAR = "Beggar";
 		GROCER = "Grocer";
-		TRADER = "Trader";
 		BANKER = "Banker";
 		BILL_GATES = "Bill Gates";
 		WIRT_THE_PEG_LEG = "Wirt The Peg-Leg";
@@ -1757,10 +1801,10 @@ public class Local {
 		
 		HTML_BODY = "<html><body>";
 		PLAYER_STATISTICS = "Player statistics";
-		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %.0f <br>\nChallenge: %s <br>\nTotal game time: %g seconds <br>\nGold: %g <br>\nLoad: %g / %g<br>\nExperience: %g<br>\nTotal skill points: %g (%g sacrificed orbs)<br>Total divine points: %g (%g sacrificed orbs)";
-		
+		PLAYER_STATISTICS_LIST = "Name: %s <br>\nLevel: %.0f <br>\nChallenge: %s <br>\nTotal game time: %g seconds <br>\nGold: %g <br>\nLoad: %g / %g<br>\nExperience: %g (%g sacrificed orbs)<br>\nTotal skill points: %g (%g sacrificed orbs)<br>Total divine points: %g (%g sacrificed orbs)<br>Total cosmic points: %g (%g sacrificed orbs)<br>\nTotal value of the objects lost in black holes: %g";
+
 		UNIVERSE_CONST = "<br>Universe constants: <ul>";
-		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>Universe: %d<br>Number of dimensional trips: %d<br>Holiday: %s<br>Maximum player level: %d";
+		UNIVERSE_INFORMATION_LIST = "<h2>Universe information</h2>Universe: %d<br>Number of dimensional trips: %d<br>Holiday: %s";
 		H3_AVAILABLE_OBJECTS_H3 = "<h3>Unavailable objects:</h3>";
 		BASE_DISTRIBUTION_OF_MONSTER_SKILL_POINTS = "<h3>Base distribution of monster skill points</h3><ul>";
 		LI_SKILL_POINTS = "<li>%s: %g%% of skill points";
@@ -1851,7 +1895,12 @@ public class Local {
 		HOLIDAY_PRECIPITATION_MULT = "<li>Precipitation multiplier: %g";
 		HOLIDAY_TEMPERATURE_MULT = "<li>Temperature multiplier: %g";
 		MUTUAL_FLEE = "The fight is taking forever. After %d attacks, %s and %s both give up.";
-		
+		BLACK_HOLE = "The inventory of %s contains more than %d different objects. It collapses, forming a black hole (%g%% probability).\n%s receives %g cosmic points (%d objects are destroyed, for a total value of %g gold coins).";
+		ADDITIONAL_COSMIC_POINTS = "Additional cosmic points";
+		MAXIMUM_OBJECT_QUALITY_LOOT = "Maximum object quality according to cosmic points (loot))";
+		MAXIMUM_OBJECT_QUALITY_CRAFT = "Maximum object quality according to cosmic points (crafting)";
+		CLASS = "Class";
+		CHOICE_OF_CLASS = "Choice of class";
 		PLAYER_INFOS = getPlayerInfos();
 		UNIVERSE_EQUATIONS_NAME = getEquationName();
 	}
@@ -1894,7 +1943,7 @@ public class Local {
 		Local.INITIATIVE_BONUS_AGAINST_A_TRAP + Local.COLON + " %g\n"+
 		Local.INITIATIVE_TIME_AGAINST_A_TRAP + Local.COLON + " %g " + Local.SECONDS + "\n"+
 		Local.FINDING_A_MONSTER + Local.COLON + " %g " + Local.SECONDS + "\n"+
-		Local.FINDING_A_TRADER + Local.COLON + " %g " + Local.SECONDS + "\n"+
+		Local.FINDING_A_SELLER + Local.COLON + " %g " + Local.SECONDS + "\n"+
 		Local.FINDING_A_FORGE + Local.COLON + " %g " + Local.SECONDS + "\n"+
 		Local.RESURRECTION + Local.COLON + " %g " + Local.SECONDS + "\n"+	
 		Local.MAXIMUM_LOAD + Local.COLON + " %g\n"+
@@ -1969,7 +2018,10 @@ public class Local {
 		"  (" + UNDERLOAD + ") "+ SKILLS_NAME[15] + Local.COLON + " %g%%\n"+
 		"  (" + ACHIEVEMENTS + ") "+ SKILLS_NAME[21] + ", " + SKILLS_NAME[45] + Local.COLON + " %g%%\n"+
 		CLEARANCE_SALE_INVENTORY_MULTIPLIER + Local.COLON + " %g\n"+
-		DISCOUNT_PRICE_MULTIPLIER + Local.COLON + " %g";
+		DISCOUNT_PRICE_MULTIPLIER + Local.COLON + " %g\n"+
+		ADDITIONAL_COSMIC_POINTS + Local.COLON + " %g\n"+
+		MAXIMUM_OBJECT_QUALITY_LOOT_S + Local.COLON + " %g%%\n"+
+		MAXIMUM_OBJECT_QUALITY_CRAFT_S  + Local.COLON + " %g%%";
 		return res;
 	}
 	
@@ -1987,7 +2039,7 @@ public class Local {
 	HEALTH_POINTS_PER_SECOND,
 	MAXIMUM_LOAD,
 	FINDING_A_MONSTER,
-	FINDING_A_TRADER,
+	FINDING_A_SELLER,
 	FINDING_A_FORGE,
 	RESURRECTION,
 	BUY_PRICE_MULTIPLIER,
@@ -2065,7 +2117,14 @@ public class Local {
 	UNDERLOAD_BONUS,
 	DISCOUNT_PRICE_MULTIPLIER,
 	TRAP_LEVEL,
-	HOLIDAY_EFFECT_MULTIPLIER};
+	HOLIDAY_EFFECT_MULTIPLIER,
+	COSMIC_POINTS_GOLD,
+	COSMIC_POINTS_ORBS,
+	ADDITIONAL_COSMIC_POINTS,
+	MAXIMUM_OBJECT_QUALITY_LOOT,
+	MAXIMUM_OBJECT_QUALITY_CRAFT
+	};
+	
 	return tmpStr;
 	}
 }

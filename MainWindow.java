@@ -36,12 +36,14 @@ public class MainWindow extends javax.swing.JDialog {
 	public boolean mustRefreshCharge=true;
 	public boolean mustRefreshMonsters=true;
 	public boolean mustRefreshWeather=true;
+	public boolean mustRefreshstatsWithBonus=true;
 	
     static private final long serialVersionUID = 1338162012;
 	private ScheduledExecutorService refreshService;
     public Player Joueur;
     public LevelUp DistWindow;
 	public EditUniverse EditUniverseWindow;
+	public ClassWindow ClassW;
     public Courbes CurvWindow;
     public InventoryWindow InvWindow;
     public WorldMap WorldMapWindow;
@@ -59,6 +61,7 @@ public class MainWindow extends javax.swing.JDialog {
     private JProgressBar hp_bar1;
     private JProgressBar hp_bar2;
     private JButton distrib;
+	private JButton sclass;
     private JButton voyager;
     private JButton combat_cmd;
     private JTextArea stats;
@@ -83,7 +86,8 @@ public class MainWindow extends javax.swing.JDialog {
 	{
 		Joueur = J;
 		DistWindow.SetPlayer(J);
-		EditUniverseWindow.SetPlayer(J);;
+		EditUniverseWindow.SetPlayer(J);
+		ClassW.SetPlayer(J);
 		CurvWindow.SetPlayer(J);
 		InvWindow.SetPlayer(J);
 		WorldMapWindow.SetPlayer(J);
@@ -107,6 +111,7 @@ public class MainWindow extends javax.swing.JDialog {
 	index_line=0;
 
 	EditUniverseWindow = new EditUniverse(Joueur);
+	ClassW = new ClassWindow(Joueur);
 	DistWindow = new LevelUp(Joueur);
 	CurvWindow = new Courbes(Joueur);
 	InvWindow = new InventoryWindow(Joueur);
@@ -180,6 +185,7 @@ public class MainWindow extends javax.swing.JDialog {
 	shop_cmd.setEnabled(!infight);
 	univers_cmd.setEnabled(!infight);
 	distrib.setEnabled(!infight);
+	sclass.setEnabled(!infight);
 	prog_cmd.setEnabled(!infight);
 	}
 	
@@ -187,7 +193,7 @@ public class MainWindow extends javax.swing.JDialog {
     {
 	SwingUtilities.invokeLater(new Runnable() {
      public void run() {
-	if(Joueur.level < Joueur.MAX_LEVEL)
+	if(Joueur.level+0.5 < Joueur.universe.niveau_max())
 	{
 		double current = Joueur.xp_pt-Joueur.xp_level(Joueur.level);
 		double next = Joueur.next_level()-Joueur.xp_level(Joueur.level);
@@ -230,10 +236,12 @@ public class MainWindow extends javax.swing.JDialog {
 				
 		if(refCounter%5==0) {Achievements.refreshAchievements(Joueur,false);}
 		
+		if(mustRefreshstatsWithBonus) {Joueur.refresh_stats_with_bonus(); mustRefreshstatsWithBonus=false;}
 		if(mustRefreshCharge) {Joueur.refresh_charge(); mustRefreshCharge=false;}
 		if(mustRefreshWeather) {Joueur.refresh_weather_penalties(); mustRefreshWeather=false;}
 		
 		if (EditUniverseWindow.isVisible()) EditUniverseWindow.refresh();
+		
 		if (InWindow.isVisible() && refCounter%2==0) 
 		{
 		if(InWindow.displayType==3 && mustRefreshMonsters) 
@@ -521,12 +529,21 @@ public class MainWindow extends javax.swing.JDialog {
 	    });
 	distrib.setMnemonic('t');
 	
+	sclass = new JButton();
+	sclass.setBounds(new Rectangle(285, 285+20, 135, 15));
+	sclass.setText(Local.CLASS);
+	sclass.addActionListener(new java.awt.event.ActionListener() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    ClassW.montre(); 
+		}
+	    });
+	
 	univers_cmd = new JButton();
 	univers_cmd.setBounds(new Rectangle(285, 285+40, 135, 15));
 	univers_cmd.setText(Local.UNIVERSE_EDITION);
 	univers_cmd.addActionListener(new java.awt.event.ActionListener() {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-		   EditUniverseWindow.dist(); 
+		   EditUniverseWindow.montre(); 
 		}
 	});
 	univers_cmd.setMnemonic('u');
@@ -581,6 +598,7 @@ public class MainWindow extends javax.swing.JDialog {
 	ivjJFrameContentPane.add(xp_bar);
 	ivjJFrameContentPane.add(hp_bar1);
 	ivjJFrameContentPane.add(hp_bar2);
+	ivjJFrameContentPane.add(sclass);
 	ivjJFrameContentPane.add(distrib);
 	ivjJFrameContentPane.add(stats);
 	ivjJFrameContentPane.add(stats3);

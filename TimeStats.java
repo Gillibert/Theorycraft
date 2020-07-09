@@ -69,12 +69,16 @@ public ArrayList<double[]> data_xp;
 private double total_time;
 private double true_total_time;
 
+public double best_object_level;
+public double most_expensive_object;
 
 public TimeStats()
 {
 	events_base = new double[NB_EVENT];
 	events_money = new double[NB_MONEY];
 	
+	best_object_level = 0;
+	most_expensive_object = 0;
 	true_total_time = 0;
 	total_time = 0;
 	data = new  ArrayList<double[]>();

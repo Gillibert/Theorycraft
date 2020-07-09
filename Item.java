@@ -220,8 +220,6 @@ public String item_description(Player p)
 
 static public Item get_ressouce_base(double il,Player p)
 {
-	if(il==0)
-		System.out.println("Get_ressouce_base called with il=0, seed="+p.universe.seed);
 	double obj_lev = Math.min((double)StaticItem.max_level-1,il);
 	if(Math.random() < p.universe.proba_orbe_niveau_drop(il))
 	{
@@ -316,7 +314,7 @@ static class ComparateurItem implements Comparator<Item> {
 	String no = String.format(Local.OF_ALLOY,an);
 	int ty = 5;
 	double cpo, cpr, sol, eff, clvl;
-	double coeff = 1.1;
+	double coeff = p.universe.multiplicateur_alliage();
 	if(a.type == 5 || b.type == 5) coeff = 1.0;
 	
 	cpo = randomInInterval(rg,a.coeffPoids,b.coeffPoids,coeff);
@@ -337,12 +335,17 @@ static class ComparateurItem implements Comparator<Item> {
 	double pipc = p.orbes_investits_en_points_competence;
 	double qtypc = Math.max(1.0,pipc*0.00001);
 	
-	double pipd = p.orbes_investits_en_points_competence;
+	double pipd = p.orbes_investits_en_points_divins;
 	double qtypd = Math.max(1.0,pipd*0.00001);
 	
-	double nextOrbPCGain = (p.universe.points_competence_orbes(p.orbes_investits_en_points_competence+((qtypc/orb_unit) * p.rendement()))-p.universe.points_competence_orbes(p.orbes_investits_en_points_competence))/qtypc;
+	double pipcos = p.orbes_investits_en_points_cosmiques;
+	double qtypcos = Math.max(1.0,pipcos*0.00001);
 	
-	double nextOrbPDGain = (p.universe.points_divins_totaux(p.DIEU(),p.orbes_investits_en_points_divins+((qtypd/orb_unit) * p.rendement()),p.level)-p.universe.points_divins_totaux(p.DIEU(),p.orbes_investits_en_points_divins,p.level))/qtypd;
+	double nextOrbPCGain = (p.universe.points_competence_orbes(pipc+((qtypc/orb_unit) * p.rendement()))-p.universe.points_competence_orbes(pipc))/qtypc;
+	
+	double nextOrbPDGain = (p.universe.points_divins_totaux(p.DIEU(),pipd+((qtypd/orb_unit) * p.rendement()),p.level)-p.universe.points_divins_totaux(p.DIEU(),pipd,p.level))/qtypd;
+	
+	double nextOrbPCOSGain = (p.universe.points_cosmiques_pour_x_orbe(pipcos+((qtypcos/orb_unit) * p.rendement()))-p.universe.points_cosmiques_pour_x_orbe(pipcos))/qtypcos;
 	
 	String res = "";
 	res += "<b>Un objet normal ou magique, seul</b>";
@@ -361,9 +364,12 @@ static class ComparateurItem implements Comparator<Item> {
 	res += String.format("<br>Crée un nombre de points divins de plus en plus petit en fonction du nombre de points divins déjà créés. La quantité produite dépend aussi des compétences <i>Divinité</i>, <i>Rendement du craft</i> et <i>Économie d'orbes</i>. Le prochain orbe créera %g points divins.",nextOrbPDGain);
 	
 	res += "<br><br><b>Une quantité quelconque d'orbe de fusion</b>";
-	res += String.format("<br>Crée un nombre de points de compétences de plus en plus petit en fonction du nombre de points compétences déjà créés. La quantité produite dépend aussi des compétences <i>Rendement du craft</i> et <i>Économie d'orbes</i>. Le prochain orbe créera %g points de compétences.",nextOrbPCGain);
+	res += String.format("<br>Crée un nombre de points de compétences de plus en plus petit en fonction du nombre de points de compétences déjà créés. La quantité produite dépend aussi des compétences <i>Rendement du craft</i> et <i>Économie d'orbes</i>. Le prochain orbe créera %g points de compétences.",nextOrbPCGain);
 	
-	res += String.format("<br><br><b>%g orbe de transfert ou orbe de transmutation</b>",orb_unit);
+	res += "<br><br><b>Une quantité quelconque d'orbe de transfert</b>";
+	res += String.format("<br>Crée un nombre de points cosmiques de plus en plus petit en fonction du nombre de points cosmiques déjà créés. La quantité produite dépend aussi des compétences <i>Rendement du craft</i> et <i>Économie d'orbes</i>. Le prochain orbe créera %g points cosmiques.",nextOrbPCOSGain);
+	
+	res += String.format("<br><br><b>%g orbe de transmutation</b>",orb_unit);
 	res += "<br>Permet de redistribuer tous les points de compétence.";
 	
 	res += "<br><br><b>Une quantité quelconque d'orbes de deux types</b>";
@@ -392,7 +398,7 @@ static class ComparateurItem implements Comparator<Item> {
 	res += String.format("<br>Augmente la quantité de ressource. Il y a conservation du prix avec une perte de %g%%.",100*(1-rendement));
 	
 	res += String.format("<br><br><b>Un objet normal, magique, rare ou légendaire et une quantité quelconque d'orbe d'augmentation</b>",orb_unit);
-	res += String.format("<br>Augmente la qualité de l'objet de %g%% par orbe d'augmentation dans la limite des %g%%.",100*0.05*p.rendement()/orb_unit,100*p.universe.qualite_max()*p.rendement());
+	res += String.format("<br>Augmente la qualité de l'objet de %g%% par orbe d'augmentation dans la limite des %g%%.",100*0.05*p.rendement()/orb_unit,100*p.universe.qualite_max_craft(p.points_cosmiques_totaux())*p.rendement());
 	
 	res += String.format("<br><br><b>Une ressource élémentaire (quantité quelconque) et %g orbe de transfert ou d'évolution</b>",orb_unit);
 	res += String.format("<br>Transforme la ressource en ressource primordiale. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %g%%.",100*(1-rendement));
@@ -512,6 +518,8 @@ static class ComparateurItem implements Comparator<Item> {
 				
 				if (a.name.equals("Orbe d'augmentation"))
 				{
+					Game.MW.addLog("Orbes d'augmentation sacrifiés en échange de points d'expérience.");
+					p.orbes_investits_en_xp += (a.qty/orb_unit) * p.rendement();
 					double xp = (a.qty/orb_unit) * p.universe.experience_orbe() * p.rendement();
 					p.gain_xp(xp, TimeStats.XP_ORB, p.level);
 					a.set_qty(0);
@@ -519,17 +527,26 @@ static class ComparateurItem implements Comparator<Item> {
 				
 				if (a.name.equals("Orbe d'évolution"))	
 				{
+					Game.MW.addLog("Orbes d'évolution sacrifiés en échange de points divins.");
 					p.orbes_investits_en_points_divins += (a.qty/orb_unit) * p.rendement();
 					a.set_qty(0);
 				}
 
 				if (a.name.equals("Orbe de fusion"))	
 				{
+					Game.MW.addLog("Orbes de fusion sacrifiés en échange de points de compétences.");
 					p.orbes_investits_en_points_competence += (a.qty/orb_unit) * p.rendement();
 					a.set_qty(0);
 				}
 				
-				else if (a.qty >= orb_unit && (a.name.equals("Orbe de transfert") || a.name.equals("Orbe de transmutation")))
+				if (a.name.equals("Orbe de transfert"))	
+				{
+					Game.MW.addLog("Orbes de transfert sacrifiés en échange de points de cosmiques.");
+					p.orbes_investits_en_points_cosmiques += (a.qty/orb_unit) * p.rendement();
+					a.set_qty(0);
+				}
+				
+				else if (a.qty >= orb_unit && a.name.equals("Orbe de transmutation"))
 				{
 					p.reset_build();
 					a.set_qty(a.qty-orb_unit);
@@ -566,7 +583,7 @@ static class ComparateurItem implements Comparator<Item> {
 				if (a.rare == 6) {comp = a; other = b;}
 				else {comp = b; other = a;}
 				res = other;
-				double added_quality = Math.min(comp.qty*0.05*p.rendement()/orb_unit,p.universe.qualite_max()*p.rendement()-res.quality);
+				double added_quality = Math.min(comp.qty*0.05*p.rendement()/orb_unit,p.universe.qualite_max_craft(p.points_cosmiques_totaux())*p.rendement()-res.quality);
 				if (added_quality<0.0) added_quality=0.0;
 				res.quality += added_quality;
 				comp.set_qty(comp.qty-added_quality/(0.05*p.rendement()/orb_unit));
@@ -974,7 +991,7 @@ static class ComparateurItem implements Comparator<Item> {
 			    transform_magic(p);
 			}
 		if (Math.random()< p.chance_qualite())
-		    quality = Math.random()*p.universe.qualite_max();
+		    quality = Math.random()*p.universe.qualite_max_drop(p.points_cosmiques_totaux());
 		update();
 	    }
     }

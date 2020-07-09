@@ -96,7 +96,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 		refresh();
 	}
 
-	public void dist()
+	public void montre()
     {
 	mustRefreshInfos = true;
 	refresh();
@@ -112,14 +112,20 @@ public class EditUniverse extends javax.swing.JDialog  {
 		{
 			int i = idx;
 			res+=String.format("<p><b>Base : %.3f</b><br>",Joueur.universe.constantes[i]);
-			res+=String.format("-10 points divins : %.3f<br>",Joueur.universe.adjust_constant(-10,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("-100 points divins : %.3f<br>",Joueur.universe.adjust_constant(-100,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("-1000 points divins : %.3f<br>",Joueur.universe.adjust_constant(-1000,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("-10000 points divins : %.3f<br>",Joueur.universe.adjust_constant(-10000,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("<p>10 points divins : %.3f<br>",Joueur.universe.adjust_constant(10,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("100 points divins : %.3f<br>",Joueur.universe.adjust_constant(100,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("1000 points divins : %.3f<br>",Joueur.universe.adjust_constant(1000,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
-			res+=String.format("10000 points divins : %.3f<br>",Joueur.universe.adjust_constant(10000,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
+			int lst=6;
+			for(int j=-lst; j<=lst; j++)
+			{
+				double t;
+				if(j<0) 
+					t=-Math.pow(10,lst+j+1);
+				else
+					t=Math.pow(10,j);
+				if(j==0) 
+					res+="<p>";
+				else
+					res+=String.format("%g points divins : %.3f<br>",t,Joueur.universe.adjust_constant(t,Joueur.universe.constantes[i],Joueur.universe.constantes_min[i], Joueur.universe.constantes_max[i]));
+				
+			}
 		}
 		else
 		{
@@ -309,6 +315,8 @@ public class EditUniverse extends javax.swing.JDialog  {
 		Game.MW.mustRefreshCurves=true;
 		if (idx == 1 || idx == 14 || idx == 21 || idx == 23 || idx == 24) Game.MW.mustRefreshMonsters=true;
 		if (idx == 17) Game.MW.mustRefreshWeather=true;
+		if (idx == 31 || idx == 32 || idx == 33) Game.MW.mustRefreshstatsWithBonus=true;
+		
 		if(idx >= Joueur.universe.nb_universe_stats)
 		{
 			int tidx = Joueur.universe.sortedEquations[idx-Joueur.universe.nb_universe_stats].id;
@@ -352,6 +360,7 @@ public class EditUniverse extends javax.swing.JDialog  {
 		Game.MW.mustRefreshMonsters=true;
 		Game.MW.mustRefreshWeather=true;
 		Game.MW.mustRefreshCharge=true;
+		Game.MW.mustRefreshstatsWithBonus=true;
 		
 		for (int idx=0; idx< Joueur.universe.nb_universe_stats+Joueur.universe.nb_universe_equations ; idx++)
 	    {

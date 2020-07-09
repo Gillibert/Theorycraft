@@ -82,7 +82,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 		//res += best_dist();
 		res += Local.H2S + Local.PLAYER_STATISTICS + Local.H2E;
 		res +=  String.format(Local.PLAYER_STATISTICS_LIST,Joueur.name, Joueur.level, Joueur.defi.name,
-		Joueur.temps_total,Joueur.money,Joueur.charge,Joueur.charge_max(),Joueur.xp_pt,Joueur.total_skill_points(),Joueur.orbes_investits_en_points_competence,Joueur.points_divins_totaux(),Joueur.orbes_investits_en_points_divins);
+		Joueur.temps_total,Joueur.money,Joueur.charge,Joueur.charge_max(),Joueur.xp_pt,Joueur.orbes_investits_en_xp,Joueur.total_skill_points(),Joueur.orbes_investits_en_points_competence,Joueur.points_divins_totaux(),Joueur.orbes_investits_en_points_divins,Joueur.points_cosmiques_totaux(),Joueur.orbes_investits_en_points_cosmiques,Joueur.or_perdu_en_trou_noirs);
 		res += Joueur.t_stats.eventStats();
 		res += Local.BODY_HTML_END;
 		return res;
@@ -93,8 +93,7 @@ public class InfoWindow extends javax.swing.JDialog  {
 		res += String.format(Local.UNIVERSE_INFORMATION_LIST,
 			Joueur.universe.seed,
 			Joueur.universe.numberOfTravels,
-			Local.HOLIDAY_NAME[Game.HOLIDAY],
-			Joueur.MAX_LEVEL);
+			Local.HOLIDAY_NAME[Game.HOLIDAY]);
 		res += Local.UNIVERSE_CONST;
 		for(int i=0; i< Local.UNIVERSE_STATS_NAME.length; i++)
 		{

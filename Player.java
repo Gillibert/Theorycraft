@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class Player implements Serializable {
     static private final long serialVersionUID = 100;
 	static private int dsp_target[] = {0,1,2,3,4,5,6,7,9,10,24,31,53};
-	static public int MAX_LEVEL = 2000000000;
 		
     //***********************
+	public int current_class = -1;
 	public boolean jeu_fini = false;
 	public int nb_hits = 0;
     public int crit_taken = 0;	
@@ -38,8 +38,13 @@ public class Player implements Serializable {
     public double temps; // temps écoulé depuis le début du combat
     public double temps_total; // temps écoulé depuis le début du jeu
 	
+	public double orbes_investits_en_xp;
 	public double orbes_investits_en_points_divins;
 	public double orbes_investits_en_points_competence;
+	public double orbes_investits_en_points_cosmiques;
+	public double or_perdu_en_trou_noirs;
+	public double nombre_trous_noirs;
+	
     public double vie; // vie
     public ArrayList<Item> inventory;// inventraire
     public ArrayList<Item> craftInventory; //inventaire de la forge mystique
@@ -48,6 +53,7 @@ public class Player implements Serializable {
     public double charge;
     public double level;  // niveau
     public double money; // argent
+	public double cosmic_pts;
     public int zone; // zone
     public double xp_pt; // exp
     public Shop shop; // the shop
@@ -63,6 +69,13 @@ public class Player implements Serializable {
 	    else return 0;
 	} 
 }
+	
+	public double points_cosmiques_totaux()
+	{
+		return points_de_competence_cosmique()
+		+universe.points_cosmiques_pour_x_orbe(orbes_investits_en_points_cosmiques)
+		+universe.points_cosmiques_pour_x_ecus(or_perdu_en_trou_noirs);
+	}
 	
 	public double heat_penalty()
 	{
@@ -165,6 +178,8 @@ public class Player implements Serializable {
 		    {the_object.equiped=false; break;}
 	    }
 	i.equiped=true;
+	t_stats.best_object_level = Math.max(t_stats.best_object_level,i.effectiveIlvl());
+	t_stats.most_expensive_object = Math.max(t_stats.most_expensive_object,i.prix());
 	refresh_stats_with_bonus();
     }
 
@@ -593,6 +608,7 @@ public class Player implements Serializable {
 
     public void refresh_stats_with_bonus()
     {
+	System.out.println("refresh_stats_with_bonus()");
 	for(int i=0; i<nb_stats; i++) 
 		{
 		item_bonus[i]=0;
@@ -609,6 +625,20 @@ public class Player implements Serializable {
 				item_bonus[i]+=the_object.bonus(i);
 			}
 	    }
+	
+	if(current_class >=0)
+	{
+	ClassRPG cls = universe.classList.get(current_class);
+	for(int i=0; i< nb_stats; i++)
+		{
+		if (cls.bonus[i] == 1)
+			stats_with_bonus[i] = (stats_with_bonus[i] + universe.class_bonus_add()) * universe.class_bonus_mult();
+			
+		if (cls.malus[i] == 1)
+			stats_with_bonus[i] = stats_with_bonus[i] * universe.class_malus_mult();
+		}
+	}
+	
 	refresh_charge();
 	vie=vie_max();
     }
@@ -685,7 +715,8 @@ public class Player implements Serializable {
 			cold_affinity(), heat_affinity(), precipitation_affinity(), underload_affinity(),achievements_affinity(),bonus_vacances(),
 			100*(cold_bonus()-1.0), 100*(heat_bonus()-1.0), 100*(precipitation_bonus()-1.0),
 			100*(underload_bonus()-1.0),100*(bonus_haut_faits()-1.0),
-			clearance_sale_inventory_multiplier(),discount_multiplier()
+			clearance_sale_inventory_multiplier(),discount_multiplier(),points_de_competence_cosmique(),
+			100*universe.qualite_max_drop(points_cosmiques_totaux()),100*universe.qualite_max_craft(points_cosmiques_totaux())
 			);
 	}
 
@@ -902,6 +933,9 @@ public class Player implements Serializable {
 	public double DISCOUNT_SPEC()
 	{return stats_with_bonus[Universe.DISCOUNT_SPEC];}
 	
+	public double COSMOLOGY()
+	{return stats_with_bonus[Universe.COSMOLOGY];}
+		
 	public double total_skill_points()
 	{
 		double res=0;
@@ -985,6 +1019,7 @@ public class Player implements Serializable {
 	public double discount_multiplier() {return universe.discount_multiplier(DISCOUNT_SPEC());}
 	public double bonus_haut_faits() {return universe.bonus_haut_faits_base(points_haut_faits*achievements_affinity());}
 	public double bonus_vacances() {return universe.affinite_vacances(HOLIDAY_BONUS());}
+	public double points_de_competence_cosmique() {return universe.cosmologie(COSMOLOGY());}
 	
 	public double divine_cap(int i){
 		if(i < universe.nb_universe_stats) return universe.divine_cap[i] * universe.divine_cap_const(CONST_MASTER());
@@ -1148,8 +1183,13 @@ public Player()
 	if(!light)
 	{
 	disp=true;
+	orbes_investits_en_xp = 0;
 	orbes_investits_en_points_divins = 0;
 	orbes_investits_en_points_competence = 0;
+	orbes_investits_en_points_cosmiques = 0;
+	or_perdu_en_trou_noirs = 0;
+	nombre_trous_noirs = 0;
+	
 	temps_total = 0;
 	t_stats = new TimeStats();
 	conditionToggle = new boolean[]{true,true,true,true,true};
@@ -1246,7 +1286,7 @@ public Player()
 		    {
 			it.bonus[i]=puissance_ench_sup()*it.elvl;
 		    }
-		it.quality = universe.qualite_max();
+		it.quality = 10.0;
 		it.update();
 		inventory.add(it);
 		}
@@ -1373,7 +1413,7 @@ public Player()
 	    {
 		double ts = temps_shop();
 		double tt = universe.plage_random()*ts;
-		if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_A_TRADER,tt));
+		if(disp) Game.MW.addLog(String.format(Local.LOOKING_FOR_A_SELLER,tt));
 		t_stats.addEvent(1.0,TimeStats.EVENT_FIND_SHOP);
 		personal_wait(tt,TimeStats.ACTIVITY_CHERCHE_MARCHAND);
 		shop = new Shop(this);
@@ -1602,12 +1642,13 @@ public Player()
     {
 	ArrayList<Item> loot = p2.drop(this);
 	double fric = universe.plage_random() * universe.gold_drop(p2.level) * multiplicateur_or();
-	
+
 	if(fric < 1.0) fric = 0;
 	if (loot.isEmpty() && fric <= 0.1) 
 		{if(disp) Game.MW.addLog(String.format(Local.NO_LOOT, p2.name));}
 	else
 	    {
+		int initial_size = inventory.size(); 
 		money_gain(fric, TimeStats.GAIN_DROP);
 		if(disp) Game.MW.addLog(String.format(Local.GOLD_LOOT,name, fric, p2.name));
 		String lootStr = "";
@@ -1643,8 +1684,35 @@ public Player()
 		if(dontLootStr != "" && disp)
 			Game.MW.addLog(String.format(Local.OBJECTS_LEFT_BEHIND, dontLootStr));
 	    clean_list(inventory);
-		}
 		
+		// Black hole
+		int final_size = inventory.size(); 
+		double limite_effondrement_inventaire = universe.limite_effondrement_inventaire();
+		if (final_size>initial_size && final_size >= limite_effondrement_inventaire)
+			{
+			double proba_effondrement = universe.proba_effondrement();
+			if (Math.random() < proba_effondrement)
+				{
+				double prix_total=0.0;
+				ArrayList<Item> slist = new ArrayList<Item>();
+				for(Item the_object : inventory)
+				{
+				if(the_object.equiped == false && the_object.rare != 6)
+					{
+					prix_total += the_object.prix();
+					charge -= the_object.poids_final(this);
+					slist.add(the_object);
+					}
+				}
+				inventory.removeAll(slist);
+				double old_cosmic_pts = universe.points_cosmiques_pour_x_ecus(or_perdu_en_trou_noirs);
+				or_perdu_en_trou_noirs += prix_total;
+				nombre_trous_noirs = nombre_trous_noirs+1.0;
+				double cosmic_pts = universe.points_cosmiques_pour_x_ecus(or_perdu_en_trou_noirs);
+				if(disp) Game.MW.addLog(String.format(Local.BLACK_HOLE, name, (int)limite_effondrement_inventaire,proba_effondrement*100.0,name,cosmic_pts-old_cosmic_pts,slist.size(),prix_total));
+				}
+			}
+		}
 	double nec = necrophagie()*p2.vie_max();
 	double to_heal = Math.min(vie_max()-vie,nec);
 	if(to_heal > 0.01)
@@ -1715,7 +1783,7 @@ public Player()
 	public double level_for_xp(double x)
     {
 	if(x < 1000.0) return 1;
-	else return Math.floor(Math.min((1.5 + (0.5/Math.sqrt(250.0)) * Math.sqrt(x - 750)),MAX_LEVEL));
+	else return Math.floor(Math.min((1.5 + (0.5/Math.sqrt(250.0)) * Math.sqrt(x - 750)),universe.niveau_max()));
 	}
 	
     public void gain_xp(double sx,int type, double gainLevel)
@@ -1725,7 +1793,7 @@ public Player()
 	t_stats.addXp((double)x, type);
 	if(disp) Game.MW.addLog(String.format(Local.EARN_EXPERIENCE,name,x,sx,bonus_xp(),modif_exp_lvl(gainLevel-level)));
 
-	if (level == MAX_LEVEL) return;
+	if (level >= universe.niveau_max()) return;
 	double levelback=level;
 	level = level_for_xp(xp_pt);
 	
