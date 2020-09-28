@@ -37,6 +37,13 @@ public class LevelUp extends javax.swing.JDialog  {
 		refresh();
 	}
 
+	public void refresh_lite()
+	{
+	plus.setEnabled(Joueur.points_a_distribuer() >= 1);
+	moins.setEnabled(stats_tmp[table.getSelectedRow()] < Joueur.stats[table.getSelectedRow()]);
+	moins2.setEnabled(Joueur.auto_dist_coeff[table.getSelectedRow()]>0);
+	}
+
     public void refresh()
     {
 	Joueur.refresh_stats_with_bonus();
@@ -49,10 +56,8 @@ public class LevelUp extends javax.swing.JDialog  {
 		rowData[i][4] = String.format("%d",Joueur.auto_dist_coeff[i]);
 	    }
 	table.repaint();
-	plus.setEnabled(Joueur.points_a_distribuer() >= 1);
-	moins.setEnabled(stats_tmp[table.getSelectedRow()] < Joueur.stats[table.getSelectedRow()]);
-	moins2.setEnabled(Joueur.auto_dist_coeff[table.getSelectedRow()]>0);
 	infos.setText(Joueur.infos());
+	refresh_lite();
     }
 	
 	
@@ -78,9 +83,9 @@ public class LevelUp extends javax.swing.JDialog  {
 	    table.getColumnModel().getColumn(4).setPreferredWidth(90);
 		table.getTableHeader().setReorderingAllowed(false);
 		
-	    //javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
-		//    public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh();}};
-		//table.getSelectionModel().addListSelectionListener(refresher);
+	    javax.swing.event.ListSelectionListener refresher = new javax.swing.event.ListSelectionListener() {
+		    public void valueChanged(javax.swing.event.ListSelectionEvent e) {refresh_lite();}};
+		table.getSelectionModel().addListSelectionListener(refresher);
 			
 	    prompt = new JLabel();
 	    prompt.setBounds(new Rectangle(10, 3, 400, 23));

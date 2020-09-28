@@ -52,8 +52,16 @@ import java.util.*;
 		}
 		pts += achievementPts(ptmp);
 		
-		ptmp = p.t_stats.events_base[TimeStats.EVENT_FIGHT_SUCCESS];
+
+		ptmp = p.t_stats.events_base[TimeStats.EVENT_FIGHT_DEATH]+p.t_stats.events_base[TimeStats.EVENT_TRAP_DEATH];
+		if(outs)
+		{
+			res += "<dt><b>Revenant</b><dd>Mourez et ressuscitez<br>";
+			res += achievementStr(ptmp);
+		}
+		pts += achievementPts(ptmp);
 		
+		ptmp = p.t_stats.events_base[TimeStats.EVENT_FIGHT_SUCCESS];
 		if(outs)
 		{
 			res += "<dt><b>Tueur sanguinaire</b><dd>Tuez des monstres<br>";

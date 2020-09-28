@@ -51,7 +51,7 @@ class StaticItem {
     }
     
     public static Material[] MA = new Material[]{
-    // type; coeffPoids; coeffPrix;     coeffSolidite; coeffEfficacite; coeffPuissance;
+    // type; 		coeffPoids; coeffPrix;     coeffSolidite; coeffEfficacite; coeffPuissance;
     new Material("ordure","d'ordures",0,          2.0,0.4,     0.2,0.15,0.05),
     new Material("détritus","de détritus",0,      2.0,0.4,     0.2,0.20,0.10),
     new Material("papier","de papier",0,          2.0,0.5,     0.2,0.25,0.15),
@@ -155,7 +155,7 @@ class StaticItem {
     new Material("désordre","de désordre",4,           0.02,5.7,    0.2,0.2,4.80),
     new Material("excellence","d'excellence",4,        0.02,5.8,    0.2,0.2,4.85),
     new Material("savoir","de savoir",4,               0.02,5.9,    0.2,0.2,4.90),
-    new Material("vérité","de vérité",4,               0.02,6.0,    0.2,0.2,4.95),
+    new Material("classe","de classe",4,               0.02,6.0,    0.2,0.6,4.95),
     new Material("perfection","de perfection",4,       0.02,6.5,    0.4,0.5,5.00),
     new Material("illogisme","d'illogisme",4,          0.02,6.5,    0.4,5.00,0.5)
     };

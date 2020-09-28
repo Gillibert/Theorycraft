@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*; 
  
  public class Universe implements Serializable {
-	private TheoryGenerator gen;
+	public TheoryGenerator gen;
 	public NameGenerator nameGenerator;
 	public Player joueur;
 	public ArrayList<ClassRPG> classList;
@@ -11,21 +11,20 @@ import java.util.*;
 	public int nuberSlotsAvailable;
 	public Equation[] equations;
 	public Equation[] sortedEquations;
-	
+	public Constant[] constantes;
+	public Constant[] sortedConstantes;
+		
 	public double[] divine_cap;
-	public double[] constantes;
-	public double[] constantes_min;
-	public double[] constantes_max;
 	
 	public double[] points_divins; // répartition des points divins
 	public static int nb_universe_stats = Local.UNIVERSE_STATS_NAME.length;  // nombre de paramètres modifiables de l'univers
 	public static int nb_universe_equations = Local.UNIVERSE_EQUATIONS_NAME.length;
-			
+
 	public ArrayList<Integer> ItemUnlockOrder;
 	private boolean[] binVar;
 	public Map map;
 	static private final long serialVersionUID = 42;
-	
+	private int initialClassListSize;
 
 	
 	// IAS(0) DMG(1) REDUC(2) ABS(3) ESQ(4) PRC(5) LCK(6) CRT(7)
@@ -41,7 +40,7 @@ import java.util.*;
 	// COLD_RES(58) HOT_RES(59) PRECI_RES(60) 
 	// COLD_BONUS(61) HOT_BONUS(62) PRECI_BONUS(63) OVERLOAD_RES(64) 
 	// UNDERLOAD_BONUS(65) ACHI_BONUS(66) HOLIDAY_BONUS(67)
-	// SHOPPING_ADDICT(68) DISCOUNT_SPEC(69) COSMOLOGY(70)
+	// SHOPPING_ADDICT(68) DISCOUNT_SPEC(69) COSMO_ADD(70) COSMO_MUL(71)
 
 	
 	public static int IAS = 0;
@@ -114,14 +113,16 @@ import java.util.*;
 	public static int HOLIDAY_BONUS = 67;
 	public static int SHOPPING_ADDICT = 68;
 	public static int DISCOUNT_SPEC = 69;
-	public static int COSMOLOGY = 70;
-
+	public static int COSMO_ADD = 70;
+	public static int COSMO_MUL = 71;
 	
 	Universe(int sd)
 	{
+		seed = sd;
 		numberOfTravels = 0;
 		gen = new TheoryGenerator(sd);
 		
+		// Create basic classes
 		classList = new ArrayList<ClassRPG>();
 		
 		ClassRPG tc;
@@ -150,134 +151,70 @@ import java.util.*;
 		for(int i=0; i< Local.SKILLS_NAME.length; i++) SkillsId.add(i);
 		Collections.shuffle(SkillsId,gen.gen);
 		
-		NameGenerator nameGen = new NameGenerator(gen.nextInt(Integer.MAX_VALUE));
-		int nbrandclass = 10;
-		for(int i=0; i<nbrandclass; i++)
+		nameGenerator = new NameGenerator(gen.nextInt(Integer.MAX_VALUE));
+		int nbrandclass = 10+gen.nextInt(30);
+		int idx2=0;
+		for(int idx=0; idx<nbrandclass; idx++)
 		{
-			String cname = String.format(Local.RANDOM_CLASS_NAME[i%Local.RANDOM_CLASS_NAME.length],nameGen.getName());
+			String cname = String.format(Local.RANDOM_CLASS_NAME[idx%Local.RANDOM_CLASS_NAME.length],nameGenerator.getName());
 			tc = new ClassRPG(cname);
-			tc.setBonus(new int[]{SkillsId.get(5*i),SkillsId.get(5*i+1),SkillsId.get(5*i+2)});
-			tc.setMalus(new int[]{SkillsId.get(5*i+3),SkillsId.get(5*i+4)});
+			tc.setBonus(new int[]{SkillsId.get(5*idx2),SkillsId.get(5*idx2+1),SkillsId.get(5*idx2+2)});
+			tc.setMalus(new int[]{SkillsId.get(5*idx2+3),SkillsId.get(5*idx2+4)});
 			classList.add(tc);
+			idx2++;
+			if(5*idx2+4 >= Local.SKILLS_NAME.length) 
+			{Collections.shuffle(SkillsId,gen.gen); idx2=0;}
 		}
+		initialClassListSize = classList.size();
 		
-		
+		// Intitalize divine points
 		points_divins = new double[nb_universe_stats+nb_universe_equations];
 		for(int i=0; i<nb_universe_stats+nb_universe_equations; i++) 
 			{points_divins[i]=0;}
 	
-		constantes = new double[Local.UNIVERSE_STATS_NAME.length];
-		constantes_min = new double[Local.UNIVERSE_STATS_NAME.length];
-		constantes_max = new double[Local.UNIVERSE_STATS_NAME.length];
+		// Intitalize constants
+		constantes = new Constant[nb_universe_stats];
 		
-		binVar = new boolean[StaticItem.nb_pos-1];
-		seed = sd;
+		// constant constructor : int dist_strategy, double min, double max, double df
+		constantes[0]=new Constant(0, 0.01, 1.0,0.5,(int)(gen.nextInt(8)+6), 2); // vie de départ()
+		constantes[1]=new Constant(0, 0.02, 5.0,0.5,(int)(gen.nextInt(25)+8.0), 2); // points_initiaux()
+		constantes[2]=new Constant(0, 1.01, 0.0,1.0,0.05+gen.nextDouble()*0.40, 0); // proba_rencontrer_piege()
+		constantes[3]=new Constant(1, 1.04, 0.0,1.0,0.05+gen.nextDouble()*0.20, 0); // proba_promo()
+		constantes[4]=new Constant(1, 1.05, 0.0,1.0,0.01*(gen.nextInt(6)+2.0), 0); // proba_clearance_sale()
+		constantes[5]=new Constant(1, 1.02, 0.0,1.0,0.01*(gen.nextInt(10)+5.0), 0); // proba_champion()
+		constantes[6]=new Constant(1, 1.03, 0.0,1.0,0.001*(gen.nextInt(10)+2.0), 0); // proba_super_champion()
+		constantes[7]=new Constant(0, 1.06, 0.0,1.0,0.15+gen.nextDouble()*0.3, 0); // proba_ressource()
+		constantes[8]=new Constant(-1, 2.01, 0.0,0.6,(0.2+gen.nextDouble()*0.4), 0); // penalty_for_bad_material()
+		constantes[9]=new Constant(-1, 2.02, 0.0,200,(int)(gen.nextInt(131)+15), 0); // penalty_for_new_challenge()
+		constantes[10]=new Constant(-1, 2.03,  0.0,10,(int)(gen.nextInt(4)+1), 0); // penalty_for_travel
+		constantes[11]=new Constant(-1, 2.04, 0.0,200,(int)(gen.nextInt(151)+5), 0); // penalty_for_dimensional_travel()
+		constantes[12]=new Constant(-1, 2.05, 0.0,10,1.0+gen.nextDouble()*4.0, 0); // penalty_for_death()
+		constantes[13]=new Constant(-1, 2.06, 0.0,1.0,(gen.nextInt(16)+2)*0.01, 0); // base_gold_penalty_for_death()
+		constantes[14]=new Constant(-1, 2.07, 0.0,10,(int)(gen.nextInt(5)+2), 0); // base_penalty_for_class_change()
+		constantes[15]=new Constant(1, 0.05, 20000.0,1000.0,(100+gen.nextInt(1000))*100000, 1); // niveau_max()
+		constantes[16]=new Constant(1, 0.06, 0.0,0.2,(int)(gen.nextInt(100)+250), 1); // experience_orbe()
+		constantes[17]=new Constant(0, 0.07, -273.15,10.0,5.0+gen.nextDouble()*20.0, 1); // temperature_ideale()
+		constantes[18]=new Constant(1, 0.08, 0.0,0.1,0.4+gen.nextDouble()*0.6, 1); // niveau_boutique_pour_niveau_zone()
+		constantes[19]=new Constant(1, 0.09, 0.0,0.2,0.7+gen.nextDouble()*0.6, 1); // quantite_ressource_base_drops()
+		constantes[20]=new Constant(1, 0.10, 0.0,1.0,1.0+gen.nextDouble()*2.0, 1); // quantite_ressource_base_marchands()
+		constantes[21]=new Constant(1, 0.11, 10.0,42.2,(int)(gen.nextInt(15)+12), 0); // nombre_zones()
+		constantes[22]=new Constant(-1, 0.12, 0.0,500,(int)(gen.nextInt(300)+50), 0); // travel_cost()
+		constantes[23]=new Constant(-1, 0.13, 1.5,5.0,1.5+gen.nextDouble()*2.0, 0); // mul_points_competences_champions()
+		constantes[24]=new Constant(-1, 0.14, 20.0,50.0,20.0+gen.nextDouble()*20.0, 0); // mul_points_competences_super_champions()
+		constantes[25]=new Constant(1, 0.15, 0.0,0.06,0.20+gen.nextDouble()*0.8, 1); // efficacite_base()
+		constantes[26]=new Constant(1, 0.16, 0.0,0.04,0.20+gen.nextDouble()*0.30, 1); // puissance_ench_sup()
+		constantes[27]=new Constant(0, 0.17, 3.0,10000,(int)(gen.nextInt(960)+20), 0); // nombre_maximal_coup()
+		constantes[28]=new Constant(1, 0.18, 1.0,0.02,1.1+gen.nextDouble()*0.80, 1); // multiplicateur_alliage()
+		constantes[29]=new Constant(0, 0.19, 200.0,3000.0,200.0+gen.nextInt(10)*100.0, 0); // limite_effondrement_inventaire()
+		constantes[30]=new Constant(0, 1.07, 0.1,1.0,0.20+gen.nextDouble()*0.80, 0); // proba_effondrement()
+		constantes[31]=new Constant(1, 0.21, 0.0,0.5,2.0+gen.nextInt(6), 2); // class_bonus_add()
+		constantes[32]=new Constant(1, 0.22, 1.0,0.2,1.2+gen.nextInt(6)*0.1, 1); // class_bonus_mult()
+		constantes[33]=new Constant(1, 0.23, 0.0,0.8,0.3+gen.nextInt(6)*0.1, 0); // class_malus_mult()
+		constantes[34]=new Constant(0, 0.24, 0.0,1.6,0.01*(gen.nextInt(76)+2.0), 0); // plage_random()
+		constantes[35]=new Constant(1, 0.03, 1.0,1.0,(int)(gen.nextInt(50)+100), 1); // niveau de la petite arene
+		constantes[36]=new Constant(1, 0.04, 1.0,0.2,(int)(gen.nextInt(500)+1000), 1); // niveau de la grande arene
 		
-		constantes_min[0] = 1.0; // vie de départ()
-		constantes_min[1] = 5.0; // points_initiaux()
-		constantes_min[2] = 0.0; // proba_rencontrer_piege()
-		constantes_min[3] = 0.0; // proba_promo()
-		constantes_min[4] = 0.0; // proba_clearance_sale()
-		constantes_min[5] = 0.0; // proba_champion()
-		constantes_min[6] = 0.0; // proba_super_champion()
-		constantes_min[7] = 0.0; // proba_ressource()
-		constantes_min[8] = 0.0; // penalty_for_bad_material()
-		constantes_min[9] = 0.0; // penalty_for_new_challenge()
-		constantes_min[10] = 0.0; // penalty_for_travel
-		constantes_min[11] = 0.0; // penalty_for_dimensional_travel()
-		constantes_min[12] = 0.0; // penalty_for_death()
-		constantes_min[13] = 0.0; // base_gold_penalty_for_death()
-		constantes_min[14] = 0.0; // plage_random()
-		constantes_min[15] = 20000.0; // niveau_max()
-		constantes_min[16] = 0.0; // experience_orbe()
-		constantes_min[17] = -273.15; // temperature_ideale()
-		constantes_min[18] = 0.0; // niveau_boutique_pour_niveau_zone()
-		constantes_min[19] = 0.0; // quantite_ressource_base_drops()
-		constantes_min[20] = 0.0; // quantite_ressource_base_marchands()
-		constantes_min[21] = 10.0; // nombre_zones()
-		constantes_min[22] = 0.0; // travel_cost()
-		constantes_min[23] = 1.5; // mul_points_competences_champions()
-		constantes_min[24] = 20.0; // mul_points_competences_super_champions()
-		constantes_min[25] = 0.0; // efficacite_base()
-		constantes_min[26] = 0.0; // puissance_ench_sup()
-		constantes_min[27] = 3.0; // nombre_maximal_coup()
-		constantes_min[28] = 1.0; // multiplicateur_alliage()
-		constantes_min[29] = 200.0; // limite_effondrement_inventaire()
-		constantes_min[30] = 0.1; // proba_effondrement()
-		constantes_min[31] = 0.0; // class_bonus_add()
-		constantes_min[32] = 1.0; // class_bonus_mult()
-		constantes_min[33] = 0.0; // class_malus_mult()
-		
-		constantes_max[0] = 100; // vie de départ()
-		constantes_max[1] = 200; // points_initiaux()
-		constantes_max[2] = 1.0; // proba_rencontrer_piege()
-		constantes_max[3] = 1.0; // proba_promo()
-		constantes_max[4] = 1.0; // proba_clearance_sale()
-		constantes_max[5] = 1.0; // proba_champion()
-		constantes_max[6] = 1.0; // proba_super_champion()
-		constantes_max[7] = 1.0; // proba_ressource()
-		constantes_max[8] = 0.6; // penalty_for_bad_material()
-		constantes_max[9] = 200; // penalty_for_new_challenge()
-		constantes_max[10] = 10; // penalty_for_travel
-		constantes_max[11] = 200; // penalty_for_dimensional_travel()
-		constantes_max[12] = 10; // penalty_for_death()
-		constantes_max[13] = 1.0; // base_gold_penalty_for_death()
-		constantes_max[14] = 1.6; // plage_random()
-		constantes_max[15] = 4000000001.0; // niveau_max()
-		constantes_max[16] = 500.0; // experience_orbe()
-		constantes_max[17] = 500.0; // temperature_ideale()
-		constantes_max[18] = 3.0; // niveau_boutique_pour_niveau_zone()
-		constantes_max[19] = 4.0; // quantite_ressource_base_drops()
-		constantes_max[20] = 100.0; // quantite_ressource_base_marchands()
-		constantes_max[21] = 42.2; // nombre_zones()
-		constantes_max[22] = 500; // travel_cost()
-		constantes_max[23] = 5.0; // mul_points_competences_champions()
-		constantes_max[24] = 50.0; // mul_points_competences_super_champions()
-		constantes_max[25] = 5.0; // efficacite_base()
-		constantes_max[26] = 0.6; // puissance_ench_sup()
-		constantes_max[27] = 10000; // nombre_maximal_coup()
-		constantes_max[28] = 2.0; // multiplicateur_alliage()
-		constantes_max[29] = 3000.0; // limite_effondrement_inventaire()
-		constantes_max[30] = 1.0; // proba_effondrement()
-		constantes_max[31] = 50.0; // class_bonus_add()
-		constantes_max[32] = 10.0; // class_bonus_mult()
-		constantes_max[33] = 0.8; // class_malus_mult()
-		
-		constantes[0] = (int)(gen.nextInt(8)+6); // vie de départ()
-		constantes[1] = (int)(gen.nextInt(25)+8.0); // points_initiaux()
-		constantes[2] = 0.05+gen.nextDouble()*0.40; // proba_rencontrer_piege()
-		constantes[3] = 0.05+gen.nextDouble()*0.20; // proba_promo()
-		constantes[4] = 0.01*(gen.nextInt(6)+2.0); // proba_clearance_sale()
-		constantes[5] = 0.01*(gen.nextInt(10)+5.0); // proba_champion()
-		constantes[6] = 0.001*(gen.nextInt(10)+2.0); // proba_super_champion()
-		constantes[7] = 0.15+gen.nextDouble()*0.3; // proba_ressource()
-		constantes[8] = (0.2+gen.nextDouble()*0.4); // penalty_for_bad_material()
-		constantes[9] = (int)(gen.nextInt(131)+15); // penalty_for_new_challenge()
-		constantes[10] = (int)(gen.nextInt(4)+1); // penalty_for_travel
-		constantes[11] = (int)(gen.nextInt(151)+5); // penalty_for_dimensional_travel()
-		constantes[12] = 1.0+gen.nextDouble()*4.0; // penalty_for_death()
-		constantes[13] = (gen.nextInt(16)+2)*0.01; // base_gold_penalty_for_death()	
-		constantes[14] = 0.01*(gen.nextInt(76)+2.0); // plage_random()
-		constantes[15] = (100+gen.nextInt(1000))*100000; // niveau_max()
-		constantes[16] = (int)(gen.nextInt(100)+250); // experience_orbe()
-		constantes[17] = 5.0+gen.nextDouble()*20.0; // temperature_ideale()
-		constantes[18] = 0.4+gen.nextDouble()*0.6; // niveau_boutique_pour_niveau_zone()
-		constantes[19] = 0.7+gen.nextDouble()*0.6; // quantite_ressource_base_drops()
-		constantes[20] = 2.0+gen.nextDouble()*4.0; // quantite_ressource_base_marchands()
-		constantes[21] = (int)(gen.nextInt(15)+12); // nombre_zones()
-		constantes[22] = (int)(gen.nextInt(300)+50); // travel_cost()
-		constantes[23] = 1.5+gen.nextDouble()*2.0; // mul_points_competences_champions()
-		constantes[24] = 20.0+gen.nextDouble()*20.0; // mul_points_competences_super_champions()
-		constantes[25] = 0.2+gen.nextDouble()*0.8; // efficacite_base()
-		constantes[26] = 0.20+gen.nextDouble()*0.30; // puissance_ench_sup()
-		constantes[27] = (int)(gen.nextInt(960)+20); // nombre_maximal_coup()
-		constantes[28] = 1.1+gen.nextDouble()*0.90; // multiplicateur_alliage()
-		constantes[29] = 200.0+gen.nextInt(10)*100.0; // limite_effondrement_inventaire()
-		constantes[30] = 0.20+gen.nextDouble()*0.80; // proba_effondrement()
-		constantes[31] = 2.0+gen.nextInt(6); // class_bonus_add()
-		constantes[32] = 1.2+gen.nextInt(6)*0.1; // class_bonus_mult()
-		constantes[33] = 0.3+gen.nextInt(6)*0.1; // class_malus_mult()
-		
+		// Intitalize equations
 		equations = new Equation[nb_universe_equations];
 			
 		equations[0] = new Equation(gen, 1, 10, 1.0, true, 1.5, 0.8); // att_per_sec
@@ -288,7 +225,7 @@ import java.util.*;
 		equations[5] = new Equation(gen, 1, 15, 1.0, false, 1.2,0.7); // reduc
 		equations[6] = new Equation(gen, 1, 16, 0.0, true, 10.0, 0.65); // absorption
 		equations[7] = new Equation(gen, 1, 17, 10.0, true, 20.0, 1.0); // used in esquive_proba
-		equations[8] = new Equation(gen, 1, 18, 0.0, 1.0, 100.0, 0.35); // vol_de_vie
+		equations[8] = new Equation(gen, 1, 18, 4, 0.0, 0.12, 2.0); // vol_de_vie
 		equations[9] = new Equation(gen, 1, 19, 2.5, true, 8.0, 0.9); // regen
 		equations[10] = new Equation(gen, 1, 20, 10+gen.nextInt(10), true, 200.0, 0.6); // charge maximale
 		equations[11] = new Equation(gen, 1, 21, 0.5+gen.nextDouble()*1.5, 0.0, 30.0, 0.5); // temps_traque
@@ -301,7 +238,7 @@ import java.util.*;
 		equations[18] = new Equation(gen, 1, 28, 0.01+gen.nextDouble()*0.02, 1.0, 60.0, 0.5); // chance_magique
 		equations[19] = new Equation(gen, 1, 29, 0.01+gen.nextDouble()*0.02, 1.0, 80.0, 0.5); // chance_rare
 		equations[20] = new Equation(gen, 1, 30, 0.02+gen.nextDouble()*0.02, 1.0, 70.0, 0.5); // chance_qualite
-		equations[21] = new Equation(gen, 1, 31, 2.0, 50.0, 300, 0.3); // quantite_drop
+		equations[21] = new Equation(gen, 1, 31, 4, 2.0,1.5, 10.0); // quantite_drop
 		equations[22] = new Equation(gen, 1, 32, 0.1, 1.0, 30.0, 0.75); // puissance_ench_inf
 		equations[23] = new Equation(gen, 1, 33, 1.0, true, 5.0, 0.35); // multiplicateur_or
 		equations[24] = new Equation(gen, 1, 34, 1.0, true, 1.2, 0.55); // ed_mort_vivant
@@ -316,7 +253,7 @@ import java.util.*;
 		equations[33] = new Equation(gen, 1, 43, 0.0, 1.0,  50.0, 0.75); // proba_immunite_final
 		equations[34] = new Equation(gen, 1, 44, 1.0, true, 2.0, 0.5); // facteur_temps
 		equations[35] = new Equation(gen, 1, 45, 0.0, true, 10.0, 0.7); // epines
-		equations[36] = new Equation(gen, 1, 46, 0.0, 1.0+gen.nextDouble()*4.0, 180.0, 0.4); // represailles
+		equations[36] = new Equation(gen, 1, 46, 4, 0.0, 0.3+gen.nextDouble()*0.4,0.8); // represailles
 		equations[37] = new Equation(gen, 1, 47, 0.0, 1.0+gen.nextDouble()*4.0, 170.0, 0.4); // necrophagie
 		equations[38] = new Equation(gen, 1, 48, 0.5+gen.nextDouble()*1.5, 0.0, 30, 1.0); // temps_craft
 		equations[39] = new Equation(gen, 1, 49, 0.4+gen.nextDouble()*0.5, 1.0,  75.0, 0.7); // rendement
@@ -333,17 +270,17 @@ import java.util.*;
 		equations[50] = new Equation(gen, 1, 60, 0.0, 1.0, 50, 0.5); // modif_exp_lowlev
 		equations[51] = new Equation(gen, 1, 0.61, 0.0, true, 350.0, 1.2); // get_zone_level et get_zone_max_level
 		equations[52] = new Equation(gen, 1, 0.62, 1.0, true, 12.0, 1.1); // gold_drop
-		equations[53] = new Equation(gen, 0, 0.63, 10.0, true, 75.0, 1.45,0.1); //monster_points_for_level
+		equations[53] = new Equation(gen, -1, 0.63, 10.0, true, 75.0, 1.45,0.1); //monster_points_for_level
 		equations[54] = new Equation(gen, 1, 0.64, 1.5+gen.nextDouble()*1.0, true, 20.0, 1.45,0.1); // niveau_champion
-		equations[55] = new Equation(gen, 0, 0.65, 1.0, true, 10.0, 2.7); // traps_dmg_for_level
+		equations[55] = new Equation(gen, -1, 0.65, 1.0, true, 10.0, 2.7); // traps_dmg_for_level
 		equations[56] = new Equation(gen, 1, 66, 1.0, false, 0.5, 0.6); // penalty_reduction
 		equations[57] = new Equation(gen, 1, 67, 1.0, true, 4.0, 0.3); // zone_multiplier
 		equations[58] = new Equation(gen, 1, 68, 1.0, true, 0.8, 0.35); // points_divins_multiplier
 		equations[59] = new Equation(gen, 1, 0.690, 0.0, true, 30.0, 0.4); // points_divins_pour_x_orbe
 		equations[60] = new Equation(gen, 1, 70, 1.0, true, 1.5, 0.5); // multi_premier_coup
 		equations[61] = new Equation(gen, 1, 0.71, 0.0, true, 2500, 0.9,0.1); // xp_for_level
-		equations[62] = new Equation(gen, 1, 72, 1.0, true, 1.5, 0.28); // divine_cap_eq
-		equations[63] = new Equation(gen, 1, 73, 1.0, true, 1.8, 0.28); // divine_cap_const
+		equations[62] = new Equation(gen, 1, 72, 1.0, true, 1.5, 0.3); // divine_cap_eq
+		equations[63] = new Equation(gen, 1, 73, 1.0, true, 1.5, 0.6); // divine_cap_const
 		equations[64] = new Equation(gen, 1, 0.691, 4+gen.nextInt(4), true, 80, 0.4); // points_divins_pour_niveau
 		equations[65] = new Equation(gen, 1, 75, 1.0, false, 2.0, 0.6); // resources_weight_multiplier
 		equations[66] = new Equation(gen, 1, 76, 1.0, false, 0.8, 0.3); // equipment_weight_multiplier
@@ -357,7 +294,7 @@ import java.util.*;
 		equations[74] = new Equation(gen, 1, 84, 1.0, true, 1.0, 0.4); // affinite_precipitations
 		equations[75] = new Equation(gen, 1, 0.85, 1.0, true, 1.5, 0.3); // get_current_temperature
 		equations[76] = new Equation(gen, 1, 0.86, 1.0, true, 5.0, 1.0); // get_current_precipitation
-		equations[77] = new Equation(gen, 0, 0.87, 1.0, false, 50.0, 1.0); // base_overload_penalty
+		equations[77] = new Equation(gen, -1, 0.87, 1.0, false, 50.0, 1.0); // base_overload_penalty
 		equations[78] = new Equation(gen, 1, 88, 1.0, false, 1.0, 0.7); // resistance_surcharge
 		equations[79] = new Equation(gen, 1, 89, 1.0, true, 0.65, 0.45); // affinite_souscharge
 		equations[80] = new Equation(gen, 1, 90, 1.0, true, 0.6, 0.4); // affinite_hautfaits
@@ -373,12 +310,18 @@ import java.util.*;
 		equations[90] = new Equation(gen, 1, 90.5, 1.0, true, 2.0, 0.2); // affinite_vacances
 		equations[91] = new Equation(gen, 1, 0.693, 0.0, true, 10.0, 0.35);  //points_cosmiques_pour_x_ecus
 		equations[92] = new Equation(gen, 1, 0.692, 0.0, true, 200.0, 0.4); // points_cosmiques_pour_x_orbe
-		equations[93] = new Equation(gen, 1, 99, 0.0, true, 100.0, 0.75); // cosmologie
-		equations[94] = new Equation(gen, 1, 0.97, 0.4+gen.nextDouble()*0.5, true, 3.0, 0.2); // qualite_max_drop
-		equations[95] = new Equation(gen, 1, 0.98, 0.5+gen.nextDouble()*0.5, true, 2.0, 0.25); // qualite_max_craft
+		equations[93] = new Equation(gen, 1, 99, 0.0, true, 100.0, 0.75); // cosmologie_additive
+		equations[94] = new Equation(gen, 1, 0.971, 0.4+gen.nextDouble()*0.5, true, 3.0, 0.2); // qualite_max_drop
+		equations[95] = new Equation(gen, 1, 0.972, 0.5+gen.nextDouble()*0.5, true, 2.0, 0.25); // qualite_max_craft
+		equations[96] = new Equation(gen, 1, 100, 1.0, true, 1.0, 0.2); // cosmologie_multiplicative
+		equations[97] = new Equation(gen, -1, 0.973, 3, 10.0, 10.0, 4.0); // class_cost
+		equations[98] = new Equation(gen, -1, 0.974, 3, 10.0, 0.5, 7.0); // class_upgrade_cost
 		
 		for(int i=0; i< nb_universe_equations; i++)
 			equations[i].id = i;
+		
+		for(int i=0; i< nb_universe_stats; i++)
+			constantes[i].id = i;
 		
 		int preciousEquation[] = {40,48,52,53,55,58,59,61,62,64,68};
 		for(int i : preciousEquation)
@@ -387,16 +330,22 @@ import java.util.*;
 		sortedEquations = Arrays.copyOf(equations, equations.length);
 		Arrays.sort(sortedEquations, new Equation.SortByOrder());
 		
+		sortedConstantes = Arrays.copyOf(constantes, constantes.length);
+		Arrays.sort(sortedConstantes, new Constant.SortByOrder());
+		
 		divine_cap = new double[nb_universe_stats+nb_universe_equations];
 		
 		for(int i=0; i< nb_universe_stats; i++)
-			divine_cap[i]=50;
+			divine_cap[i]=75;
 		
 		for(int i=0; i< nb_universe_equations; i++)
 			divine_cap[i+nb_universe_stats]=sortedEquations[i].divine_cap;
 		
+		// Intitalize world map
 		map = new Map(gen);
 		
+		// Intitalize available objects
+		binVar = new boolean[StaticItem.nb_pos-1];
 		nuberSlotsAvailable = 0;
 		if(seed != 0)
 		{
@@ -429,6 +378,7 @@ import java.util.*;
 	public boolean slot_est_disponible(int slot){
 		return binVar[slot];
 	}
+	
 	public double att_per_sec(double x) {
 		return equations[0].eval(x);
 		}
@@ -641,14 +591,14 @@ import java.util.*;
 	
 	public double get_zone_level(int zone)
 	{
-		if(zone==0) return 100;
-		if(zone==1) return 2000;
+		if(zone==0) return Math.floor(constantes[35].value*0.8);
+		if(zone==1) return Math.floor(constantes[36].value*0.8);
 		return Math.floor(equations[51].eval(zone-2)+1.0);
 	}
 	public double get_zone_max_level(int zone)
 	{
-		if(zone==0) return 200;
-		if(zone==1) return 2500;
+		if(zone==0) return Math.floor(constantes[35].value*1.2);
+		if(zone==1) return Math.floor(constantes[36].value*1.2);
 		return Math.floor(equations[51].eval(zone-1));
 	}
 	
@@ -812,7 +762,7 @@ import java.util.*;
 		return equations[92].eval(x);
 	}
 	
-	public double cosmologie(double x) {
+	public double cosmologie_additive(double x) {
 		return equations[93].eval(x);
 	}
 	
@@ -822,6 +772,18 @@ import java.util.*;
 	
 	public double qualite_max_craft(double x) {
 		return equations[95].eval(x);
+	}
+	
+	public double cosmologie_multiplicative(double x) {
+		return equations[96].eval(x);
+	}
+	
+	public double class_cost(){
+		return equations[97].eval(1+classList.size()-initialClassListSize);
+	}
+	
+	public double class_upgrade_cost(double x){
+		return equations[98].eval(x);
 	}
 	
 	public double points_divins_totaux(double x, double y, double lvl) {
@@ -835,29 +797,28 @@ import java.util.*;
 		return 1.0;}
 
 	public double vie_depart() 
-	{ return adjusted_constant(0); }
+	{ return constantes[0].value;}
 		
     public double vie_max(double VITA, double CON)
-	{ return adjusted_constant(0) + pv_per_vita(CON)*VITA; }
+	{ return constantes[0].value + pv_per_vita(CON)*VITA; }
 	
 	public double points_initiaux()
-	{ return adjusted_constant(1); }
+	{ return constantes[1].value; }
 		
 	public double proba_rencontrer_piege() 
-	{ return adjusted_constant(2); }
+	{ return constantes[2].value; }
 	
 	public double proba_promo()
-	{ return adjusted_constant(3); }
+	{ return constantes[3].value; }
 	
 	public double proba_clearance_sale()
-	{ return adjusted_constant(4); }
+	{ return constantes[4].value; }
 	
 	public double proba_champion()
-	{ return adjusted_constant(5); }
+	{ return constantes[5].value; }
 	
 	public double proba_super_champion()
-	{ return adjusted_constant(6); }
-	
+	{ return constantes[6].value; }
 	
 	public double proba_trouver_piege(double td, double hidden_lvl)
 	{
@@ -866,92 +827,91 @@ import java.util.*;
 	}
 
 	double proba_ressource()
-	{ return adjusted_constant(7); }
+	{ return constantes[7].value; }
 	
 	double penalty_for_bad_material()
-    { return adjusted_constant(8); }
+    { return constantes[8].value; }
 	
 	double base_penalty_for_new_challenge()
-	{ return adjusted_constant(9); }
+	{ return constantes[9].value; }
 	
 	double base_penalty_for_travel()
-	{ return adjusted_constant(10); }
+	{ return constantes[10].value; }
 	
 	double base_penalty_for_dimensional_travel()
-	{ return adjusted_constant(11); }
+	{ return constantes[11].value; }
 	
 	double base_penalty_for_death()
-	{ return adjusted_constant(12); }
+	{ return constantes[12].value; }
 	
 	public double base_gold_penalty_for_death()
-	{ return adjusted_constant(13); }
+	{ return constantes[13].value; }
 	
-	double static_plage_random()
-    { return adjusted_constant(14); }
-	
-	double plage_random()
-    { return 1.0 + (Math.random() - 0.5) * adjusted_constant(14); }
+	public double base_penalty_for_class_change()
+	{ return constantes[14].value; }
 	
 	double niveau_max()
-	{ return adjusted_constant(15); }
+	{ return constantes[15].value; }
 	
 	double experience_orbe()
-	{ return adjusted_constant(16); }
+	{ return constantes[16].value; }
 
 	double temperature_ideale()
-	{ return adjusted_constant(17); }
+	{ return constantes[17].value; }
 	
 	double niveau_boutique_pour_niveau_zone()
-	{ return adjusted_constant(18); }
+	{ return constantes[18].value; }
 	
 	double quantite_ressource_base_drops()
-	{ return adjusted_constant(19); }
+	{ return constantes[19].value; }
 	
 	double quantite_ressource_base_marchands()
-	{ return adjusted_constant(20); }
+	{ return constantes[20].value; }
 	
 	double nombre_zones()
-	{ return adjusted_constant(21); }
+	{ return constantes[21].value; }
 	
 	public double travel_cost()
-	{ return adjusted_constant(22); }
+	{ return constantes[22].value; }
 	
 	public double mul_points_competences_champions()
-	{ return adjusted_constant(23); }
+	{ return constantes[23].value; }
 	
 	public double mul_points_competences_super_champions()
-	{ return adjusted_constant(24); }
+	{ return constantes[24].value; }
 	
 	double efficacite_base()
-	{ return adjusted_constant(25); }
+	{ return constantes[25].value; }
 	
 	public double puissance_ench_sup() 
-	{ return adjusted_constant(26); }
+	{ return constantes[26].value; }
 	
 	public double nombre_maximal_coup() 
-	{ return adjusted_constant(27); }
+	{ return constantes[27].value; }
 	
 	public double multiplicateur_alliage()
-	{ return adjusted_constant(28); }
+	{ return constantes[28].value; }
 	
 	public double limite_effondrement_inventaire()
-	{ return adjusted_constant(29); }
+	{ return constantes[29].value; }
 	
 	public double proba_effondrement()
-	{ return adjusted_constant(30); }
+	{ return constantes[30].value; }
 	
 	public double class_bonus_add()
-	{ return adjusted_constant(31); }
+	{ return constantes[31].value; }
 	
 	public double class_bonus_mult()
-	{ return adjusted_constant(32); }
+	{ return constantes[32].value; }
 	
 	public double class_malus_mult()
-	{ return adjusted_constant(33); }
+	{ return constantes[33].value; }
 	
+	double static_plage_random()
+	{ return constantes[34].value; }
 	
-	double adjusted_constant(int idx)
-	{ return adjust_constant(points_divins[idx],constantes[idx],constantes_min[idx], constantes_max[idx]); }
+	double plage_random()
+    { return 1.0 + (Math.random() - 0.5) * constantes[34].value; }
 	
 	
 	public double get_adjusted_temperature(int i, double temperature_modifier)

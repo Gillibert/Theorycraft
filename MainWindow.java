@@ -36,7 +36,8 @@ public class MainWindow extends javax.swing.JDialog {
 	public boolean mustRefreshCharge=true;
 	public boolean mustRefreshMonsters=true;
 	public boolean mustRefreshWeather=true;
-	public boolean mustRefreshstatsWithBonus=true;
+	public boolean mustRefreshStatsWithBonus=true;
+	public boolean mustRefreshClassList=true;
 	
     static private final long serialVersionUID = 1338162012;
 	private ScheduledExecutorService refreshService;
@@ -236,7 +237,8 @@ public class MainWindow extends javax.swing.JDialog {
 				
 		if(refCounter%5==0) {Achievements.refreshAchievements(Joueur,false);}
 		
-		if(mustRefreshstatsWithBonus) {Joueur.refresh_stats_with_bonus(); mustRefreshstatsWithBonus=false;}
+		if(mustRefreshClassList) {ClassW.updateClassTable(); ClassW.refresh(); mustRefreshClassList=false;}
+		if(mustRefreshStatsWithBonus) {Joueur.refresh_stats_with_bonus(); mustRefreshStatsWithBonus=false;}
 		if(mustRefreshCharge) {Joueur.refresh_charge(); mustRefreshCharge=false;}
 		if(mustRefreshWeather) {Joueur.refresh_weather_penalties(); mustRefreshWeather=false;}
 		

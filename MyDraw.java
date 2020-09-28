@@ -142,10 +142,10 @@ public class MyDraw extends JPanel {
 			else if(ty<10000.0) ster = String.format("%.0f",ty);
 			else ster = String.format("%2.2e",ty);
 			
-			graph.drawString(ster, 3, (int)ly+9);
+			graph.drawString(ster, 6, (int)ly+9);
 			}
 			
-		graph.drawString("0.00", 3, (int)(my-6));
+		graph.drawString("0.00", 4, (int)(my-6));
 
 	  	}
 		

@@ -6,7 +6,7 @@ public class ClassRPG implements Serializable {
 public int[] bonus;
 public int[] malus;
 public String name;
- 
+
 public ClassRPG(String n)
 {
 	name = n;

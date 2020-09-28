@@ -12,7 +12,8 @@ public class ClassWindow extends javax.swing.JDialog  {
 	private boolean mustRefreshInfos = true;
     private JButton choisir;
     private JScrollPane scroll;
-    private String[][] rowData;
+	private JScrollPane scroll2;
+    private MyTableModel tableModel;
     private JTable table;
 	private JEditorPane infos;
 
@@ -36,11 +37,13 @@ public class ClassWindow extends javax.swing.JDialog  {
 	this.setVisible(true);
     }
 	
-	private String infoHTML()
+	private void refreshInfos()
 	{
 		String res=Local.HTML_BODY;
 		int idx = table.getSelectedRow();
-		
+		if(idx >  Joueur.universe.classList.size() || idx < 0) 
+			{idx = 0;}
+		int nbline = 3;
 		if (idx >= 0)
 		{
 			ClassRPG theClass = Joueur.universe.classList.get(idx);
@@ -49,52 +52,52 @@ public class ClassWindow extends javax.swing.JDialog  {
 			res+= "<ul>";
 			for(int i=0; i<Joueur.nb_stats; i++)
 				if(theClass.bonus[i] > 0)
-					res+= "<li>" + Local.SKILLS_NAME[i];
+				{res+= "<li>" + Local.SKILLS_NAME[i]; nbline++;}
 			res+= "</ul>";
 			res+= "Réduit : ";
 			res+= "<ul>";
 			for(int i=0; i<Joueur.nb_stats; i++)
 				if(theClass.malus[i] > 0)
-					res+= "<li>" + Local.SKILLS_NAME[i];
+				{res+= "<li>" + Local.SKILLS_NAME[i]; nbline++;}
 			res+= "</ul>";
 		}
-		return res+Local.BODY_HTML_END;
+		infos.setText(res+Local.BODY_HTML_END);
 	}
 	
     public void refresh()
     {
 		if(mustRefreshInfos == true)
 		{
-			try{infos.setText(infoHTML());}
+			try{refreshInfos();}
 			catch (Exception e){System.out.println("Refresh problem in ClassWindow: " + e);}
 		}
 		table.repaint();
     }
 	
-	private void updateClassTable()
+	public void updateClassTable()
 	{
 		int idx = 0;
+		tableModel.clear();
 	    for (ClassRPG cls : Joueur.universe.classList)
 		{
+			String[] line= new String[1];
 			if (Joueur.current_class == idx)
-				rowData[idx][0] = "<html><font color=\"blue\">(" + cls.name + ")</font></html>";
+				line[0] = "<html><font color=\"blue\">(" + cls.name + ")</font></html>";
 			else
-				rowData[idx][0] =  cls.name;
+				line[0] = cls.name;
+			tableModel.addRow(line);
 			idx++;
 		}
 	}
 	
-    private javax.swing.JPanel getJFrameContentPane() {
+    private javax.swing.JPanel getJFrameContentPane() 
+	{
 	if (ivjJFrameContentPane == null) {
-			
-	    rowData = new String[Joueur.universe.classList.size()][2];
-		
-		updateClassTable();
-		
 		String[] colums = {Local.CLASS};
-	    AbstractTableModel mytm = new MyTableModel(rowData,colums);
+	    tableModel = new MyTableModel(new String[0][0],colums);
+		updateClassTable();
 
-	    table = new JTable(mytm);
+	    table = new JTable(tableModel);
 	    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	    table.setRowSelectionInterval(0,0);
 		
@@ -108,15 +111,18 @@ public class ClassWindow extends javax.swing.JDialog  {
 	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	    scroll.setBounds(new Rectangle(10, 5, 250, 495));
 
-
 		infos = new JEditorPane();
 	    infos.setEditable(false);
 		infos.setContentType("text/html");
-	    DefaultCaret caret = (DefaultCaret)infos.getCaret();
-	    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		infos.setBackground(scroll.getBackground());
 		infos.setSelectionColor(infos.getBackground());
-		infos.setBounds(new Rectangle(250+10+10, 5, 510, 520));
+		
+	    scroll2 = new JScrollPane(infos);
+	    scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	    scroll2.setBounds(new Rectangle(250+10+10, 5, 510, 520));
+
+	    DefaultCaret caret = (DefaultCaret)infos.getCaret();
+	    caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		
 	    choisir = new JButton();
 	    choisir.setBounds(new Rectangle(10, 495+10, 80, 21));
@@ -129,12 +135,12 @@ public class ClassWindow extends javax.swing.JDialog  {
 		});
 	    choisir.setMnemonic('c');
 		
-	    table.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 11));
+	    table.setFont(new Font(Local.FONT_TIMES, Font.BOLD, 12));
 
 	    ivjJFrameContentPane = new javax.swing.JPanel();
 	    ivjJFrameContentPane.setLayout(null);
 
-		ivjJFrameContentPane.add(infos);
+		ivjJFrameContentPane.add(scroll2);
 	    ivjJFrameContentPane.add(scroll);
 	    ivjJFrameContentPane.add(choisir);
 	}
@@ -144,11 +150,9 @@ public class ClassWindow extends javax.swing.JDialog  {
 	private void selectClass(int idx)
 	{
 		if(idx < 0) return;
-		ClassRPG cls = Joueur.universe.classList.get(idx);
-		Joueur.current_class = idx;
+		Joueur.change_class(idx);
 		updateClassTable();
 		refresh();
-		Joueur.refresh_stats_with_bonus();
 		Game.MW.mustRefreshCharge=true;
 	}
 	
@@ -164,7 +168,4 @@ public class ClassWindow extends javax.swing.JDialog  {
     
 	refresh();
     }
-	
-
-
 } 

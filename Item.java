@@ -80,10 +80,7 @@ public String item_description(Player p)
 	  for (int i=0; i<Player.nb_stats; i++)
 	  if (bonus(i)>0)
 	      {
-			if(bonus(i) >= 100)
-		  		res += String.format("%s +%.0f\n",Player.stats_name[i],bonus(i));
-			else
-				res += String.format("%s +%g\n",Player.stats_name[i],bonus(i));
+			res += String.format("%s +%g\n",Player.stats_name[i],bonus(i));
 	      }
   }
   return res;
@@ -388,6 +385,12 @@ static class ComparateurItem implements Comparator<Item> {
 	res += String.format("<br><br><b>Sécheresse alchimique (quantité quelconque) et %g orbe d'évolution</b>",orb_unit);
 	res += String.format("<br>Diminue le niveau de précipitation de la zone actuelle. La diminution dépend du niveau de précipitation actuel, du mombre de ressources sacrifiées et de la compétence <i>Rendement du craft</i>. La prochaine ressource sacrifiée diminuera le niveau de précipitation de %g%%.",100*(p.universe.get_current_precipitation(p.zone)-p.universe.get_adjusted_precipitation(p.zone,p.universe.map.current_precipitation_modifier.get(p.zone)-p.rendement()*0.1)));
 	
+	res += String.format("<br><br><b>%g classe alchimique et %g orbe d'évolution</b>",p.universe.class_cost(),orb_unit);
+	res += String.format("<br>Crée une nouvelle classe. Chaque classe existante augmente le coût.");
+	
+	res += String.format("<br><br><b>%g classe alchimique et %g orbe de transfert</b>",p.class_upgrade_cost(),orb_unit);
+	res += String.format("<br>Modifie la classe actuelle : ajoute une compétence augmentée et une compétence réduite. Chaque compétence supplémentaire augmente le coût.");
+	
 	res += String.format("<br><br><b>Une ressource (quantité quelconque) et %g orbe de transmutation</b>",orb_unit);
 	res += String.format("<br>Produit une nouvelle ressource élémentaire ou primordiale suivant le type de la ressource de départ. La quantité obtenue est calculée pour qu'il y ait conservation du prix avec une perte de %g%%.",100*(1-rendement));
 	
@@ -620,7 +623,7 @@ static class ComparateurItem implements Comparator<Item> {
 					comp.set_qty(comp.qty-orb_unit);
 					res.update();
 					rlist.add(res);
-					if(comp.qty>0.001) rlist.add(comp);			  
+					if(comp.qty>0.001) rlist.add(comp);
 				}
 				// orbe d'augmentation + ressource quelconque
 				// augmente la quantité de ressource (conservation du prix)
@@ -631,7 +634,8 @@ static class ComparateurItem implements Comparator<Item> {
 					comp.set_qty(comp.qty-orb_unit);
 					res.discount = other.discount;
 					rlist.add(res);
-					if(comp.qty>0.001) rlist.add(comp);			  
+					if(comp.qty>0.001) rlist.add(comp);		
+					Game.MW.addLog(String.format("Quantité de %s augmentée",other.name));					
 				}
 				// orbe d'évolution (ou de transfert) + ressource élémentaire
 				// transforme la ressource en ressource primordiale (conservation du prix)
@@ -643,7 +647,8 @@ static class ComparateurItem implements Comparator<Item> {
 					res.aligner_qty(p, other.prix()+comp.prix_unitaire()*orb_unit);
 					res.discount = other.discount;
 					rlist.add(res);
-					if(comp.qty>0.001) rlist.add(comp);	  
+					if(comp.qty>0.001) rlist.add(comp);
+					Game.MW.addLog(String.format("Création d'une ressource primordiale : %s",res.name));
 				}
 				// orbe d'évolution + ressource primordiale (chaud ou froid)
 				// change la température de la zone
@@ -658,19 +663,51 @@ static class ComparateurItem implements Comparator<Item> {
 					comp.set_qty(comp.qty-orb_unit);
 					if(comp.qty>0.001) rlist.add(comp);	  
 				}
-				// orbe d'évolution + ressource primordiale (humidité ou sécheresse)
-				// change le niveau de précipitation de la zone
-				else if(other.rare == 5 && comp.name.equals("Orbe d'évolution") && 
-				(other.name.equals("Humidité alchimique") || other.name.equals("Sécheresse alchimique")))
+				// orbe d'évolution + ressource primordiale (classe)
+				// crée une nouvelle classe
+				else if(other.rare == 5 && comp.name.equals("Orbe d'évolution") && other.name.equals("Classe alchimique")
+					&& other.qty >= p.universe.class_cost() && comp.qty > orb_unit)
 				{
-					double mdiff = other.qty*p.rendement()*0.1;
-					if(other.name.equals("Sécheresse alchimique")) mdiff=-mdiff;
-					
-					p.universe.map.current_precipitation_modifier.set(p.zone,p.universe.map.current_precipitation_modifier.get(p.zone)+mdiff);
-					p.refresh_weather_penalties();
+					double puc = p.universe.class_cost();
+					ArrayList<Integer> SkillsId = new ArrayList<Integer>(Local.SKILLS_NAME.length);
+					for(int i=0; i< Local.SKILLS_NAME.length; i++) SkillsId.add(i);
+					Collections.shuffle(SkillsId,p.universe.gen.gen);
+					String clna = String.format(Local.RANDOM_CLASS_NAME[(p.universe.classList.size()+5)%Local.RANDOM_CLASS_NAME.length],p.universe.nameGenerator.getName());
+					ClassRPG tc = new ClassRPG(clna);
+					tc.setBonus(new int[]{SkillsId.get(0),SkillsId.get(1),SkillsId.get(2),SkillsId.get(3)});
+					tc.setMalus(new int[]{SkillsId.get(4),SkillsId.get(5),SkillsId.get(6)});
+					p.universe.classList.add(tc);
+					Game.MW.mustRefreshClassList = true;
 					comp.set_qty(comp.qty-orb_unit);
-					if(comp.qty>0.001) rlist.add(comp);	  
+					other.set_qty(other.qty-puc);
+					if(comp.qty>0.001) rlist.add(comp);
+					if(other.qty>0.001) rlist.add(other);
+					Game.MW.addLog(String.format("Création d'une nouvelle classe : %s",clna));
 				}
+				// orbe de transfert + ressource primordiale (classe)
+				// modifie la classe actuelle
+				else if(other.rare == 5 && comp.name.equals("Orbe de transfert") && other.name.equals("Classe alchimique")
+					&& other.qty >= p.class_upgrade_cost() && comp.qty > orb_unit && p.current_class != -1)
+				{
+					double puc = p.class_upgrade_cost();
+					String clna = p.universe.classList.get(p.current_class).name;
+					boolean upgrade_success = p.upgrade_class();
+					if(upgrade_success)
+					{
+						comp.set_qty(comp.qty-orb_unit);
+						other.set_qty(other.qty-puc);
+						if(comp.qty>0.001) rlist.add(comp);
+						if(other.qty>0.001) rlist.add(other);
+						Game.MW.addLog(String.format("La classe %s est modifiée",clna));
+					}
+					else
+					{
+						rlist.add(comp);
+						rlist.add(other);
+						Game.MW.addLog(String.format("La classe %s ne peut pas être modifiée",clna));
+					}
+				}
+				
 				// orbe d'évolution + objet normal, magique ou rare
 				// ajoute un enchantement à l'objet (dans la limite des 5 enchantements)
 				else if(other.rare < 3 && comp.name.equals("Orbe d'évolution")) 

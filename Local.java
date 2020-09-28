@@ -325,7 +325,7 @@ public class Local {
 	public static String LAKE;
 	public static String FORTRESS;
 	public static String TREE_CITY;
-	public static String MASSIF ;
+	public static String MASSIF;
 	public static String FOREST;
 	public static String CAPE;
 	public static String CAVES;
@@ -333,6 +333,7 @@ public class Local {
 	public static String ROADSTEAD;
 	public static String WOOD;
 	public static String ARENA;
+	public static String GREAT_ARENA;
 	public static String MOUTH;
 	public static String JUNCTION;
 	public static String RAVINE;
@@ -525,13 +526,18 @@ public class Local {
 	public static String MUTUAL_FLEE;
 	public static String BLACK_HOLE;
 	public static String ADDITIONAL_COSMIC_POINTS;
+	public static String COSMIC_POINTS_MULTIPLIER;
+	public static String CLASS_COST;
+	public static String CLASS_UPGRADE_COST;
 	public static String MAXIMUM_OBJECT_QUALITY_LOOT;
 	public static String MAXIMUM_OBJECT_QUALITY_CRAFT;
 	public static String MAXIMUM_OBJECT_QUALITY_LOOT_S;
 	public static String MAXIMUM_OBJECT_QUALITY_CRAFT_S;
 	public static String CLASS;
 	public static String CHOICE_OF_CLASS;
-	
+	public static String INITIAL_CLASS_SELECTION;
+	public static String CLASS_CHANGE;
+
 	public static void init(int lang)
 	{
 	if(lang == 0)
@@ -549,7 +555,7 @@ public class Local {
 		"Vitesse du temps","Épines","Représailles","Nécrophagie",
 		"Vitesse du craft", "Rendement du craft", "Économie d'orbes", 
 		"Niveau des marchands", "Inventaire des marchands", 
-		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Affinité aux vacances", "Accro du shopping", "Promophile","Cosmologie"};
+		"Détection des pièges", "Bonus d'initiative face aux pièges", "Bonus de résistance aux pièges","Rente viagère","Éducation", "Apprentissage", "Overkilling", "Hardiesse", "Réduction des pénalités", "Accès étendu", "Divinité", "Premier coup", "Maîtrise des équations", "Maîtrise des constantes", "Allégement des ressources", "Allégement de l'équipement", "Résistance au froid", "Résistance à la chaleur", "Résistance aux précipitations",  "Affinité au froid", "Affinité à la chaleur", "Affinité aux précipitations","Résistance à la surcharge", "Affinité à la sous-charge", "Affinité au haut-faits", "Affinité aux vacances", "Accro du shopping", "Promophile","Cosmologie additive","Cosmologie multiplicative"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"déchet","tissu/cuir","métal","pierre précieuse","conceptuel","alliage"};
@@ -675,11 +681,11 @@ public class Local {
 		"Pénalité de temps d'un voyage dimensionnel",
 		"Pénalité de temps à chaque mort",
 		"Pénalité d'or à chaque mort",
-		"Plage aléatoire",
+		"Pénalité de temps pour changer de classe",
 		"Niveau maximal",
 		"Expérience pour le sacrifice d'un orbe",
 		"Température idéale",
-		"Niveau des marchands (pourcentage du niveau de la zone)",
+		"Niveau des marchands (proportion du niveau de la zone)",
 		"Quantité de ressources de base (butin)",
 		"Quantité de ressources de base (marchands)",
 		"Nombre de zones",
@@ -694,7 +700,10 @@ public class Local {
 		"Probabilité d'effondrement de l'inventaire",
 		"Bonus additif de classe",
 		"Bonus multiplicatif de classe",
-		"Malus multiplicatif de classe"};
+		"Malus multiplicatif de classe",
+		"Plage aléatoire",
+		"Niveau de la petite arène",
+		"Niveau de la grande arène"};
 		UNIVERSE_STATS_NAME = tmp19;
 		
 		String[] tmp20 = {"Pas de vacances","Nouvel an","Fête du travail","Halloween","Noël","Équinoxe du printemps"};
@@ -703,7 +712,7 @@ public class Local {
 		String[] tmp21 = {"%s","%s ivre","%s en grève","%s d'Halloween","%s de Noël","%s printanier"};
 		HOLIDAY_FORMAT = tmp21;
 		
-		String[] tmp22 = {"Disciple de %s","Condisciple de %s","Rejeton de %s","Héritier de %s","Élève de %s","Apprenti de %s"};
+		String[] tmp22 = {"Disciple de %s","Condisciple de %s","Rejeton de %s","Héritier de %s","Élève de %s","Apprenti de %s","Adepte de %s","Apôtre de %s","Fidèle de %s"};
 		RANDOM_CLASS_NAME = tmp22;
 		
 		COLON = " :";
@@ -972,13 +981,13 @@ public class Local {
 		KILL_BILL = "Kill Bill";
 		BILL_BOSS = "Bill";
 		GOAL = "\nObjectif : ";
-		REACH_LEVEL = "atteindre le niveau %d";
-		WIN_GOLD_COINS = "gagner %d écus";
+		REACH_LEVEL = "atteindre le niveau %g";
+		WIN_GOLD_COINS = "gagner %g écus";
 		DEFEAT_BOSS = "vaincre %s";
-		LEVEL_REACHED_VICTORY = "Niveau %d atteint, victoire !";
-		YOU_MUST_BE_AT_LEAST_LEVEL = "%s doit être au moins niveau %d pour gagner.";
-		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possède %d écus, victoire !";
-		YOU_MUST_POSSESS_AT_LEAST = "%s doit posséder au moins %d écus pour gagner.";
+		LEVEL_REACHED_VICTORY = "Niveau %g atteint, victoire !";
+		YOU_MUST_BE_AT_LEAST_LEVEL = "%s doit être au moins niveau %g pour gagner.";
+		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possède %g écus, victoire !";
+		YOU_MUST_POSSESS_AT_LEAST = "%s doit posséder au moins %g écus pour gagner.";
 
 		CHOOSE_A_SEED = "Choisissez une graine (un entier naturel)\n 0 pour les règles classiques";
 		CREATE_A_UNIVERSE = "Création d'un univers";
@@ -1013,6 +1022,7 @@ public class Local {
 		ROADSTEAD = "Rade";
 		WOOD = "Bois";
 		ARENA = "Arène";
+		GREAT_ARENA = "Grande arène";
 		MOUTH = "Bouche";
 		JUNCTION = "Confluent";
 		RAVINE = "Ravin";
@@ -1209,6 +1219,9 @@ public class Local {
 		
 		MUTUAL_FLEE = "Le combat s'éternise. Après %d coups échangés, %s et %s abandonnent tous les deux.";
 		BLACK_HOLE = "L'inventaire de %s contient plus de %d objets différents. Il s'effondre et un trou noir se forme (%g%% de probabilité).\n%s recoit %g points cosmiques (%d objets sont détruits, pour une valeur totale de %g écus).";
+		COSMIC_POINTS_MULTIPLIER = "Muliplicateur de points cosmiques";
+		CLASS_COST = "Cout d'une classe en fonction du nombre de classes";
+		CLASS_UPGRADE_COST = "Cout d'upgrade d'une classe en fonction du nombre de bonus de classe";
 		ADDITIONAL_COSMIC_POINTS = "Points cosmiques additionnels";
 		MAXIMUM_OBJECT_QUALITY_LOOT = "Qualité maximale des objets en fonction des points cosmiques (butin)";
 		MAXIMUM_OBJECT_QUALITY_CRAFT = "Qualité maximale des objets en fonction des points cosmiques (crafting)";
@@ -1217,7 +1230,9 @@ public class Local {
 		MAXIMUM_OBJECT_QUALITY_CRAFT_S = "Qualité maximale des objets (crafting)";
 		CLASS = "Classe";
 		CHOICE_OF_CLASS = "Choix de la classe";
-		
+		INITIAL_CLASS_SELECTION = "Choix de la classe initiale : %s (0.0 secondes).";
+		CLASS_CHANGE = "Changement de classe (%s, pénalité de %g secondes).";
+
 		PLAYER_INFOS = getPlayerInfos();
 		UNIVERSE_EQUATIONS_NAME = getEquationName();
 	}
@@ -1236,7 +1251,7 @@ public class Local {
 		"Speed of time","Thorns","Reprisals","Necrophagy",
 		"Speed of craft", "Craft performance", "Saving orbs", 
 		"Merchant level", "Merchant inventory", 
-		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Holiday affinity","Shopping addict","Discount specialist","Cosmology"};
+		"Trap detection", "Initiative bonus against traps", "Resistance to traps","Life annuity","Education", "Learning", "Overkilling", "Boldness", "Penalties reduction","Extended access", "Deity", "First strike","Mastery of equations", "Mastery of constants", "Lighter resources", "Lighter equipment", "Cold resistance", "Heat resistance", "Precipitation resistance", "Cold affinity", "Heat affinity", "Precipitation affinity", "Overload resistance","Underload affinity","Achievements affinity","Holiday affinity","Shopping addict","Discount specialist","Additive cosmology","Multiplicative cosmology"};
 		SKILLS_NAME = tmp2;
 		
 		String[] tmp3 = {"junk","fabric/leather","metal","gemstone","conceptual","alloy"};
@@ -1362,11 +1377,11 @@ public class Local {
 		"Time penalty to change universe",
 		"Time penalty at each death",
 		"Gold penalty at each death ",
-		"Random range",
+		"Time penalty to change class",
 		"Maximum level",
 		"Experience for the sacrifice of an orb",
 		"Ideal temperature",
-		"Merchant level (percentage of zone level)",
+		"Merchant level (proportional to zone level)",
 		"Base quantity of resources (loot)",
 		"Base quantity of resources (merchants)",
 		"Number of zones",
@@ -1381,7 +1396,10 @@ public class Local {
 		"Inventory collapse probability",
 		"Class bonus (additive)",
 		"Class bonus (multiplicative)",
-		"Class malus (multiplicative)"};
+		"Class malus (multiplicative)",
+		"Random range",
+		"Small arena level",
+		"Great arena level"};
 		UNIVERSE_STATS_NAME = tmp19;
 		
 		String[] tmp20 = {"No holiday","New year","International Workers' Day","Halloween","Christmas","Spring equinox"};
@@ -1660,13 +1678,13 @@ public class Local {
 		KILL_BILL = "Kill Bill";
 		BILL_BOSS = "Bill";
 		GOAL = "\nGoal: ";
-		REACH_LEVEL = "reach level %d";
-		WIN_GOLD_COINS = "win %d gold coins";
+		REACH_LEVEL = "reach level %g";
+		WIN_GOLD_COINS = "win %g gold coins";
 		DEFEAT_BOSS = "defeat %s";
-		LEVEL_REACHED_VICTORY = "Level %d reached, victory!";
-		YOU_MUST_BE_AT_LEAST_LEVEL = "%s must be at least level %d to win.";
-		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possess %d gold coins, victory!";
-		YOU_MUST_POSSESS_AT_LEAST = "%s must possess at least %d gold coins to win.";
+		LEVEL_REACHED_VICTORY = "Level %g reached, victory!";
+		YOU_MUST_BE_AT_LEAST_LEVEL = "%s must be at least level %g to win.";
+		YOU_POSSESS_GOLD_COINS_VICTORY = "%s possess %g gold coins, victory!";
+		YOU_MUST_POSSESS_AT_LEAST = "%s must possess at least %g gold coins to win.";
 		
 		
 		CHOOSE_A_SEED = "Choose a seed (a natural integer)\n 0 for the classic rules";
@@ -1702,6 +1720,7 @@ public class Local {
 		ROADSTEAD = "Roadstead";
 		WOOD = "Wood";
 		ARENA = "Arena";
+		GREAT_ARENA = "Great arena"; 
 		MOUTH = "Mouth";
 		JUNCTION = "Junction";
 		RAVINE = "Rift";
@@ -1897,10 +1916,16 @@ public class Local {
 		MUTUAL_FLEE = "The fight is taking forever. After %d attacks, %s and %s both give up.";
 		BLACK_HOLE = "The inventory of %s contains more than %d different objects. It collapses, forming a black hole (%g%% probability).\n%s receives %g cosmic points (%d objects are destroyed, for a total value of %g gold coins).";
 		ADDITIONAL_COSMIC_POINTS = "Additional cosmic points";
+		COSMIC_POINTS_MULTIPLIER = "Cosmic points multiplier";
+		CLASS_COST = "Cost of a class according to the number of classes";
+		CLASS_UPGRADE_COST = "Cost of a class upgrade according to the number of class bonuses";
 		MAXIMUM_OBJECT_QUALITY_LOOT = "Maximum object quality according to cosmic points (loot))";
 		MAXIMUM_OBJECT_QUALITY_CRAFT = "Maximum object quality according to cosmic points (crafting)";
 		CLASS = "Class";
 		CHOICE_OF_CLASS = "Choice of class";
+		INITIAL_CLASS_SELECTION = "Initial class selection: %s (0.0 seconds).";
+		CLASS_CHANGE = "Class change (%s, penalty of %g seconds).";
+
 		PLAYER_INFOS = getPlayerInfos();
 		UNIVERSE_EQUATIONS_NAME = getEquationName();
 	}
@@ -2020,6 +2045,7 @@ public class Local {
 		CLEARANCE_SALE_INVENTORY_MULTIPLIER + Local.COLON + " %g\n"+
 		DISCOUNT_PRICE_MULTIPLIER + Local.COLON + " %g\n"+
 		ADDITIONAL_COSMIC_POINTS + Local.COLON + " %g\n"+
+		COSMIC_POINTS_MULTIPLIER + Local.COLON + " %g\n"+
 		MAXIMUM_OBJECT_QUALITY_LOOT_S + Local.COLON + " %g%%\n"+
 		MAXIMUM_OBJECT_QUALITY_CRAFT_S  + Local.COLON + " %g%%";
 		return res;
@@ -2122,7 +2148,10 @@ public class Local {
 	COSMIC_POINTS_ORBS,
 	ADDITIONAL_COSMIC_POINTS,
 	MAXIMUM_OBJECT_QUALITY_LOOT,
-	MAXIMUM_OBJECT_QUALITY_CRAFT
+	MAXIMUM_OBJECT_QUALITY_CRAFT,
+	COSMIC_POINTS_MULTIPLIER,
+	CLASS_COST,
+	CLASS_UPGRADE_COST
 	};
 	
 	return tmpStr;

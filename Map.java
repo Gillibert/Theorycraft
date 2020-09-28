@@ -252,7 +252,7 @@ public class Map implements Serializable {
 		current_precipitation_modifier.add(0.0);
 		
 		zonesR.add(new Rectangle(403, 26, 66, 37));
-		zonesName.add(nameGen.getNameOf(Local.ARENA));
+		zonesName.add(nameGen.getNameOf(Local.GREAT_ARENA));
 		boss_coeff.add(0.002);
 		trap_coeff.add(0.01);
 		temperature.add(18.0);

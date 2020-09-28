@@ -97,16 +97,16 @@ public class InfoWindow extends javax.swing.JDialog  {
 		res += Local.UNIVERSE_CONST;
 		for(int i=0; i< Local.UNIVERSE_STATS_NAME.length; i++)
 		{
-		if(i == 8)
-			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[i] + Local.COLON + " %g [%g %g]",
+		if(Joueur.universe.sortedConstantes[i].id == 8)
+			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[Joueur.universe.sortedConstantes[i].id] + Local.COLON + " %g [%g %g]",
 			Joueur.universe.penalty_for_bad_material(),
 			Joueur.universe.penalty_for_bad_material()*(1.0 - 0.5 * Joueur.universe.static_plage_random()),
 			Joueur.universe.penalty_for_bad_material()*(1.0 + 0.5 * Joueur.universe.static_plage_random()));
-		else if(i == 14)
-			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[i] + Local.COLON + " %g [%g %g]",
+		else if(Joueur.universe.sortedConstantes[i].id == 34)
+			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[Joueur.universe.sortedConstantes[i].id] + Local.COLON + " %g [%g %g]",
 			Joueur.universe.static_plage_random(),1.0 - 0.5 * Joueur.universe.static_plage_random(), 1.0 + 0.5 * Joueur.universe.static_plage_random());
 		else
-			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[i] + Local.COLON + " %g",Joueur.universe.adjusted_constant(i));
+			res += String.format("<li>" + Local.UNIVERSE_STATS_NAME[Joueur.universe.sortedConstantes[i].id] + Local.COLON + " %g",Joueur.universe.sortedConstantes[i].value);
 		}
 		res += "</ul>";
 		res += Local.H3_AVAILABLE_OBJECTS_H3;

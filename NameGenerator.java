@@ -1,11 +1,11 @@
 import java.util.*;
-
+import java.io.*;
 /*
 * Thanks to Simon Heinen for his Simple Random Name Generator for Java
 * Source http://andrdev.blogspot.de/2011/02/simple-random-name-generator.html
 */
 
-public class NameGenerator {
+public class NameGenerator implements Serializable {
 
 private List<String> vocals = new ArrayList<String>();
 private List<String> startConsonants = new ArrayList<String>();

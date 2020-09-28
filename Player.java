@@ -68,13 +68,68 @@ public class Player implements Serializable {
 	    if (s1.nb_pts() < s2.nb_pts()) return 1;
 	    else return 0;
 	} 
-}
+	}
+	
+	public double class_upgrade_cost()
+	{
+		int cc = Math.max(0,current_class);
+		ClassRPG theClass = universe.classList.get(cc);
+		int nbc = 0;
+		for(int i=0; i<nb_stats; i++)
+				if(theClass.bonus[i] > 0) nbc++;
+		return universe.class_upgrade_cost(nbc);
+	}
+	
+	public boolean upgrade_class()
+	{
+		int thid, thid2;
+		ClassRPG theClass = universe.classList.get(current_class);
+		ArrayList<Integer> skillsId = new ArrayList<Integer>();
+		for(int i=0; i<nb_stats; i++)
+			if(theClass.bonus[i] == 0 && theClass.malus[i] == 0) 
+				skillsId.add(i);
+		if(skillsId.size() < 3) return false;
+		
+		thid =  skillsId.get((int)(Math.random()*skillsId.size()));
+		thid2 = skillsId.get((int)(Math.random()*skillsId.size()));
+		for(int i=0; i<3; i++)
+		{
+			if(thid2!=thid) break;
+			thid2 = skillsId.get((int)(Math.random()*skillsId.size()));
+		}
+		
+		theClass.bonus[thid] = 1;
+		if(thid2 != thid) theClass.malus[thid2] = 1;
+		refresh_stats_with_bonus();
+		return true;
+	}
+	
+	public void change_class(int idx)
+	{
+		if(idx == current_class || idx == -1) return;
+
+		ClassRPG cls = universe.classList.get(idx);
+		if(current_class == -1) 
+		{
+			current_class = idx;
+			if(disp) Game.MW.addLog(String.format(Local.INITIAL_CLASS_SELECTION,cls.name));
+		}
+		else
+		{
+			current_class = idx;
+			double bp = universe.base_penalty_for_class_change();
+			double pr = penalty_reduction();
+			personal_wait(bp*pr,TimeStats.ACTIVITY_PENALTY);
+			if(disp) Game.MW.addLog(String.format(Local.CLASS_CHANGE,cls.name,bp*pr));
+		}
+		refresh_stats_with_bonus();
+	}
 	
 	public double points_cosmiques_totaux()
 	{
-		return points_de_competence_cosmique()
+		return multiplicateur_points_cosmiques()*(points_de_competence_cosmique()
 		+universe.points_cosmiques_pour_x_orbe(orbes_investits_en_points_cosmiques)
-		+universe.points_cosmiques_pour_x_ecus(or_perdu_en_trou_noirs);
+		+universe.points_cosmiques_pour_x_ecus(or_perdu_en_trou_noirs));
 	}
 	
 	public double heat_penalty()
@@ -608,7 +663,6 @@ public class Player implements Serializable {
 
     public void refresh_stats_with_bonus()
     {
-	System.out.println("refresh_stats_with_bonus()");
 	for(int i=0; i<nb_stats; i++) 
 		{
 		item_bonus[i]=0;
@@ -715,8 +769,11 @@ public class Player implements Serializable {
 			cold_affinity(), heat_affinity(), precipitation_affinity(), underload_affinity(),achievements_affinity(),bonus_vacances(),
 			100*(cold_bonus()-1.0), 100*(heat_bonus()-1.0), 100*(precipitation_bonus()-1.0),
 			100*(underload_bonus()-1.0),100*(bonus_haut_faits()-1.0),
-			clearance_sale_inventory_multiplier(),discount_multiplier(),points_de_competence_cosmique(),
-			100*universe.qualite_max_drop(points_cosmiques_totaux()),100*universe.qualite_max_craft(points_cosmiques_totaux())
+			clearance_sale_inventory_multiplier(),discount_multiplier(),
+			points_de_competence_cosmique(),
+			multiplicateur_points_cosmiques(),
+			100*universe.qualite_max_drop(points_cosmiques_totaux()),
+			100*universe.qualite_max_craft(points_cosmiques_totaux())
 			);
 	}
 
@@ -933,9 +990,12 @@ public class Player implements Serializable {
 	public double DISCOUNT_SPEC()
 	{return stats_with_bonus[Universe.DISCOUNT_SPEC];}
 	
-	public double COSMOLOGY()
-	{return stats_with_bonus[Universe.COSMOLOGY];}
-		
+	public double COSMO_ADD()
+	{return stats_with_bonus[Universe.COSMO_ADD];}
+	
+	public double COSMO_MUL()
+	{return stats_with_bonus[Universe.COSMO_MUL];}
+	
 	public double total_skill_points()
 	{
 		double res=0;
@@ -1019,7 +1079,8 @@ public class Player implements Serializable {
 	public double discount_multiplier() {return universe.discount_multiplier(DISCOUNT_SPEC());}
 	public double bonus_haut_faits() {return universe.bonus_haut_faits_base(points_haut_faits*achievements_affinity());}
 	public double bonus_vacances() {return universe.affinite_vacances(HOLIDAY_BONUS());}
-	public double points_de_competence_cosmique() {return universe.cosmologie(COSMOLOGY());}
+	public double points_de_competence_cosmique() {return universe.cosmologie_additive(COSMO_ADD());}
+	public double multiplicateur_points_cosmiques() {return universe.cosmologie_multiplicative(COSMO_MUL());}
 	
 	public double divine_cap(int i){
 		if(i < universe.nb_universe_stats) return universe.divine_cap[i] * universe.divine_cap_const(CONST_MASTER());
@@ -1250,7 +1311,7 @@ public Player()
 	for (int i=1;i<500;i+=1)
 	    {
 		it = new Item(i,this,Item.ITEM_DROP);
-		if(it.stackable) it.set_qty(5.0);
+		if(it.stackable) it.set_qty(1.0e20);
 		inventory.add(it);
 		}
 	
@@ -1887,11 +1948,17 @@ public Player()
 		refresh_weather_penalties();
 		Monster.SetOptimalDistribution(universe);
 		StaticItem.init(universe);
-
+		current_class=-1;
 		double bp = universe.base_penalty_for_dimensional_travel();
 		double pen_reduc = penalty_reduction();
 		if(disp) Game.MW.addLog(String.format(Local.UNIVERSE_CHANGE, bp*pen_reduc, pen_reduc,bp));
 		personal_wait(bp*pen_reduc,TimeStats.ACTIVITY_PENALTY);
+		Game.MW.mustRefreshCurves=true;
+		Game.MW.mustRefreshCharge=true;
+		Game.MW.mustRefreshMonsters=true;
+		Game.MW.mustRefreshWeather=true;
+		Game.MW.mustRefreshStatsWithBonus=true;
+		Game.MW.mustRefreshClassList=true;
 	}
 	
 public void reset_build()

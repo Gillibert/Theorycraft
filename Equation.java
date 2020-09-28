@@ -55,6 +55,37 @@
 	}
 	}
 	
+	//  type=3 exp, type=4 log, invalid for other types **** WIP TODO log
+	public Equation(TheoryGenerator gen, int auto_dist, double ord, int typei, double lstart, double linearSpeed, double expSpeed)
+	{
+		type = typei;
+		auto_dist_strategy = auto_dist;
+		order = ord;
+		
+		double exp_min, exp_max;
+		double mul_max, mul_min;
+		
+		exp_min = expSpeed*(1-0.25);
+		exp_max = expSpeed*(1+0.25);
+		
+		x_mul_num_max = linearSpeed*(1+0.5);
+		x_mul_num_min = linearSpeed*(1-0.5);
+		x_mul_num = (x_mul_num_max-x_mul_num_min)*gen.nextDouble()+x_mul_num_min;
+		
+		exponent_num_max = exp_max;
+		exponent_num_min = exp_min;
+		exponent_num = (exp_max-exp_min)*gen.nextDouble()+exp_min;
+	
+		x_add_denom_max = 100;
+		x_add_denom_min = 100;
+		x_add_denom = gen.nextDouble()*(x_add_denom_min-x_add_denom_max)+x_add_denom_min;
+	
+		start = lstart;
+		if (type==3) x_add_num = start-x_mul_num;
+		else if (type==4) x_add_num = start-x_mul_num*Math.log(x_add_denom);
+		update(0.0);
+	}
+	
 	public Equation(TheoryGenerator gen, int auto_dist, double ord, double lstart, boolean croissant, double linearSpeed, double expSpeed)
 	{
 		this(gen, auto_dist, ord, lstart, croissant, linearSpeed, expSpeed, 0.25);
@@ -85,7 +116,7 @@
 			
 			x_add_num_max = add_max;
 			x_add_num_min = add_min;
-			x_add_num = gen.nextDouble()*(add_min-add_max)+add_max;;
+			x_add_num = gen.nextDouble()*(add_min-add_max)+add_max;
 			
 			x_mul_num_max = mul_max;
 			x_mul_num_min = mul_min;
@@ -164,7 +195,7 @@
 		x_add_num_min = Math.pow(x_add_denom_min,exponent_denom_min)*(start-end);
 		x_add_num = Math.pow(x_add_denom,exponent_denom)*(start-end);
 		type=2;
-		update(0);
+		update(0.0);
 	}
 	
 	public void disp()
@@ -180,12 +211,16 @@
 	
 	public double evalStatic(double x)
 	{
-		return Math.max(0.0,(Math.pow(x*x_mul_num+x_add_num,exponent_num) / Math.pow(x*x_mul_denom+x_add_denom,exponent_denom)) + result_add);
+		if (type == 3) return x_add_num+x_mul_num*Math.pow(exponent_num,x);
+		else if (type == 4) return x_add_num+x_mul_num*Math.log(exponent_num*x+x_add_denom);
+		else return Math.max(0.0,(Math.pow(x*x_mul_num+x_add_num,exponent_num) / Math.pow(x*x_mul_denom+x_add_denom,exponent_denom)) + result_add);
 	}
 	
 	public double eval(double x)
 	{
-		return Math.max(0.0,(Math.pow(x*x_mul_num_adj+x_add_num_adj,exponent_num_adj) / Math.pow(x*x_mul_denom_adj+x_add_denom_adj,exponent_denom_adj)) + result_add_adj);
+		if (type == 3) return x_add_num_adj+x_mul_num_adj*Math.pow(exponent_num_adj,x);
+		else if (type == 4) return x_add_num_adj+x_mul_num_adj*Math.log(exponent_num_adj*x+x_add_denom_adj);
+		else return Math.max(0.0,(Math.pow(x*x_mul_num_adj+x_add_num_adj,exponent_num_adj) / Math.pow(x*x_mul_denom_adj+x_add_denom_adj,exponent_denom_adj)) + result_add_adj);
 	}
 	
 	public void update(double adj)
@@ -194,7 +229,7 @@
 		{
 		double x = adj*0.005;
 		exponent_num_adj = exponent_num_max * (x/(x+1)) + exponent_num * (1-x/(x+1));
-		if (type!=1 && type!=2) x_add_num_adj = x_add_num_max * (x/(x+1)) + x_add_num * (1-x/(x+1));
+		if (type==0) x_add_num_adj = x_add_num_max * (x/(x+1)) + x_add_num * (1-x/(x+1));
 		x_mul_num_adj = x_mul_num_max * (x/(x+1)) + x_mul_num * (1-x/(x+1));
 		exponent_denom_adj = exponent_denom_max * (x/(x+1)) + exponent_denom * (1-x/(x+1));
 		if (type!=0) x_add_denom_adj = x_add_denom_max * (x/(x+1)) + x_add_denom * (1-x/(x+1));
@@ -205,7 +240,7 @@
 		{
 		double x = -adj*0.005;
 		exponent_num_adj = exponent_num_min * (x/(x+1)) + exponent_num * (1-x/(x+1));
-		if (type!=1 && type!=2) x_add_num_adj = x_add_num_min * (x/(x+1)) + x_add_num * (1-x/(x+1));
+		if (type==0) x_add_num_adj = x_add_num_min * (x/(x+1)) + x_add_num * (1-x/(x+1));
 		x_mul_num_adj = x_mul_num_min * (x/(x+1)) + x_mul_num * (1-x/(x+1));
 		exponent_denom_adj = exponent_denom_min * (x/(x+1)) + exponent_denom * (1-x/(x+1));
 		if (type!=0) x_add_denom_adj = x_add_denom_min * (x/(x+1)) + x_add_denom * (1-x/(x+1));
@@ -216,10 +251,23 @@
 		if (type==0) x_add_denom_adj = Math.pow(x_add_num_adj,exponent_num_adj);
 		else if (type==1) x_add_num_adj = Math.pow(x_add_denom_adj,exponent_denom_adj)*start;
 		else if (type==2) x_add_num_adj = Math.pow(x_add_denom_adj,exponent_denom_adj)*(start-end);
+		else if (type==3) x_add_num_adj = start-x_mul_num_adj;
+		else if (type==4) x_add_num_adj = start-x_mul_num_adj*Math.log(x_add_denom_adj);
 	}
 	
 	public String dispHTMLadj(boolean includeBalise)
 	{
+		if (type==3 || type==4)
+		{
+			String num = "";
+			if(Math.abs(x_add_num_adj) > 0.0001) num += String.format("%.3f+",x_add_num_adj);
+			if(type==3) num +=String.format("%.3f×%.3f<sup>x</sup>",x_mul_num_adj,exponent_num_adj);
+			if(type==4) num +=String.format("%.3f×<i>Log</i>(%.3fx+%.3f)",x_mul_num_adj,exponent_num_adj,x_add_denom_adj);
+			if(includeBalise) return "<html>" + num + "</html>";
+			else return num;
+		}
+		else
+		{
 		String exp1 = "";
 		String exp2 = "";
 		if (Math.abs(exponent_num_adj-1.0) > 0.0001) exp1 = String.format("<sup>%.3f</sup>",exponent_num_adj);
@@ -247,10 +295,22 @@
 	
 		if(includeBalise) return "<html>" + num + denom + plus3 + "</html>";
 		else return num + denom + plus3;
+		}
 	}
 	
 	public String dispHTML(boolean includeBalise)
 	{
+		if (type==3 || type==4)
+		{
+			String num = "";
+			if(Math.abs(x_add_num) > 0.0001) num += String.format("%.3f+",x_add_num);
+			if(type==3) num +=String.format("%.3f×%.3f<sup>x</sup>",x_mul_num,exponent_num);
+			if(type==4) num +=String.format("%.3f×<i>Log</i>(%.3fx+%.3f)",x_mul_num,exponent_num,x_add_denom);
+			if(includeBalise) return "<html>" + num + "</html>";
+			else return num;
+		}
+		else
+		{
 		String exp1 = "";
 		String exp2 = "";
 		if (Math.abs(exponent_num-1.0) > 0.0001) exp1 = String.format("<sup>%.3f</sup>",exponent_num);
@@ -278,6 +338,7 @@
 		
 		if(includeBalise) return "<html>" + num + denom + plus3 + "</html>";
 		else return num + denom + plus3;
+		}
 	}
 	
 }

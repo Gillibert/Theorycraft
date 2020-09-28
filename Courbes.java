@@ -1349,7 +1349,19 @@ public class Courbes extends javax.swing.JDialog  {
 			{
 				tx = ((double)x/(double)(sizar-1))*max_pt;
 				curve_to_draw.arr_x[x] = tx;
-				curve_to_draw.arr_y[x] = Joueur.universe.cosmologie(tx);
+				curve_to_draw.arr_y[x] = Joueur.universe.cosmologie_additive(tx);
+			}
+			}
+		break;
+		case 71:
+			{
+			curve_to_draw.title = Local.COSMIC_POINTS_MULTIPLIER;
+			
+			for (int x = 0; x< sizar; x++)
+			{
+				tx = ((double)x/(double)(sizar-1))*max_pt;
+				curve_to_draw.arr_x[x] = tx;
+				curve_to_draw.arr_y[x] = Joueur.universe.cosmologie_multiplicative(tx);
 			}
 			}
 		break;
